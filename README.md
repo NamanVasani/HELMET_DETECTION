@@ -4,7 +4,7 @@ A Python webcam demo that uses a trained YOLOv8 model to find helmets, people wi
 
 ## Run the webcam demo
 
-The trained checkpoint is included at `runs/detect/helmet_v3/weights/best.pt`. From the project folder, create an environment, install the packages, and start the app:
+The trained checkpoint is included at `best.pt` in the project root. From the project folder, create an environment, install the packages, and start the app:
 
 ```bash
 python3 -m venv .venv
@@ -30,7 +30,6 @@ Roboflow download scripts read their credential from the `ROBOFLOW_API_KEY` envi
 - `train.py` — trains from an already prepared merged dataset.
 - `download_dataset.py` — downloads one Roboflow dataset.
 - `download_merge_retrain.py` — downloads and merges datasets, then trains a model.
-- `HELMET_Project_Guide.md` — project explanation and interview preparation.
 - `requirements.txt` — Python package dependencies.
 
 ## Limitations
