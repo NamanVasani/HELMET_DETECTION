@@ -1,3 +1,4 @@
+
 import platform
 import sys
 import time
@@ -6,7 +7,7 @@ from pathlib import Path
 import cv2
 from ultralytics import YOLO
 
-MODEL_PATH = Path(__file__).resolve().parent / "runs/detect/helmet_v3/weights/best.pt"
+MODEL_PATH = Path(__file__).resolve().parent / "best.pt"
 WEBCAM_INDEX = 0
 WINDOW_NAME = "Helmet Detection"
 
