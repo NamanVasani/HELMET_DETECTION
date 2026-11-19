@@ -7,8 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: System libraries for OpenCV
@@ -21,7 +21,7 @@ jobs:
         run: ruff check .
       - name: Python tests
         run: python -B -m unittest test_adaptive_zoom test_capture_state test_evaluation test_service test_event_store test_dashboard test_server_features test_manage test_alerts_cameras
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
       - name: Browser tests
