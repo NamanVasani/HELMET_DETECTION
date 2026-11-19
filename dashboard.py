@@ -117,6 +117,7 @@ class DashboardServer:
         self.cleanup_after = time.monotonic() + 3600
         self.version = code_version()
         self.login_failures = {}
+        self.setup_lock = threading.Lock()
         self.stopping = threading.Event()
 
         self.socket = socket.socket(socket.AF_INET6 if ":" in host else socket.AF_INET, socket.SOCK_STREAM)
@@ -346,7 +347,10 @@ class DashboardServer:
             if not _is_loopback(request.client.host if request.client else ""):
                 raise HTTPException(403, "Create the first admin from the computer running Helmet")
             data = await read_json(request)
-            user = auth.create_user(owner.storage, data.get("username"), data.get("password"), "admin")
+            with owner.setup_lock:
+                if auth.user_count(owner.storage):
+                    raise HTTPException(409, "Setup is already complete")
+                user = auth.create_user(owner.storage, data.get("username"), data.get("password"), "admin")
             audit(user, "setup_admin", user["username"])
             return login_response(user, request)
 

@@ -1,3 +1,4 @@
+from collections import deque
 import time
 import traceback
 import os
@@ -335,7 +336,7 @@ class SourcePipeline:
         self.thresholds = thresholds
         self.zoom_threshold = zoom_threshold
         self.frames = 0
-        self.started = time.monotonic()
+        self.recent = deque(maxlen=30)
         self.fps = 0.0
         self.events = 0
         self.reset()
@@ -409,9 +410,9 @@ class SourcePipeline:
         if ok:
             dashboard.update_frame(encoded.tobytes(), source=self.key)
         self.frames += 1
-        elapsed = time.monotonic() - self.started
-        if elapsed >= 2:
-            self.fps = self.frames / elapsed
+        self.recent.append(time.monotonic())
+        if len(self.recent) >= 2 and self.recent[-1] > self.recent[0]:
+            self.fps = (len(self.recent) - 1) / (self.recent[-1] - self.recent[0])
         dashboard.update_metrics(self.key, {"fps": round(self.fps, 2), "frames": self.frames, "events": self.events})
         return saved
 
