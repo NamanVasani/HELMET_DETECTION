@@ -10,7 +10,7 @@ import numpy as np
 import yaml
 from ultralytics import YOLO
 
-from hi import EXPECTED_CLASSES, MODEL_PATH, INFERENCE_SIZE
+from app import EXPECTED_CLASSES, MODEL_PATH, INFERENCE_SIZE
 
 
 def sha256(path):

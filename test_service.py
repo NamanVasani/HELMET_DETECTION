@@ -13,6 +13,7 @@ class ServiceTests(unittest.TestCase):
         self.assertTrue(config["RunAtLoad"])
         self.assertEqual(config["Umask"], 0o077)
         self.assertEqual(config["ProgramArguments"][0], str(runtime / ".venv/bin/python"))
+        self.assertEqual(config["ProgramArguments"][-1], str(runtime / "app.py"))
         self.assertNotIn("Desktop", str(config))
         self.assertEqual(config["EnvironmentVariables"]["HELMET_STORAGE"], str(runtime / "storage"))
 

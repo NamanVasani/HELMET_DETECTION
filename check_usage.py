@@ -13,7 +13,7 @@ import numpy as np
 
 from dashboard import DashboardServer
 from event_store import list_events
-from hi import run_detector
+from app import run_detector
 
 
 def main():

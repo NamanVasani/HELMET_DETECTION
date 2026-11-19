@@ -26,7 +26,7 @@ It runs on one machine (a Mac, a Linux server or an edge box). All footage, evid
 uv venv --python 3.12 .venv            # or: python3.12 -m venv .venv
 VIRTUAL_ENV=.venv uv pip install -r requirements-lock.txt
 brew install tesseract                     # optional, for number-plate text
-.venv/bin/python hi.py
+.venv/bin/python app.py
 ```
 
 Open **http://127.0.0.1:8003**. On the first visit you create the admin account (only possible from the same computer).
@@ -199,7 +199,7 @@ CI runs the same lint and tests on every push (`.github/workflows/ci.yml`).
 
 | File | Purpose |
 |---|---|
-| `hi.py` | detector: per-source pipelines, capture confirmation, zoom, video/CCTV/browser loop |
+| `app.py` | detector: per-source pipelines, capture confirmation, zoom, video/CCTV/browser loop |
 | `dashboard.py` | FastAPI server: auth, review/export/report APIs, live preview, cameras, alerts, users, audit |
 | `event_store.py` | SQLite index + evidence folders, retention, export, privacy redaction, plate normalisation |
 | `auth.py`, `alerts.py`, `cameras.py`, `reports_pdf.py` | accounts, notifications, RTSP readers, PDF reports |

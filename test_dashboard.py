@@ -42,7 +42,7 @@ class DashboardTests(unittest.TestCase):
                 server.close()
 
     def test_full_frame_people_confirm_together_with_video_provenance(self):
-        import hi
+        import app
         from event_store import list_events
         with tempfile.TemporaryDirectory() as temp:
             video = Path(temp) / "clip.mp4"
@@ -56,18 +56,18 @@ class DashboardTests(unittest.TestCase):
             capture.read.side_effect = [(True, frame)] * 3 + [(False, None)]
             capture.get.side_effect = lambda prop: {cv2.CAP_PROP_POS_FRAMES: 3, cv2.CAP_PROP_FPS: 10,
                                                    cv2.CAP_PROP_FRAME_COUNT: 3}.get(prop, 0)
-            model = Mock(names=dict(enumerate(hi.EXPECTED_CLASSES)), predictor=None)
+            model = Mock(names=dict(enumerate(app.EXPECTED_CLASSES)), predictor=None)
             model.track.return_value = [None]
             heads = [{"class_name": "helmet", "confidence": 0.95, "track_id": i,
                       "box": [x, 20, x + 20, 40], "zoomed": False} for i, x in enumerate((20, 100))]
-            with patch.object(hi, "YOLO", return_value=model), \
-                 patch.object(hi, "load_thresholds", return_value={"helmet": 0.8, "no-helmet": 0.8}), \
-                 patch.object(hi.cv2.FaceDetectorYN, "create"), \
-                 patch.object(hi.cv2, "VideoCapture", return_value=capture), \
-                 patch.object(hi, "detect_faces", return_value=[]), \
-                 patch.object(hi, "read_detections", side_effect=lambda *args, **kwargs: [dict(head) for head in heads]), \
+            with patch.object(app, "YOLO", return_value=model), \
+                 patch.object(app, "load_thresholds", return_value={"helmet": 0.8, "no-helmet": 0.8}), \
+                 patch.object(app.cv2.FaceDetectorYN, "create"), \
+                 patch.object(app.cv2, "VideoCapture", return_value=capture), \
+                 patch.object(app, "detect_faces", return_value=[]), \
+                 patch.object(app, "read_detections", side_effect=lambda *args, **kwargs: [dict(head) for head in heads]), \
                  self.assertRaises(KeyboardInterrupt):
-                hi.run_detector(server)
+                app.run_detector(server)
             model.predict.assert_not_called()
             events = list_events(date.today().isoformat(), server.storage)
             self.assertEqual(len(events), 2)
@@ -79,7 +79,7 @@ class DashboardTests(unittest.TestCase):
             server.close()
 
     def test_opened_video_with_no_readable_frames_reports_failure_and_is_deleted(self):
-        import hi
+        import app
         with tempfile.TemporaryDirectory() as temp:
             video = Path(temp) / "empty.mp4"
             video.write_bytes(b"empty")
@@ -90,20 +90,20 @@ class DashboardTests(unittest.TestCase):
             capture.isOpened.return_value = True
             capture.read.return_value = (False, None)
             capture.get.return_value = 0
-            model = SimpleNamespace(names=dict(enumerate(hi.EXPECTED_CLASSES)), predictor=None)
-            with patch.object(hi, "YOLO", return_value=model), \
-                 patch.object(hi, "load_thresholds", return_value={"helmet": 0.8, "no-helmet": 0.8}), \
-                 patch.object(hi.cv2.FaceDetectorYN, "create"), \
-                 patch.object(hi.cv2, "VideoCapture", return_value=capture), \
+            model = SimpleNamespace(names=dict(enumerate(app.EXPECTED_CLASSES)), predictor=None)
+            with patch.object(app, "YOLO", return_value=model), \
+                 patch.object(app, "load_thresholds", return_value={"helmet": 0.8, "no-helmet": 0.8}), \
+                 patch.object(app.cv2.FaceDetectorYN, "create"), \
+                 patch.object(app.cv2, "VideoCapture", return_value=capture), \
                  self.assertRaises(KeyboardInterrupt):
-                hi.run_detector(server)
+                app.run_detector(server)
             self.assertEqual(server.video["state"], "failed")
             self.assertIn("no decodable frames", server.video["error"])
             self.assertFalse(video.exists())
             server.close()
 
     def test_detector_failure_keeps_event_review_available(self):
-        import hi
+        import app
         with tempfile.TemporaryDirectory() as temp:
             server = DashboardServer(port=0, storage=Path(temp), require_auth=False)
 
@@ -118,22 +118,22 @@ class DashboardTests(unittest.TestCase):
                     self.assertEqual(response.status, 200)
                 raise KeyboardInterrupt
 
-            with patch.object(hi, "DashboardServer", return_value=server), \
-                 patch.object(hi, "clean_expired_events"), \
-                 patch.object(hi, "YOLO", side_effect=RuntimeError("model failed")), \
-                 patch.object(hi.traceback, "print_exc"), \
+            with patch.object(app, "DashboardServer", return_value=server), \
+                 patch.object(app, "clean_expired_events"), \
+                 patch.object(app, "YOLO", side_effect=RuntimeError("model failed")), \
+                 patch.object(app.traceback, "print_exc"), \
                  patch.object(server.restart_detector, "wait", side_effect=check_review):
-                hi.main()
+                app.main()
 
     def test_failed_detector_is_retried_without_rebinding_dashboard(self):
-        import hi
+        import app
         with tempfile.TemporaryDirectory() as temp:
             server = DashboardServer(port=0, storage=Path(temp), require_auth=False)
-            with patch.object(hi, "DashboardServer", return_value=server), \
-                 patch.object(hi, "run_detector", side_effect=[RuntimeError("transient"), KeyboardInterrupt]) as detector, \
+            with patch.object(app, "DashboardServer", return_value=server), \
+                 patch.object(app, "run_detector", side_effect=[RuntimeError("transient"), KeyboardInterrupt]) as detector, \
                  patch.object(server.restart_detector, "wait", return_value=False), \
-                 patch.object(hi.traceback, "print_exc"):
-                hi.main()
+                 patch.object(app.traceback, "print_exc"):
+                app.main()
             self.assertEqual(detector.call_count, 2)
             self.assertTrue(server.detector_managed)
 

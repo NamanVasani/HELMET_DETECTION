@@ -8,7 +8,7 @@ import unittest
 import numpy as np
 
 from evaluate_model import split_audit, thresholds_from_validation
-from hi import load_thresholds
+from app import load_thresholds
 
 
 class EvaluationTests(unittest.TestCase):

@@ -32,7 +32,7 @@ DEFAULT_PORT = 8003
 SESSION_COOKIE = "helmet_session"
 MAX_VIDEO_BYTES = 250 * 1024 * 1024
 VIDEO_SUFFIXES = {".mp4", ".mov", ".avi", ".mkv", ".m4v"}
-CODE_FILES = ("hi.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py",
+CODE_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py",
               "static/index.html", "static/app.js", "static/app.css")
 CSP = ("default-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; style-src 'self'; "
        "script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
@@ -553,7 +553,7 @@ class DashboardServer:
         def restart(request: Request):
             user = require(request, "camera")
             if not owner.detector_managed:
-                raise HTTPException(503, "Run hi.py to manage the detector")
+                raise HTTPException(503, "Run app.py to manage the detector")
             owner.restart_detector.set()
             audit(user, "detector_restart")
             return JSONResponse({"restarting": True}, status_code=202)
@@ -577,7 +577,7 @@ class DashboardServer:
         async def video(request: Request):
             user = require(request, "video")
             if not owner.accept_video:
-                raise HTTPException(503, "Video analysis needs the detector (run hi.py)")
+                raise HTTPException(503, "Video analysis needs the detector (run app.py)")
             with owner.frame_lock:
                 busy = owner.video["state"] in {"uploading", "queued", "processing"}
                 if not busy:

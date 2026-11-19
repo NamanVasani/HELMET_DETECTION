@@ -175,7 +175,7 @@ class CameraTests(unittest.TestCase):
 
 class MultiSourceDetectorTests(unittest.TestCase):
     def test_cctv_frames_get_their_own_pipeline_and_camera_source(self):
-        import hi
+        import app
         from dashboard import DashboardServer
         from event_store import list_events
         with tempfile.TemporaryDirectory() as temp:
@@ -190,20 +190,20 @@ class MultiSourceDetectorTests(unittest.TestCase):
             models = []
 
             def make_model(*_args):
-                model = Mock(names=dict(enumerate(hi.EXPECTED_CLASSES)), predictor=None)
+                model = Mock(names=dict(enumerate(app.EXPECTED_CLASSES)), predictor=None)
                 model.track.return_value = [None]
                 models.append(model)
                 return model
 
             head = {"class_name": "no-helmet", "confidence": 0.95, "track_id": 4, "box": [20, 20, 40, 40], "zoomed": False}
             alerts_mock = Mock()
-            with patch.object(hi, "YOLO", side_effect=make_model), \
-                 patch.object(hi, "load_thresholds", return_value={"helmet": 0.8, "no-helmet": 0.8}), \
-                 patch.object(hi.cv2.FaceDetectorYN, "create"), \
-                 patch.object(hi, "detect_faces", return_value=[]), \
-                 patch.object(hi, "read_detections", side_effect=lambda *a, **k: [dict(head)]), \
+            with patch.object(app, "YOLO", side_effect=make_model), \
+                 patch.object(app, "load_thresholds", return_value={"helmet": 0.8, "no-helmet": 0.8}), \
+                 patch.object(app.cv2.FaceDetectorYN, "create"), \
+                 patch.object(app, "detect_faces", return_value=[]), \
+                 patch.object(app, "read_detections", side_effect=lambda *a, **k: [dict(head)]), \
                  self.assertRaises(KeyboardInterrupt):
-                hi.run_detector(server, manager, alerts_mock)
+                app.run_detector(server, manager, alerts_mock)
             events = list_events(date.today().isoformat(), Path(temp))
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0]["source"], {"type": "rtsp", "camera": "Gate 1", "camera_id": "cam1", "site": "Plant A"})

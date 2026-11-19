@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from hi import (adaptive_zoom, belongs_to_focus, event_track_keys, focus_target, should_save_detection,
+from app import (adaptive_zoom, belongs_to_focus, event_track_keys, focus_target, should_save_detection,
                 face_targets, read_detections, should_save_event, target_key,
                 visible_detections, zoom_region)
 
@@ -49,7 +49,7 @@ class AdaptiveZoomTests(unittest.TestCase):
     def test_focus_scan_limits_candidates_to_three(self):
         riders = [{"class_name": "rider", "track_id": i, "box": [i * 50, 50, i * 50 + 30, 100]}
                   for i in range(5)]
-        from hi import zoom_targets
+        from app import zoom_targets
         self.assertEqual(len(zoom_targets(riders)), 3)
 
     def test_focus_reaches_people_after_the_first_three_are_captured(self):
@@ -58,7 +58,7 @@ class AdaptiveZoomTests(unittest.TestCase):
         self.assertIs(focus_target(riders, riders[:3]), riders[3])
 
     def test_overlapping_different_rider_tracks_are_not_the_same_person(self):
-        from hi import same_focus
+        from app import same_focus
         first = {"class_name": "rider", "track_id": 1, "box": [100, 40, 200, 260]}
         other = dict(first, track_id=2)
         self.assertFalse(same_focus(first, other))
@@ -73,7 +73,7 @@ class AdaptiveZoomTests(unittest.TestCase):
         first = {"class_name": "face", "box": [100, 80, 180, 170]}
         jittered = {"class_name": "face", "box": [110, 85, 190, 175]}
         second = {"class_name": "face", "box": [360, 80, 440, 170]}
-        from hi import same_focus
+        from app import same_focus
         self.assertTrue(same_focus(first, jittered))
         self.assertIs(focus_target([jittered, second], [first]), second)
         self.assertIsNone(focus_target([jittered], [first]))
@@ -86,7 +86,7 @@ class AdaptiveZoomTests(unittest.TestCase):
             def detect(self, frame):
                 return 1, np.array([[12, 24, 80, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.93]])
 
-        from hi import detect_faces
+        from app import detect_faces
         frame = np.zeros((120, 160, 3), dtype=np.uint8)
         face = detect_faces(frame, Detector())[0]
         self.assertEqual(face["box"], [12, 24, 92, 114])

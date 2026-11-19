@@ -16,8 +16,8 @@ import time
 from urllib.request import urlopen
 
 LABEL = "com.helmet.dashboard"
-ENTRY = "hi.py"
-RUNTIME_FILES = ("hi.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py",
+ENTRY = "app.py"
+RUNTIME_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py",
                  "manage.py", "model-manifest.json")
 
 
@@ -42,6 +42,7 @@ def prepare_runtime(project, runtime):
     for name in RUNTIME_FILES:
         shutil.copy2(project / name, runtime / name)
     shutil.copytree(project / "static", runtime / "static", dirs_exist_ok=True)
+    (runtime / "hi.py").unlink(missing_ok=True)  # detector entry was renamed to app.py
     if (project / "thresholds.json").is_file():
         shutil.copy2(project / "thresholds.json", runtime / "thresholds.json")
     shutil.copy2(model, runtime / "best.pt")

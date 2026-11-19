@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch==2.8.0 torchvision==0.23.0 \
  && pip install --no-cache-dir -r requirements.txt
 
-COPY hi.py dashboard.py event_store.py auth.py alerts.py cameras.py reports_pdf.py manage.py \
+COPY app.py dashboard.py event_store.py auth.py alerts.py cameras.py reports_pdf.py manage.py \
      model-manifest.json thresholds.json best.pt ./
 COPY static ./static
 COPY models ./models
@@ -28,4 +28,4 @@ VOLUME ["/data"]
 EXPOSE 8003
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s \
   CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8003/healthz', timeout=3)"
-CMD ["python", "-u", "hi.py"]
+CMD ["python", "-u", "app.py"]

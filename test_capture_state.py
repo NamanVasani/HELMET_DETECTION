@@ -1,6 +1,6 @@
 import unittest
 
-from hi import CaptureState, EventConfirmation, zoom_targets
+from app import CaptureState, EventConfirmation, zoom_targets
 
 
 def face(x=100, track_id=None):

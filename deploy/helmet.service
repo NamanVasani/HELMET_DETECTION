@@ -13,7 +13,7 @@ Environment=HELMET_STORAGE=/var/lib/helmet
 Environment=HELMET_HOST=0.0.0.0
 Environment=HELMET_AUTH=1
 # Environment=HELMET_ALLOWED_HOSTS=helmet.local,192.168.1.50
-ExecStart=/opt/helmet/.venv/bin/python -u hi.py
+ExecStart=/opt/helmet/.venv/bin/python -u app.py
 Restart=always
 RestartSec=5
 UMask=0077

@@ -547,7 +547,7 @@ async function refreshStatus() {
     if (state.cameraStream && !data.camera_enabled) stopCamera(data.status);
     else if (state.cameraStream) setText('#camera-status', data.status);
     else if (!state.startingCamera && !/denied|No camera|could not start/i.test($('#camera-status').textContent)) {
-      setText('#camera-status', data.camera_enabled ? 'Detector ready. Press Start camera to begin.' : 'Saved-event review only. Run the detector (hi.py) for live detection.');
+      setText('#camera-status', data.camera_enabled ? 'Detector ready. Press Start camera to begin.' : 'Saved-event review only. Run the detector (app.py) for live detection.');
     }
     syncStreams();
   } catch {
