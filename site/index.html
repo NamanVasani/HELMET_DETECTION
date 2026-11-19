@@ -39,6 +39,7 @@ h2{font-size:28px;margin:0 0 10px;letter-spacing:-.01em}
 .steps{counter-reset:s;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .steps .card{counter-increment:s}.steps .card::before{content:counter(s);display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:700;margin-bottom:8px}
 .honest li{margin-bottom:6px}
+.demo{width:100%;border-radius:14px;border:1px solid var(--line);background:#05070d}
 .contact{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px;display:flex;justify-content:space-between;gap:20px;align-items:center;flex-wrap:wrap}
 footer{padding:28px 0 40px;color:var(--muted);font-size:14px}
 @media (max-width:860px){.hero,.grid,.steps{grid-template-columns:1fr}.hero{padding-top:24px}}
@@ -88,6 +89,13 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:14px}
     <div class="card"><h3>Review</h3><p>Your team confirms or rejects each case with the person, plate and context images side by side.</p></div>
     <div class="card"><h3>Improve</h3><p>Reviewed cases become training data, so the model learns your cameras and lighting.</p></div>
   </div>
+</section>
+
+<section id="demo">
+  <h2>See it in use</h2>
+  <p class="sub">A two-minute walkthrough: real detections from a recorded clip, review with keyboard shortcuts, bulk
+    confirmation, analytics and adding a CCTV camera.</p>
+  <video class="demo" controls preload="metadata" src="media/helmet-demo.webm"></video>
 </section>
 
 <section>

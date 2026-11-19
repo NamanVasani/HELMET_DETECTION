@@ -33,3 +33,6 @@ __pycache__/
 
 # JavaScript test dependencies
 /node_modules/
+
+# Demo recordings contain dataset footage of real people; publish only after checking dataset licences
+/site/media/
