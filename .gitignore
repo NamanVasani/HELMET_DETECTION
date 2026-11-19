@@ -20,8 +20,8 @@ __pycache__/
 /yolov8*.pt
 /.venv-py39/
 
-# Trained checkpoint (6 MB, private; provision with `python manage.py prepare-model`)
-/best.pt
+# Personal interview notes (kept local)
+/HELMET_Project_Guide.md
 
 # Rollback copy of private event data
 /storage.before-login-service/

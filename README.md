@@ -25,7 +25,6 @@ It runs on one machine (a Mac, a Linux server or an edge box). All footage, evid
 ```bash
 uv venv --python 3.12 .venv            # or: python3.12 -m venv .venv
 VIRTUAL_ENV=.venv uv pip install -r requirements-lock.txt
-.venv/bin/python manage.py prepare-model   # copies the trusted checkpoint to best.pt and checks its hash
 brew install tesseract                     # optional, for number-plate text
 .venv/bin/python hi.py
 ```
@@ -131,7 +130,6 @@ read the Desktop), verifies imports in a staging copy, swaps it in, and replaces
 ### Docker (Linux amd64/arm64)
 
 ```bash
-.venv/bin/python manage.py prepare-model          # the image needs best.pt
 echo "HELMET_ADMIN_PASSWORD=choose-a-long-password" > .env
 docker compose up -d --build
 ```
@@ -161,8 +159,9 @@ python manage.py prepare-model
 
 ## Model, accuracy and limits
 
-- Five classes: helmet, no-helmet, number-plate, rider, bike. Checkpoint: `runs/detect/helmet_v3/weights/best.pt`
-  (YOLOv8n, 640 training size) — `model-manifest.json` records its SHA-256. No public download is provided.
+- Five classes: helmet, no-helmet, number-plate, rider, bike. The checkpoint `best.pt` (YOLOv8n, 640 training size) is
+  in the repository; `model-manifest.json` records its SHA-256 and `python manage.py prepare-model --source PATH`
+  verifies a replacement before installing it.
 - On the de-duplicated test split (280 images after excluding 446 overlapping files): **mAP50 0.745,
   mAP50–95 0.444**. At the frozen validation thresholds helmet precision is 0.94 / recall 0.62 and no-helmet precision
   0.82 / recall 0.77. Rider (recall 0.42) and bike (recall 0.46) are the weak classes, which is why many events have no

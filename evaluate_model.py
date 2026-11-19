@@ -51,7 +51,8 @@ def split_audit(dataset):
             names.setdefault(source_name, (split, path.name))
     return {"images": counts, "eligible_images": {split: len(paths) for split, paths in eligible.items()},
             "excluded_overlaps": overlaps,
-            "limit": "Byte hashes and source names cannot exclude all augmented duplicates or prove scene independence."}, eligible
+            "limit": ("Byte hashes and source names cannot exclude all augmented duplicates "
+                      "or prove scene independence.")}, eligible
 
 
 def main():

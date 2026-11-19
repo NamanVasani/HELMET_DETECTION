@@ -1,5 +1,5 @@
 # Helmet detector + dashboard for Linux servers and edge boxes (amd64 / arm64, CPU inference).
-# Build:  docker build -t helmet .        (needs best.pt in this folder: python manage.py prepare-model)
+# Build:  docker build -t helmet .        (uses the committed best.pt)
 # Run:    docker compose up -d            (see docker-compose.yml)
 FROM python:3.12-slim
 
