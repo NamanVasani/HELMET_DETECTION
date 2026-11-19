@@ -292,7 +292,7 @@ async function testQuickReview() {
   await settle();
   assert.match(document.querySelector('#events').textContent, /All done/);
   document.querySelector('#quick-toggle').click();
-  assert.equal(document.querySelector('#quick-toggle').textContent, 'Quick review');
+  assert.match(document.querySelector('#quick-toggle').textContent, /^Quick review$/);
 }
 
 (async () => {

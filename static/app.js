@@ -102,6 +102,14 @@ async function logout() {
 function selectTab(tab) {
   if (tab === 'settings' && !can('admin')) tab = 'review';
   state.tab = tab;
+  const titles = {
+    review: ['Review', 'Check detections and decide what is real.'],
+    live: ['Live', 'Browser camera, CCTV streams and video analysis.'],
+    analytics: ['Analytics', 'Trends, false-positive rate and repeat plates.'],
+    settings: ['Settings', 'Cameras, alerts, users, privacy and audit log.'],
+  };
+  setText('#page-title', titles[tab][0]);
+  setText('#page-sub', titles[tab][1]);
   $$('.tabs [role="tab"]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.tab === tab)));
   $$('.tab').forEach(panel => { panel.hidden = panel.id !== `tab-${tab}`; });
   syncStreams();
@@ -164,10 +172,11 @@ async function loadStats() {
 
 function renderTotals(target, totals) {
   const rate = totals.false_positive_rate == null ? '–' : Math.round(totals.false_positive_rate * 100) + '%';
-  const tiles = [['Events', totals.events], ['No helmet', totals.no_helmet], ['Helmet', totals.helmet],
-    ['Needs review', totals.needs_review], ['Confirmed', totals.confirmed], ['False positive', totals.false_positive],
-    ['False-positive rate', rate]];
-  target.innerHTML = tiles.map(([label, value]) => `<div class="stat"><small>${esc(label)}</small><b>${esc(value)}</b></div>`).join('');
+  const tiles = [['Events', totals.events, ''], ['No helmet', totals.no_helmet, 'violation'], ['Helmet', totals.helmet, 'helmet'],
+    ['Needs review', totals.needs_review, 'warn'], ['Confirmed', totals.confirmed, 'ok'], ['False positive', totals.false_positive, 'bad'],
+    ['False-positive rate', rate, '']];
+  target.innerHTML = tiles.map(([label, value, tone]) =>
+    `<div class="stat${tone ? ' tone-' + tone : ''}"><small>${esc(label)}</small><b>${esc(value)}</b></div>`).join('');
 }
 
 function fillCameraSelects(cameras) {
@@ -276,7 +285,7 @@ function renderQuick() {
 function setQuick(on) {
   state.quick = on;
   state.quickIndex = 0;
-  $('#quick-toggle').textContent = on ? 'Exit quick review' : 'Quick review';
+  $('#quick-toggle').innerHTML = `<svg class="ic"><use href="#i-bolt"/></svg>${on ? 'Exit quick review' : 'Quick review'}`;
   $('#tab-review').classList.toggle('quick-mode', on);
   $('#events').classList.toggle('quick', on);
   state.signature = '';
@@ -298,7 +307,8 @@ function renderEvents() {
   const container = $('#events');
   if (state.quick) { renderQuick(); return; }
   container.classList.remove('quick');
-  container.innerHTML = state.events.map(cardHtml).join('') || '<p class="muted">No events match these filters.</p>';
+  container.innerHTML = state.events.map(cardHtml).join('')
+    || '<p class="muted">Nothing to review here. Try a wider date range, another status, or <b>All</b> categories.</p>';
   updateSelection();
   if (state.focusEvent) {
     const card = $$('.card', container).find(item => item.dataset.key.endsWith('/' + state.focusEvent));
