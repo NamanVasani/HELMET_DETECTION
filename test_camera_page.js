@@ -120,6 +120,20 @@ async function testReviewRenderingAndFilters() {
   document.querySelector('#events .zoom').click();
   assert.ok(document.querySelector('#lightbox').hasAttribute('open'));
   assert.match(document.querySelector('#lightbox-img').src, /person\.jpg$/);
+  // Zoom viewer: buttons, wheel, limits and reset.
+  const zoomImg = document.querySelector('#lightbox-img');
+  assert.equal(document.querySelector('#zoom-level').textContent, '100%');
+  document.querySelector('#zoom-in').click();
+  assert.equal(document.querySelector('#zoom-level').textContent, '150%');
+  assert.match(zoomImg.style.transform, /scale\(1\.5\)/);
+  const stage = document.querySelector('#lightbox-stage');
+  for (let i = 0; i < 20; i++) stage.dispatchEvent(new page.window.WheelEvent('wheel', {deltaY: -100, bubbles: true, cancelable: true}));
+  assert.equal(document.querySelector('#zoom-level').textContent, '500%', 'zoom is capped at 5x');
+  document.querySelector('#zoom-out').click();
+  assert.equal(document.querySelector('#zoom-level').textContent, '333%');
+  document.querySelector('#zoom-reset').click();
+  assert.equal(document.querySelector('#zoom-level').textContent, '100%');
+  assert.match(zoomImg.style.transform, /translate\(0px, 0px\) scale\(1\)/);
 
   // Review with plate text and failure feedback.
   const card = document.querySelectorAll('#events .card')[1];

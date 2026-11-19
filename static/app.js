@@ -372,11 +372,81 @@ async function bulkAction(action) {
   } catch (error) { flash(`Bulk action failed: ${error.message}`, true); }
 }
 
+const viewer = {scale: 1, x: 0, y: 0, pointers: new Map(), pinch: null, drag: null};
+const MAX_ZOOM = 5;
+
+function applyZoom() {
+  viewer.scale = Math.min(MAX_ZOOM, Math.max(1, viewer.scale));
+  if (viewer.scale === 1) { viewer.x = 0; viewer.y = 0; }
+  const image = $('#lightbox-img');
+  image.style.transform = `translate(${viewer.x}px, ${viewer.y}px) scale(${viewer.scale})`;
+  image.classList.toggle('zoomed', viewer.scale > 1);
+  setText('#zoom-level', `${Math.round(viewer.scale * 100)}%`);
+}
+
+function zoomBy(factor, centerX = 0, centerY = 0) {
+  const old = viewer.scale;
+  viewer.scale = Math.min(MAX_ZOOM, Math.max(1, old * factor));
+  const ratio = viewer.scale / old;
+  // Keep the point under the cursor in place while zooming.
+  viewer.x = centerX - (centerX - viewer.x) * ratio;
+  viewer.y = centerY - (centerY - viewer.y) * ratio;
+  applyZoom();
+}
+
+function resetZoom() { viewer.scale = 1; viewer.x = 0; viewer.y = 0; applyZoom(); }
+
+function stagePoint(event) {
+  const box = $('#lightbox-stage').getBoundingClientRect();
+  return [event.clientX - box.left - box.width / 2, event.clientY - box.top - box.height / 2];
+}
+
+function bindZoomViewer() {
+  const stage = $('#lightbox-stage');
+  $('#zoom-in').addEventListener('click', () => zoomBy(1.5));
+  $('#zoom-out').addEventListener('click', () => zoomBy(1 / 1.5));
+  $('#zoom-reset').addEventListener('click', resetZoom);
+  stage.addEventListener('dblclick', resetZoom);
+  stage.addEventListener('wheel', event => {
+    event.preventDefault();
+    zoomBy(event.deltaY < 0 ? 1.2 : 1 / 1.2, ...stagePoint(event));
+  }, {passive: false});
+  stage.addEventListener('pointerdown', event => {
+    stage.setPointerCapture?.(event.pointerId);
+    viewer.pointers.set(event.pointerId, [event.clientX, event.clientY]);
+    if (viewer.pointers.size === 2) {
+      const [a, b] = [...viewer.pointers.values()];
+      viewer.pinch = {distance: Math.hypot(a[0] - b[0], a[1] - b[1]), scale: viewer.scale};
+    } else viewer.drag = {x: event.clientX - viewer.x, y: event.clientY - viewer.y};
+  });
+  stage.addEventListener('pointermove', event => {
+    if (!viewer.pointers.has(event.pointerId)) return;
+    viewer.pointers.set(event.pointerId, [event.clientX, event.clientY]);
+    if (viewer.pinch && viewer.pointers.size === 2) {
+      const [a, b] = [...viewer.pointers.values()];
+      viewer.scale = viewer.pinch.scale * Math.hypot(a[0] - b[0], a[1] - b[1]) / viewer.pinch.distance;
+      applyZoom();
+    } else if (viewer.drag && viewer.scale > 1) {
+      viewer.x = event.clientX - viewer.drag.x;
+      viewer.y = event.clientY - viewer.drag.y;
+      applyZoom();
+    }
+  });
+  const release = event => {
+    viewer.pointers.delete(event.pointerId);
+    if (viewer.pointers.size < 2) viewer.pinch = null;
+    if (!viewer.pointers.size) viewer.drag = null;
+  };
+  stage.addEventListener('pointerup', release);
+  stage.addEventListener('pointercancel', release);
+}
+
 function openLightbox(src, caption) {
   const dialog = $('#lightbox');
   $('#lightbox-img').src = src;
   $('#lightbox-img').alt = caption;
   setText('#lightbox-caption', caption);
+  resetZoom();
   if (dialog.showModal) dialog.showModal(); else dialog.setAttribute('open', '');
 }
 
@@ -911,6 +981,7 @@ function bindOnce() {
   $$('#bulkbar [data-bulk]').forEach(button => button.addEventListener('click', () => bulkAction(button.dataset.bulk)));
   $('#load-more').addEventListener('click', () => loadEvents({append: true}));
   $('#quick-toggle').addEventListener('click', () => setQuick(!state.quick));
+  bindZoomViewer();
   $('#events').addEventListener('click', event => {
     const act = event.target.closest('.quick-act');
     if (act) quickDecide(act.dataset.status);

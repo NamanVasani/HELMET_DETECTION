@@ -283,6 +283,28 @@ class ZoneTests(unittest.TestCase):
             self.assertEqual(len(list_events(date.today().isoformat(), Path(temp))), 1)
 
 
+class TooCloseTests(unittest.TestCase):
+    def test_close_up_heads_are_not_judged_but_normal_distance_is(self):
+        import app
+        from event_store import list_events
+        frame = np.zeros((720, 1280, 3), dtype=np.uint8)
+        for height, expected in ((500, 0), (150, 1)):
+            head = {"class_name": "helmet", "confidence": 0.95, "track_id": 1,
+                    "box": [500, 100, 500 + height, 100 + height], "zoomed": False}
+            with self.subTest(head_height=height), tempfile.TemporaryDirectory() as temp:
+                model = Mock(names=dict(enumerate(app.EXPECTED_CLASSES)), predictor=None)
+                model.track.return_value = [None]
+                dashboard = Mock(storage=Path(temp), url="http://test")
+                pipeline = app.SourcePipeline("browser", model, Mock(), {"helmet": 0.8, "no-helmet": 0.8})
+                with patch.object(app, "detect_faces", return_value=[]), \
+                     patch.object(app, "zoom_region", side_effect=lambda f, d, t: (f, None)), \
+                     patch.object(app, "read_detections", side_effect=lambda *a, h=head, **k: [dict(h)]):
+                    for _ in range(4):
+                        pipeline.process(frame, {"type": "camera"}, dashboard)
+                self.assertEqual(len(list_events(date.today().isoformat(), Path(temp))), expected)
+        self.assertFalse(app.too_close({"box": [0, 0, 10, 500], "zoomed": True}, 720), "zoomed crops are exempt")
+
+
 class CameraHealthTests(unittest.TestCase):
     def test_offline_reported_once_after_grace_and_recovery_reported(self):
         monitor = cameras.CameraHealthMonitor(grace_seconds=60)

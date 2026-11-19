@@ -249,6 +249,7 @@ CI runs the same lint and tests on every push (`.github/workflows/ci.yml`).
 | `HELMET_KEEP_CONFIRMED` | `1` | keep confirmed events past retention |
 | `HELMET_PRIVACY` | `1` | blur faces / drop plates for helmet-compliant riders |
 | `HELMET_FACE_EVERY` | `2` | run the face locator every Nth frame (busy scene 3.8 → 4.8 fps, same saved events) |
+| `HELMET_MAX_HEAD_FRACTION` | `0.45` | heads taller than this share of the frame are "too close to judge" (close-up webcam hair was read as a helmet); `0` disables |
 | `HELMET_DEVICE` | — | inference device, e.g. `mps`; off by default (mixed speed results, and one MPS run hung) |
 | `HELMET_BACKUP` | `1` | nightly backups on/off |
 | `HELMET_BACKUP_DIR` / `HELMET_BACKUP_TIME` / `HELMET_BACKUP_KEEP` | `../backups`, `02:00`, `7` | where, when and how many |

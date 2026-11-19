@@ -38,6 +38,16 @@ FOCUS_FRAME_LIMIT = 8
 CAPTURE_COOLDOWN = 30
 # Run the face locator on every Nth processed frame (1 = every frame).
 FACE_EVERY = max(1, int(os.environ.get("HELMET_FACE_EVERY", "2")))
+# Heads taller than this share of the frame are too close to judge: the model was trained on riders at road
+# distance and mistakes close-up hair for a helmet. 0 disables the guard.
+MAX_HEAD_FRACTION = float(os.environ.get("HELMET_MAX_HEAD_FRACTION", "0.45"))
+
+
+def too_close(detection, frame_height):
+    """True if a head box fills more of the frame than the model can judge reliably."""
+    if MAX_HEAD_FRACTION <= 0 or detection.get("zoomed"):
+        return False
+    return (detection["box"][3] - detection["box"][1]) > MAX_HEAD_FRACTION * frame_height
 # Optional inference device, e.g. HELMET_DEVICE=mps for the Apple GPU (off by default: an MPS run hung once).
 DEVICE = {"device": os.environ["HELMET_DEVICE"]} if os.environ.get("HELMET_DEVICE") else {}
 EXPECTED_CLASSES = ["helmet", "no-helmet", "number-plate", "rider", "bike"]
@@ -397,7 +407,11 @@ class SourcePipeline:
                                               track_id_override=target.get("track_id") if target else None))
 
         eligible = []
+        close_heads = 0
         for event_detection in (item for item in detections if item["class_name"] in {"helmet", "no-helmet"}):
+            if too_close(event_detection, frame.shape[0]):
+                close_heads += 1
+                continue
             association = associate_objects(event_detection, detections)
             if self._qualifies(event_detection) and (
                 not event_detection.get("zoomed") or belongs_to_focus(association, target, event_detection)
@@ -419,8 +433,13 @@ class SourcePipeline:
                 alerts.notify(event, folder / "person.jpg")
 
         visible = [item for item in detections
-                   if item["class_name"] not in {"helmet", "no-helmet"} or self._qualifies(item)]
+                   if item["class_name"] not in {"helmet", "no-helmet"}
+                   or (self._qualifies(item) and not too_close(item, frame.shape[0]))]
         annotated = draw_detections(frame.copy(), visible)
+        if close_heads:
+            cv2.rectangle(annotated, (0, 0), (frame.shape[1], 34), (20, 20, 20), -1)
+            cv2.putText(annotated, "Too close to judge - move back (about 1.5-2 m)", (10, 23),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 200, 255), 2)
         if zone:
             outline = np.array([[int(x * frame.shape[1]), int(y * frame.shape[0])] for x, y in zone], dtype=np.int32)
             cv2.polylines(annotated, [outline], True, (0, 220, 255), 2)

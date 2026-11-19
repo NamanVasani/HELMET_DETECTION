@@ -278,7 +278,20 @@
 </div>
 </div>
 
-<dialog id="lightbox" aria-label="Image preview"><form method="dialog"><button class="close" aria-label="Close">×</button></form><img id="lightbox-img" alt=""><p id="lightbox-caption" class="muted"></p></dialog>
+<dialog id="lightbox" aria-label="Image preview">
+  <div class="lb-bar">
+    <p id="lightbox-caption" class="muted"></p>
+    <div class="lb-tools">
+      <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
+      <span id="zoom-level">100%</span>
+      <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+      <button type="button" id="zoom-reset">Reset</button>
+      <form method="dialog"><button class="close" aria-label="Close">×</button></form>
+    </div>
+  </div>
+  <div class="lb-stage" id="lightbox-stage"><img id="lightbox-img" alt="" draggable="false"></div>
+  <p class="notice lb-hint">Scroll or pinch to zoom · drag to move · double-click to reset</p>
+</dialog>
 <dialog id="zone-dialog" aria-labelledby="zone-title"><form method="dialog"><button class="close" aria-label="Close">×</button></form>
   <h2 id="zone-title">Draw watch zone</h2>
   <p class="notice">Click around the area to watch (for example the gate lane), at least 3 points. Riders outside it are ignored.</p>
