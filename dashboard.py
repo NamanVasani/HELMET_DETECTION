@@ -24,7 +24,7 @@ import uvicorn
 import auth
 from event_store import (STORAGE, RETENTION_DAYS, KEEP_CONFIRMED, PRIVACY_MODE, bulk_apply, clean_expired_events,
                          delete_event, event_folder, event_stats, repeat_offenders, export_csv, export_zip, list_audit,
-                         query_events, record_audit, update_review)
+                         get_setting, query_events, record_audit, update_review)
 
 PROJECT = Path(__file__).resolve().parent
 STATIC = PROJECT / "static"
@@ -32,7 +32,7 @@ DEFAULT_PORT = 8003
 SESSION_COOKIE = "helmet_session"
 MAX_VIDEO_BYTES = 250 * 1024 * 1024
 VIDEO_SUFFIXES = {".mp4", ".mov", ".avi", ".mkv", ".m4v"}
-CODE_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py",
+CODE_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py", "backup.py",
               "static/index.html", "static/app.js", "static/app.css")
 CSP = ("default-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; style-src 'self'; "
        "script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
@@ -406,6 +406,7 @@ class DashboardServer:
                          "detector_managed": owner.detector_managed, "version": owner.version,
                          "retention_days": RETENTION_DAYS, "keep_confirmed": KEEP_CONFIRMED,
                          "privacy_mode": PRIVACY_MODE,
+                         "backup": get_setting(owner.storage, "backup_last"),
                          "alerts": {"sent": alerts.sent, "last_error": alerts.last_error} if alerts else None})
             return data
 

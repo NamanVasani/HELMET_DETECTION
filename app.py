@@ -580,6 +580,9 @@ def main():
     dashboard.detector_managed = True
     alerts = AlertDispatcher(dashboard.storage)
     DailyReporter(dashboard.storage).start()
+    from backup import BACKUP_ENABLED, BackupScheduler
+    if BACKUP_ENABLED:
+        BackupScheduler(dashboard.storage).start()
     cameras = CameraManager(dashboard.storage)
     dashboard.alerts = alerts
     print(f"Dashboard: {dashboard.url}")

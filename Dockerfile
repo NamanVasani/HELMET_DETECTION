@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch==2.8.0 torchvision==0.23.0 \
  && pip install --no-cache-dir -r requirements.txt
 
-COPY app.py dashboard.py event_store.py auth.py alerts.py cameras.py reports_pdf.py manage.py \
+COPY app.py dashboard.py event_store.py auth.py alerts.py cameras.py reports_pdf.py backup.py manage.py \
      model-manifest.json thresholds.json best.pt ./
 COPY static ./static
 COPY models ./models

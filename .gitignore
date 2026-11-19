@@ -42,3 +42,6 @@ __pycache__/
 /reports/eval-*/evaluation-data.yaml
 /reports/eval-*/val/
 /reports/eval-*/test/
+
+# Local backups contain personal data
+/backups/

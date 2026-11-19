@@ -759,7 +759,8 @@ async function loadSettings() {
   const status = state.status || {};
   $('#privacy-info').innerHTML = `<p>Retention: ${status.retention_days ? esc(status.retention_days) + ' days' : 'events are kept until deleted'}${status.keep_confirmed ? '; confirmed events are kept until you delete them' : ''}.</p>
     <p>Privacy mode: ${status.privacy_mode ? 'on — faces are blurred and plates are not stored for riders wearing a helmet' : 'off'}.</p>
-    <p>Data stays on this server. Use exports to keep records outside the retention window.</p>`;
+    <p>Data stays on this server. Use exports to keep records outside the retention window.</p>
+    <p>Last backup: ${status.backup ? `${esc(status.backup.at.replace('T', ' '))} · ${esc(Math.round(status.backup.bytes / 1024 / 1024 * 10) / 10)} MB · ${status.backup.encrypted ? 'encrypted' : 'not encrypted'} · ${esc(status.backup.folder)}` : 'none yet (runs nightly at 02:00)'}.</p>`;
   const results = await Promise.allSettled(tasks);
   const failed = results.find(result => result.status === 'rejected');
   if (failed) setText('#cameras-msg', failed.reason.message);

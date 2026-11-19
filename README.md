@@ -160,7 +160,19 @@ python manage.py export --start 2026-11-01 --end 2026-11-30 --out november.zip
 python manage.py training-export --out reviewed_dataset        # reviewed events → YOLO dataset (see below)
 python manage.py cleanup                                       # apply retention now
 python manage.py prepare-model
+python manage.py backup                                        # back up database + evidence now
+python manage.py list-backups
+python manage.py restore backups/helmet-backup-….zip --to restored-storage   # never overwrites live data
 ```
+
+### Backups
+
+Every night at 02:00 (or at the next start after a missed night) the service writes
+`helmet-backup-YYYYMMDD-HHMMSS.zip` — a consistent copy of `events.db` plus all evidence — to a `backups` folder
+beside the data (`~/Library/Application Support/Helmet/backups` for the Mac service) and keeps the newest 7.
+Set `HELMET_BACKUP_PASSPHRASE` to encrypt them with AES-256 (`.zip.enc`); keep that passphrase safe, as an encrypted
+backup cannot be restored without it. Copy backups to another disk regularly: a backup on the same disk does not
+survive a disk failure. Settings → Privacy shows the last backup.
 
 ## Model, accuracy and limits
 
@@ -206,7 +218,7 @@ validation only and reports frozen-threshold test results. Never commit API keys
 VIRTUAL_ENV=.venv uv pip install -r requirements-dev.txt && npm install
 .venv/bin/ruff check .
 .venv/bin/python -B -m unittest test_adaptive_zoom test_capture_state test_evaluation test_service test_event_store \
-    test_dashboard test_server_features test_manage test_alerts_cameras
+    test_dashboard test_server_features test_manage test_alerts_cameras test_backup
 node test_camera_page.js          # dashboard in jsdom: login, review, keyboard, bulk, camera, video, roles, chart
 .venv/bin/python check_usage.py   # real-model replay through upload, detection, storage and preview
 ```
@@ -238,3 +250,6 @@ CI runs the same lint and tests on every push (`.github/workflows/ci.yml`).
 | `HELMET_PRIVACY` | `1` | blur faces / drop plates for helmet-compliant riders |
 | `HELMET_FACE_EVERY` | `2` | run the face locator every Nth frame (busy scene 3.8 → 4.8 fps, same saved events) |
 | `HELMET_DEVICE` | — | inference device, e.g. `mps`; off by default (mixed speed results, and one MPS run hung) |
+| `HELMET_BACKUP` | `1` | nightly backups on/off |
+| `HELMET_BACKUP_DIR` / `HELMET_BACKUP_TIME` / `HELMET_BACKUP_KEEP` | `../backups`, `02:00`, `7` | where, when and how many |
+| `HELMET_BACKUP_PASSPHRASE` | — | encrypt backups (AES-256) |

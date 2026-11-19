@@ -132,6 +132,12 @@ def main(argv=None):
     training.add_argument("--start")
     training.add_argument("--end")
     commands.add_parser("cleanup", help="apply the retention policy now")
+    backup_cmd = commands.add_parser("backup", help="back up the database and evidence now")
+    backup_cmd.add_argument("--out", type=Path, help="backup folder (default: HELMET_BACKUP_DIR)")
+    restore_cmd = commands.add_parser("restore", help="unpack a backup into a NEW folder")
+    restore_cmd.add_argument("file", type=Path)
+    restore_cmd.add_argument("--to", type=Path, required=True)
+    commands.add_parser("list-backups")
     args = parser.parse_args(argv)
     root = args.storage
 
@@ -168,6 +174,22 @@ def main(argv=None):
               f"({counts['skipped']} skipped) to {args.out}")
     elif args.command == "cleanup":
         print(f"Removed {clean_expired_events(root)} expired date folder(s)")
+    elif args.command == "backup":
+        import os
+        import backup
+        path = backup.create_backup(root, args.out or backup.BACKUP_DIR,
+                                    os.environ.get("HELMET_BACKUP_PASSPHRASE") or None)
+        record_audit(root, "cli", "backup_created", path.name)
+        print(f"Backup written: {path} ({path.stat().st_size / 1024 / 1024:.1f} MB)")
+    elif args.command == "restore":
+        import backup
+        passphrase = getpass.getpass("Backup passphrase: ") if args.file.name.endswith(".enc") else None
+        target = backup.restore_backup(args.file, args.to, passphrase)
+        print(f"Restored into {target}. Point HELMET_STORAGE there (or copy it) to use it.")
+    elif args.command == "list-backups":
+        import backup
+        for item in backup.list_backups():
+            print(f"{item['name']:40} {item['bytes'] / 1024 / 1024:8.1f} MB {'encrypted' if item['encrypted'] else ''}")
     return 0
 
 
