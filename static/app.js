@@ -240,8 +240,64 @@ function cardHtml(event, index) {
   </article>`;
 }
 
+function quickCardHtml(event, index) {
+  const category = event.category || 'no_helmet';
+  const label = category === 'helmet' ? 'Helmet' : 'No helmet';
+  const detection = event.event_detection || event.helmet || event.no_helmet || {};
+  const base = eventBase(event);
+  const time = new Date(event.timestamp);
+  return `<article class="card quick-card" tabindex="0" data-key="${esc(eventKey(event))}" data-index="${index}">
+    <div class="card-head"><b>${esc(index + 1)} of ${esc(state.events.length)}${state.total > state.events.length ? '+' : ''}</b>
+      <span class="badge ${esc(category)}">${label}</span></div>
+    <p class="notice">${esc(event.date)} ${isNaN(time) ? '' : esc(time.toLocaleTimeString())} · ${sourceText(event)} · score ${esc(Number(detection.confidence).toFixed(2))}</p>
+    <div class="quick-images">
+      <button type="button" class="zoom" data-src="${base}person.jpg" data-caption="${esc(label)} person"><img src="${base}person.jpg" alt="${esc(label)} person crop"></button>
+      <button type="button" class="zoom" data-src="${base}event.jpg" data-caption="Event context"><img src="${base}event.jpg" alt="Event context"></button>
+    </div>
+    ${(event.files || {}).plate ? `<img class="quick-plate" src="${base}plate.jpg" alt="Suggested number plate">` : ''}
+    <label>Plate text <input name="plate-text" maxlength="16" value="${esc(event.plate_text || '')}" autocomplete="off"></label>
+    <div class="quick-actions">
+      <button type="button" class="ok quick-act" data-status="confirmed">✓ Confirm <small>c</small></button>
+      <button type="button" class="bad quick-act" data-status="false_positive">✗ False positive <small>f</small></button>
+      <button type="button" class="quick-skip">Skip → <small>s</small></button>
+    </div>
+  </article>`;
+}
+
+function renderQuick() {
+  const container = $('#events');
+  if (state.quickIndex >= state.events.length) state.quickIndex = Math.max(0, state.events.length - 1);
+  const event = state.events[state.quickIndex];
+  container.classList.add('quick');
+  container.innerHTML = event ? quickCardHtml(event, state.quickIndex)
+    : '<p class="muted quick-done">All done — no events left in this filter.</p>';
+}
+
+function setQuick(on) {
+  state.quick = on;
+  state.quickIndex = 0;
+  $('#quick-toggle').textContent = on ? 'Exit quick review' : 'Quick review';
+  $('#tab-review').classList.toggle('quick-mode', on);
+  $('#events').classList.toggle('quick', on);
+  state.signature = '';
+  renderEvents();
+}
+
+async function quickDecide(status) {
+  const card = $('#events .quick-card');
+  if (!card) return;
+  if (!status) { state.quickIndex += 1; renderQuick(); return; }
+  const before = state.events.length;
+  await reviewEvent(card, status);
+  // If the reviewed event is still listed (e.g. status filter "any"), move on to the next one.
+  if (state.events.length >= before) state.quickIndex += 1;
+  renderQuick();
+}
+
 function renderEvents() {
   const container = $('#events');
+  if (state.quick) { renderQuick(); return; }
+  container.classList.remove('quick');
   container.innerHTML = state.events.map(cardHtml).join('') || '<p class="muted">No events match these filters.</p>';
   updateSelection();
   if (state.focusEvent) {
@@ -337,6 +393,12 @@ function onKey(event) {
   if (typing || event.metaKey || event.ctrlKey || event.altKey || $('#app').hidden) return;
   if (event.key === '?') { $('#help').showModal?.(); event.preventDefault(); return; }
   if (state.tab !== 'review') return;
+  if (state.quick) {
+    const quick = {c: 'confirmed', f: 'false_positive', s: null}[event.key];
+    if (quick !== undefined && can('review')) { quickDecide(quick); event.preventDefault(); }
+    else if (event.key === 'Escape') setQuick(false);
+    return;
+  }
   if (event.key === '/') { $('#f-q').focus(); event.preventDefault(); return; }
   const cards = $$('#events .card');
   if (!cards.length) return;
@@ -837,6 +899,12 @@ function bindOnce() {
   });
   $$('#bulkbar [data-bulk]').forEach(button => button.addEventListener('click', () => bulkAction(button.dataset.bulk)));
   $('#load-more').addEventListener('click', () => loadEvents({append: true}));
+  $('#quick-toggle').addEventListener('click', () => setQuick(!state.quick));
+  $('#events').addEventListener('click', event => {
+    const act = event.target.closest('.quick-act');
+    if (act) quickDecide(act.dataset.status);
+    else if (event.target.closest('.quick-skip')) quickDecide(null);
+  });
   $('#camera-start').addEventListener('click', startCamera);
   $('#camera-stop').addEventListener('click', () => stopCamera('Camera stopped.'));
   $('#detector-restart').addEventListener('click', restartDetector);

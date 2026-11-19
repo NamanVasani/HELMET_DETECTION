@@ -40,6 +40,10 @@ function makePage({session, status, events = [], role = 'admin'}) {
     else if (url.startsWith('/api/offenders')) body = {offenders: [{plate_text: 'GJ01AB1234', events: 3, confirmed: 1,
       cameras: ['Gate 1'], last_seen: '2026-11-19T10:00:00+05:30', latest: {date: '2026-11-19', id: 'event_9'}}]};
     else if (url.startsWith('/api/review') && env.reviewFails) { code = 500; body = {error: 'disk full'}; }
+    else if (url.startsWith('/api/review') && env.removeOnReview) {
+      const reviewed = JSON.parse(options.body);
+      env.events = env.events.filter(item => item.id !== reviewed.id);  // "needs review" filter drops it
+    }
     return {ok: code < 400, status: code, json: async () => body};
   };
   window.navigator.mediaDevices = {async getUserMedia() {
@@ -260,7 +264,39 @@ async function testZoneEditor() {
   assert.deepEqual(env.savedCameras[0].zone, [[0.1, 0.5], [0.9, 0.5], [0.5, 1]]);
 }
 
+async function testQuickReview() {
+  const make = id => ({date: '2026-11-19', id, timestamp: '2026-11-19T10:00:00Z', category: 'no_helmet',
+    status: 'needs_review', event_detection: {confidence: 0.9}});
+  const page = makePage({status: baseStatus, events: [make('event_1'), make('event_2'), make('event_3')]});
+  page.env.removeOnReview = true;
+  await settle();
+  const {document, env, window} = page;
+  document.querySelector('#quick-toggle').click();
+  await settle();
+  assert.equal(document.querySelectorAll('#events .card').length, 1, 'one event at a time');
+  assert.match(document.querySelector('.quick-card').textContent, /1 of 3/);
+  document.querySelector('.quick-act[data-status="confirmed"]').click();
+  await settle();
+  const first = JSON.parse(env.requests.filter(r => r.url === '/api/review').pop().options.body);
+  assert.deepEqual([first.id, first.status], ['event_1', 'confirmed']);
+  assert.match(document.querySelector('.quick-card').textContent, /1 of 2/, 'next event shown');
+  assert.equal(document.querySelector('.quick-card').dataset.key, '2026-11-19/event_2');
+  document.querySelector('.quick-skip').click();
+  assert.equal(document.querySelector('.quick-card').dataset.key, '2026-11-19/event_3', 'skip moves on without saving');
+  document.body.dispatchEvent(new window.KeyboardEvent('keydown', {key: 'f', bubbles: true}));
+  await settle();
+  const second = JSON.parse(env.requests.filter(r => r.url === '/api/review').pop().options.body);
+  assert.deepEqual([second.id, second.status], ['event_3', 'false_positive']);
+  env.events = [];
+  await page.run('loadEvents({force: true})');
+  await settle();
+  assert.match(document.querySelector('#events').textContent, /All done/);
+  document.querySelector('#quick-toggle').click();
+  assert.equal(document.querySelector('#quick-toggle').textContent, 'Quick review');
+}
+
 (async () => {
+  await testQuickReview();
   await testZoneEditor();
   await testSetupFlow();
   await testReviewRenderingAndFilters();
