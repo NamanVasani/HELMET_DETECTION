@@ -578,7 +578,7 @@ function chartSvg(days, start, end) {
   for (let day = start; day <= end && series.length < 400; day = addDays(day, 1)) {
     series.push(byDate[day] || {date: day, helmet: 0, no_helmet: 0, events: 0});
   }
-  const width = 900, height = 260, left = 36, bottom = 24, top = 10;
+  const width = Math.max(320, Math.round($('#a-chart').clientWidth || 900)), height = 260, left = 36, bottom = 24, top = 10;
   const peak = Math.max(1, ...series.map(day => day.helmet + day.no_helmet));
   const slot = (width - left) / Math.max(1, series.length);
   const bar = Math.max(1, slot * 0.72);
@@ -630,6 +630,7 @@ async function loadSettings() {
       const rows = $('#camera-rows');
       rows.innerHTML = '';
       data.cameras.forEach(camera => rows.appendChild(cameraRow(camera)));
+      if (!data.cameras.length) rows.innerHTML = '<p class="empty">No cameras yet. Add an RTSP stream from a CCTV recorder or IP camera.</p>';
     }),
     api('/api/settings/alerts').then(fillAlerts),
     loadUsers(),
@@ -784,7 +785,7 @@ function bindOnce() {
   $('#cancel-video').addEventListener('click', cancelVideo);
   ['#a-start', '#a-end', '#a-camera'].forEach(id => $(id).addEventListener('change', loadAnalytics));
   $('#cameras-form').addEventListener('submit', saveCameras);
-  $('#camera-add').addEventListener('click', () => $('#camera-rows').appendChild(cameraRow()));
+  $('#camera-add').addEventListener('click', () => { $('#camera-rows .empty')?.remove(); $('#camera-rows').appendChild(cameraRow()); });
   $('#camera-rows').addEventListener('click', event => { if (event.target.classList.contains('drop')) event.target.closest('.camera-row').remove(); });
   $('#alerts-form').addEventListener('submit', saveAlerts);
   $('#alert-test').addEventListener('click', testAlert);

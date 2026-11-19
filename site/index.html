@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Helmet — rider helmet compliance</title>
+<meta name="description" content="Helmet flags two-wheeler riders without helmets on your existing CCTV, keeps the evidence on your premises, and lets your team confirm every case.">
+<link rel="icon" href="../static/icon.svg" type="image/svg+xml">
+<style>
+:root{color-scheme:light;--bg:#f6f8fb;--panel:#fff;--ink:#141b29;--muted:#566173;--line:#dde2ea;--accent:#178f6b;--accent-ink:#fff;--bad:#c44040}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0b1020;--panel:#131a2c;--ink:#eef2f8;--muted:#9ba8bd;--line:#26314a;--accent:#3fc79c;--accent-ink:#062018;--bad:#ff7a70}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0b1020;--panel:#131a2c;--ink:#eef2f8;--muted:#9ba8bd;--line:#26314a;--accent:#3fc79c;--accent-ink:#062018;--bad:#ff7a70}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.brand{display:flex;gap:10px;align-items:center;font-weight:700;font-size:19px}
+.brand img{width:30px;height:30px}
+.cta{display:inline-block;background:var(--accent);color:var(--accent-ink);padding:11px 18px;border-radius:10px;font-weight:600;text-decoration:none}
+.ghost{display:inline-block;padding:11px 18px;border-radius:10px;border:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:48px 0 56px}
+h1{font-size:clamp(32px,5vw,50px);line-height:1.1;margin:0 0 18px;letter-spacing:-.02em}
+.lead{font-size:20px;color:var(--muted);margin:0 0 26px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.mock{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(16,24,40,.08)}
+.mock .row{display:flex;justify-content:space-between;align-items:center;font-size:14px;margin-bottom:10px}
+.badge{border:1px solid currentColor;border-radius:999px;padding:1px 10px;font-size:12px;color:var(--bad)}
+.shot{height:150px;border-radius:12px;background:linear-gradient(135deg,#2b3550,#55617d);display:grid;place-items:end start;padding:10px;color:#fff;font-size:13px}
+.mock .meta{font-size:13px;color:var(--muted);margin-top:10px}
+.buttons{display:flex;gap:8px;margin-top:12px}.buttons span{flex:1;text-align:center;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:6px}
+.buttons span:first-child{border-color:var(--accent);color:var(--accent)}
+section{padding:44px 0;border-top:1px solid var(--line)}
+h2{font-size:28px;margin:0 0 10px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 26px;max-width:720px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h3{margin:0 0 6px;font-size:18px}.card p{margin:0;color:var(--muted);font-size:15px}
+.steps{counter-reset:s;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.steps .card{counter-increment:s}.steps .card::before{content:counter(s);display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:700;margin-bottom:8px}
+.honest li{margin-bottom:6px}
+.contact{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px;display:flex;justify-content:space-between;gap:20px;align-items:center;flex-wrap:wrap}
+footer{padding:28px 0 40px;color:var(--muted);font-size:14px}
+@media (max-width:860px){.hero,.grid,.steps{grid-template-columns:1fr}.hero{padding-top:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><img src="../static/icon.svg" alt="">Helmet</div>
+  <a class="ghost" href="#contact">Request a pilot</a>
+</header>
+
+<div class="hero">
+  <div>
+    <h1>See who rides in without a helmet — on the cameras you already have.</h1>
+    <p class="lead">Helmet watches two-wheeler entry points on your CCTV, flags riders without helmets, and hands your team
+      clear evidence to confirm. Footage never leaves your premises.</p>
+    <div class="actions"><a class="cta" href="#contact">Request a pilot</a><a class="ghost" href="#how">How it works</a></div>
+  </div>
+  <div class="mock" aria-label="Example review card">
+    <div class="row"><b>Gate 2 · 08:41:17</b><span class="badge">No helmet</span></div>
+    <div class="shot">Person crop</div>
+    <div class="meta">Plate GJ01AB1234 ✓ format · Rider and bike matched · Needs review</div>
+    <div class="buttons"><span>Confirm</span><span>False positive</span></div>
+  </div>
+</div>
+
+<section>
+  <h2>Built for private premises</h2>
+  <p class="sub">Campuses, corporate parks, factories, residential societies and parking operators that want safer
+    two-wheeler entry without hiring someone to watch screens all day.</p>
+  <div class="grid">
+    <div class="card"><h3>Works with existing CCTV</h3><p>Connect RTSP streams from your NVR or IP cameras. No new cameras or cloud account needed.</p></div>
+    <div class="card"><h3>People decide, not the model</h3><p>Every detection waits for a reviewer. Confirm or reject in one keystroke, correct plate text, act on what is real.</p></div>
+    <div class="card"><h3>Private by design</h3><p>Runs on one machine at your site. Riders wearing helmets have faces blurred and plates discarded. Evidence expires automatically.</p></div>
+    <div class="card"><h3>Alerts where you work</h3><p>Webhook to Slack, Teams or a WhatsApp gateway, or email with the evidence attached.</p></div>
+    <div class="card"><h3>Reports and exports</h3><p>Daily trends, false-positive rate, PDF reports, CSV and evidence ZIPs for any date range or camera.</p></div>
+    <div class="card"><h3>Accountable</h3><p>Viewer, reviewer and admin roles, and an audit log of every sign-in, review, deletion and export.</p></div>
+  </div>
+</section>
+
+<section id="how">
+  <h2>How it works</h2>
+  <div class="steps">
+    <div class="card"><h3>Connect</h3><p>Add camera streams in the dashboard, or upload a recorded clip to try it.</p></div>
+    <div class="card"><h3>Detect</h3><p>A vision model checks each rider; a case is saved only after three consecutive agreeing frames.</p></div>
+    <div class="card"><h3>Review</h3><p>Your team confirms or rejects each case with the person, plate and context images side by side.</p></div>
+    <div class="card"><h3>Improve</h3><p>Reviewed cases become training data, so the model learns your cameras and lighting.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>What to expect</h2>
+  <ul class="honest">
+    <li>Accuracy depends on camera angle, distance and light. A pilot starts by measuring it on your own footage.</li>
+    <li>Plate reading is a convenience, not proof. Reviewers can correct it, and plate-to-rider matching is a suggestion.</li>
+    <li>Helmet is a compliance and safety tool. It does not identify people or issue fines.</li>
+  </ul>
+</section>
+
+<section id="contact">
+  <div class="contact">
+    <div><h2>Run a pilot at one gate</h2><p class="sub">Install on a site computer, connect one or two cameras, and review real results with your team.</p></div>
+    <!-- TODO(owner): replace with your contact address or form before publishing. -->
+    <a class="cta" href="mailto:CONTACT@YOUR-DOMAIN">Contact us</a>
+  </div>
+</section>
+
+<footer>Helmet · on-premises helmet compliance</footer>
+</div>
+</body>
+</html>

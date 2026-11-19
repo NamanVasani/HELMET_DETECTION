@@ -1,0 +1,28 @@
+# systemd unit for a Linux server or edge box (Ubuntu, Raspberry Pi OS, Jetson L4T).
+# Install: sudo cp deploy/helmet.service /etc/systemd/system/ && sudo systemctl enable --now helmet
+# Assumes the project at /opt/helmet with its .venv, run as user "helmet".
+[Unit]
+Description=Helmet detector and review dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=helmet
+WorkingDirectory=/opt/helmet
+Environment=HELMET_STORAGE=/var/lib/helmet
+Environment=HELMET_HOST=0.0.0.0
+Environment=HELMET_AUTH=1
+# Environment=HELMET_ALLOWED_HOSTS=helmet.local,192.168.1.50
+ExecStart=/opt/helmet/.venv/bin/python -u hi.py
+Restart=always
+RestartSec=5
+UMask=0077
+StateDirectory=helmet
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/helmet /tmp
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

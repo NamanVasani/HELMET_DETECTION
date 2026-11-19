@@ -1,3 +1,4 @@
+# Runtime dependencies (direct). Exact environment: requirements-lock.txt (macOS arm64, Python 3.12).
 ultralytics==8.4.175
 opencv-python==4.11.0.86
 PyYAML==6.0.3
@@ -5,3 +6,6 @@ lap==0.5.13
 numpy==1.26.4
 torch==2.8.0
 torchvision==0.23.0
+fastapi==0.128.8
+uvicorn==0.39.0
+fpdf2==2.9.0

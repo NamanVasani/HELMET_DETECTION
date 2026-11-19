@@ -1,4 +1,8 @@
-"""Install a private macOS login runtime outside the protected Desktop folder."""
+"""Install a private macOS login runtime outside the protected Desktop folder.
+
+  python install_service.py --check                 report whether the running service matches this project
+  python install_service.py --replace-pid PID       install/update and replace the running Helmet process
+"""
 import argparse
 import json
 import os
@@ -12,11 +16,14 @@ import time
 from urllib.request import urlopen
 
 LABEL = "com.helmet.dashboard"
+ENTRY = "hi.py"
+RUNTIME_FILES = ("hi.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py",
+                 "manage.py", "model-manifest.json")
 
 
 def service_config(runtime):
     return {"Label": LABEL,
-            "ProgramArguments": [str(runtime / ".venv/bin/python"), "-u", str(runtime / "hi.py")],
+            "ProgramArguments": [str(runtime / ".venv/bin/python"), "-u", str(runtime / ENTRY)],
             "WorkingDirectory": str(runtime), "RunAtLoad": True, "KeepAlive": True,
             "ThrottleInterval": 5, "Umask": 0o077,
             "EnvironmentVariables": {"HELMET_STORAGE": str(runtime / "storage"),
@@ -32,23 +39,61 @@ def prepare_runtime(project, runtime):
         raise ValueError("Install the Python environment and trained model before installing the service")
     runtime.mkdir(parents=True, exist_ok=True, mode=0o700)
     runtime.chmod(0o700)
-    for name in ("hi.py", "dashboard.py", "event_store.py", "model-manifest.json"):
+    for name in RUNTIME_FILES:
         shutil.copy2(project / name, runtime / name)
+    shutil.copytree(project / "static", runtime / "static", dirs_exist_ok=True)
     if (project / "thresholds.json").is_file():
         shutil.copy2(project / "thresholds.json", runtime / "thresholds.json")
     shutil.copy2(model, runtime / "best.pt")
     shutil.copytree(project / "models", runtime / "models", dirs_exist_ok=True)
-    shutil.copytree(project / ".venv", runtime / ".venv", symlinks=True, dirs_exist_ok=True)
+    # Copy the environment beside the old one, verify it, then swap: copying over an existing venv fails on symlinks.
+    staging, previous = runtime / ".venv.staging", runtime / ".venv.previous"
+    shutil.rmtree(staging, ignore_errors=True)
+    shutil.copytree(project / ".venv", staging, symlinks=True)
+    subprocess.run([str(staging / "bin/python"), "-B", "-c", "import cv2, numpy, torch, ultralytics, fastapi, uvicorn, fpdf"],
+                   check=True, cwd=runtime)
+    shutil.rmtree(previous, ignore_errors=True)
+    if (runtime / ".venv").exists():
+        (runtime / ".venv").rename(previous)
+    staging.rename(runtime / ".venv")
     subprocess.run([str(runtime / ".venv/bin/python"), "-B", "-c",
-                    "import cv2, numpy, torch, ultralytics; print('Service environment imports passed')"], check=True)
+                    "import cv2, numpy, torch, ultralytics, fastapi, uvicorn, fpdf; "
+                    "print('Service environment imports passed')"], check=True, cwd=runtime)
+
+
+def running_version(timeout=3):
+    with urlopen("http://127.0.0.1:8003/healthz", timeout=timeout) as response:
+        return json.load(response)["version"]
+
+
+def check(project):
+    """Compare the project's code version with the installed runtime and the running service."""
+    sys.path.insert(0, str(project))
+    from dashboard import code_version
+    runtime = Path.home() / "Library/Application Support/Helmet"
+    expected = code_version(project)
+    installed = code_version(runtime) if (runtime / ENTRY).is_file() else None
+    try:
+        running = running_version()
+    except (OSError, ValueError, KeyError):
+        running = None
+    print(f"project  {expected}")
+    print(f"installed {installed or 'not installed'}")
+    print(f"running  {running or 'not reachable (or an older version without /healthz)'}")
+    if expected == installed == running:
+        print("The login service is up to date.")
+        return 0
+    print("The service is out of date. Re-run: python install_service.py --replace-pid "
+          "$(lsof -tnP -iTCP:8003 -sTCP:LISTEN)")
+    return 1
 
 
 def wait_ready(seconds=20):
     deadline = time.monotonic() + seconds
     while time.monotonic() < deadline:
         try:
-            with urlopen("http://127.0.0.1:8003/api/status", timeout=2) as response:
-                if json.load(response)["camera_enabled"]:
+            with urlopen("http://127.0.0.1:8003/healthz", timeout=2) as response:
+                if json.load(response)["ok"]:
                     return
         except (OSError, ValueError):
             pass
@@ -59,14 +104,19 @@ def wait_ready(seconds=20):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--project", type=Path, default=Path(__file__).resolve().parent)
-    parser.add_argument("--replace-pid", type=int, required=True, help="Existing Helmet PID to replace after preparation")
+    parser.add_argument("--replace-pid", type=int, help="Existing Helmet PID to replace after preparation")
+    parser.add_argument("--check", action="store_true", help="Only report whether the service is up to date")
     args = parser.parse_args()
+    if args.check:
+        raise SystemExit(check(args.project.resolve()))
+    if args.replace_pid is None:
+        parser.error("--replace-pid is required unless --check is used")
     if sys.platform != "darwin" or args.replace_pid <= 1:
         raise SystemExit("This installer requires macOS and an explicit existing Helmet PID")
     project = args.project.resolve()
     runtime = Path.home() / "Library/Application Support/Helmet"
     command = subprocess.check_output(["ps", "-p", str(args.replace_pid), "-o", "command="], text=True)
-    if not any(str(root / "hi.py") in command for root in (project, runtime)):
+    if not any(str(root / name) in command for root in (project, runtime) for name in ("hi.py", ENTRY)):
         raise SystemExit("Refusing to stop a process that is not this Helmet app")
     prepare_runtime(project, runtime)
     agent = Path.home() / "Library/LaunchAgents" / f"{LABEL}.plist"
@@ -127,7 +177,7 @@ def main():
             log = (project / "storage/service-rollback.log")
             log.parent.mkdir(exist_ok=True)
             with log.open("ab") as output:
-                subprocess.Popen([str(project / ".venv/bin/python"), "-u", str(project / "hi.py")],
+                subprocess.Popen([str(project / ".venv/bin/python"), "-u", str(project / ENTRY)],
                                  cwd=project, stdout=output, stderr=output, start_new_session=True)
         raise
 
