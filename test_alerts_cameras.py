@@ -221,6 +221,41 @@ class CameraTests(unittest.TestCase):
             self.assertEqual(manager.readers, {})
 
 
+class ZoneTests(unittest.TestCase):
+    def test_zone_validation_and_point_in_polygon(self):
+        lane = [[0.0, 0.5], [0.5, 0.5], [0.5, 1.0], [0.0, 1.0]]  # bottom-left quarter
+        self.assertTrue(cameras.in_zone(lane, [10, 60, 30, 80], 100, 100))
+        self.assertFalse(cameras.in_zone(lane, [60, 60, 80, 80], 100, 100))
+        self.assertFalse(cameras.in_zone(lane, [10, 10, 30, 30], 100, 100))
+        self.assertTrue(cameras.in_zone(None, [60, 60, 80, 80], 100, 100), "no zone = whole picture")
+        self.assertIsNone(cameras.validate_zone([]))
+        for bad in ([[0, 0], [1, 1]], [[0, 0], [1, 1], [2, 0]], [[0, 0], [1], [1, 0]]):
+            with self.assertRaises(ValueError):
+                cameras.validate_zone(bad)
+
+    def test_pipeline_ignores_riders_outside_the_zone(self):
+        import app
+        from event_store import list_events
+        head = {"class_name": "no-helmet", "confidence": 0.95, "track_id": 1, "box": [60, 10, 80, 30], "zoomed": False}
+        with tempfile.TemporaryDirectory() as temp:
+            model = Mock(names=dict(enumerate(app.EXPECTED_CLASSES)), predictor=None)
+            model.track.return_value = [None]
+            dashboard = Mock(storage=Path(temp), url="http://test")
+            pipeline = app.SourcePipeline("camera:c1", model, Mock(), {"helmet": 0.8, "no-helmet": 0.8})
+            frame = np.zeros((100, 100, 3), dtype=np.uint8)
+            left_half = [[0, 0], [0.5, 0], [0.5, 1], [0, 1]]
+            with patch.object(app, "detect_faces", return_value=[]), \
+                 patch.object(app, "read_detections", side_effect=lambda *a, **k: [dict(head)]):
+                for _ in range(4):
+                    pipeline.process(frame, {"type": "rtsp", "camera": "Gate"}, dashboard, zone=left_half)
+                self.assertEqual(list_events(date.today().isoformat(), Path(temp)), [])
+                pipeline.reset()
+                for _ in range(4):
+                    pipeline.process(frame, {"type": "rtsp", "camera": "Gate"}, dashboard,
+                                     zone=[[0.5, 0], [1, 0], [1, 1], [0.5, 1]])
+            self.assertEqual(len(list_events(date.today().isoformat(), Path(temp))), 1)
+
+
 class CameraHealthTests(unittest.TestCase):
     def test_offline_reported_once_after_grace_and_recovery_reported(self):
         monitor = cameras.CameraHealthMonitor(grace_seconds=60)

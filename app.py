@@ -12,6 +12,7 @@ import numpy as np
 from ultralytics import YOLO
 
 from dashboard import DashboardServer
+from cameras import in_zone
 from event_store import TESSERACT, associate_objects, clean_expired_events, save_event
 
 PROJECT = Path(__file__).resolve().parent
@@ -362,7 +363,7 @@ class SourcePipeline:
             self.thresholds.get(detection.get("class_name"), DETECTION_CONFIDENCE)
         return detection["confidence"] >= threshold
 
-    def process(self, frame, source, dashboard, alerts=None):
+    def process(self, frame, source, dashboard, alerts=None, zone=None):
         result = self.model.track(
             frame,
             persist=True,
@@ -400,7 +401,7 @@ class SourcePipeline:
             association = associate_objects(event_detection, detections)
             if self._qualifies(event_detection) and (
                 not event_detection.get("zoomed") or belongs_to_focus(association, target, event_detection)
-            ):
+            ) and in_zone(zone, event_detection["box"], frame.shape[1], frame.shape[0]):
                 eligible.append((event_detection, association))
         now = time.monotonic()
         saved = []
@@ -419,7 +420,11 @@ class SourcePipeline:
 
         visible = [item for item in detections
                    if item["class_name"] not in {"helmet", "no-helmet"} or self._qualifies(item)]
-        preview = adaptive_zoom(draw_detections(frame.copy(), visible), detections, target)
+        annotated = draw_detections(frame.copy(), visible)
+        if zone:
+            outline = np.array([[int(x * frame.shape[1]), int(y * frame.shape[0])] for x, y in zone], dtype=np.int32)
+            cv2.polylines(annotated, [outline], True, (0, 220, 255), 2)
+        preview = adaptive_zoom(annotated, detections, target)
         ok, encoded = cv2.imencode(".jpg", preview, [cv2.IMWRITE_JPEG_QUALITY, 78])
         if ok:
             dashboard.update_frame(encoded.tobytes(), source=self.key)
@@ -541,7 +546,8 @@ def run_detector(dashboard, cameras=None, alerts=None):
                 worked = True
                 source = {"type": "rtsp", "camera": reader.camera["name"], "camera_id": key,
                           "site": reader.camera.get("site", "")}
-                pipeline(f"camera:{key}").process(camera_frame, source, dashboard, alerts)
+                pipeline(f"camera:{key}").process(camera_frame, source, dashboard, alerts,
+                                                  zone=reader.camera.get("zone"))
             frame_data = dashboard.next_frame(timeout=0 if worked else 0.05 if cameras and cameras.readers else 1)
             if frame_data is None:
                 continue

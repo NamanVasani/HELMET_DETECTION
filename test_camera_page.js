@@ -33,7 +33,10 @@ function makePage({session, status, events = [], role = 'admin'}) {
       days: [{date: '2026-11-01', helmet: 1, no_helmet: 2, events: 3}], cameras: ['Gate 1']};
     else if (url.startsWith('/api/status')) body = env.status;
     else if (url.startsWith('/api/bulk')) { env.bulk = JSON.parse(options.body); body = {results: env.bulk.items.map(i => ({...i, ok: true}))}; }
-    else if (url.startsWith('/api/cameras')) body = {cameras: []};
+    else if (url.startsWith('/api/cameras')) {
+      if (options.method === 'PUT') env.savedCameras = JSON.parse(options.body).cameras;
+      body = {cameras: env.cameras || []};
+    }
     else if (url.startsWith('/api/offenders')) body = {offenders: [{plate_text: 'GJ01AB1234', events: 3, confirmed: 1,
       cameras: ['Gate 1'], last_seen: '2026-11-19T10:00:00+05:30', latest: {date: '2026-11-19', id: 'event_9'}}]};
     else if (url.startsWith('/api/review') && env.reviewFails) { code = 500; body = {error: 'disk full'}; }
@@ -231,7 +234,34 @@ async function testViewerRoleAndAnalytics() {
   assert.match(filtered.url, /category=no_helmet/);
 }
 
+async function testZoneEditor() {
+  const page = makePage({status: baseStatus});
+  page.env.cameras = [{id: 'c1', name: 'Gate 1', site: '', url: 'rtsp://***:***@10.0.0.5/s', enabled: true, zone: null}];
+  await settle();
+  const {document, env, window} = page;
+  page.run("selectTab('settings')");
+  await settle();
+  const row = document.querySelector('#camera-rows .camera-row');
+  assert.match(row.querySelector('.zone-info').textContent, /whole picture/);
+  row.querySelector('.zone-edit').click();
+  assert.ok(document.querySelector('#zone-dialog').hasAttribute('open'));
+  assert.match(document.querySelector('#zone-img').src, /\/api\/cameras\/c1\/snapshot/);
+  const svg = document.querySelector('#zone-svg');
+  svg.getBoundingClientRect = () => ({left: 0, top: 0, width: 200, height: 100});
+  for (const [x, y] of [[20, 50], [180, 50], [100, 100]]) {
+    svg.dispatchEvent(new window.MouseEvent('click', {clientX: x, clientY: y, bubbles: true}));
+  }
+  assert.equal(document.querySelectorAll('#zone-svg circle').length, 3);
+  assert.ok(document.querySelector('#zone-svg polygon'));
+  document.querySelector('#zone-done').click();
+  assert.match(row.querySelector('.zone-info').textContent, /3 points/);
+  document.querySelector('#cameras-form').dispatchEvent(new window.Event('submit', {cancelable: true}));
+  await settle();
+  assert.deepEqual(env.savedCameras[0].zone, [[0.1, 0.5], [0.9, 0.5], [0.5, 1]]);
+}
+
 (async () => {
+  await testZoneEditor();
   await testSetupFlow();
   await testReviewRenderingAndFilters();
   await testCameraAndVideo();

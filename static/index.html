@@ -225,6 +225,13 @@
 </div>
 
 <dialog id="lightbox" aria-label="Image preview"><form method="dialog"><button class="close" aria-label="Close">×</button></form><img id="lightbox-img" alt=""><p id="lightbox-caption" class="muted"></p></dialog>
+<dialog id="zone-dialog" aria-labelledby="zone-title"><form method="dialog"><button class="close" aria-label="Close">×</button></form>
+  <h2 id="zone-title">Draw watch zone</h2>
+  <p class="notice">Click around the area to watch (for example the gate lane), at least 3 points. Riders outside it are ignored.</p>
+  <div class="zone-stage"><img id="zone-img" alt="Latest camera picture"><svg id="zone-svg" viewBox="0 0 1 1" preserveAspectRatio="none" role="img" aria-label="Zone outline"></svg></div>
+  <div class="row"><button type="button" id="zone-undo">Undo point</button><button type="button" id="zone-clear">Whole picture</button><button type="button" id="zone-done" class="primary">Use this zone</button></div>
+  <p id="zone-msg" class="notice" role="status"></p>
+</dialog>
 <dialog id="help" aria-labelledby="help-title"><form method="dialog"><button class="close" aria-label="Close">×</button></form>
   <h2 id="help-title">Keyboard shortcuts</h2>
   <dl class="keys">

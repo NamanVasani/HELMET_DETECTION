@@ -622,12 +622,60 @@ function cameraRow(camera = {}) {
   const row = document.createElement('div');
   row.className = 'camera-row';
   row.dataset.id = camera.id || '';
+  row.dataset.zone = JSON.stringify(camera.zone || null);
   row.innerHTML = `<label>Name <input name="name" value="${esc(camera.name || '')}" maxlength="60" required></label>
     <label>Site <input name="site" value="${esc(camera.site || '')}" maxlength="60"></label>
     <label>Stream URL <input name="url" value="${esc(camera.url || '')}" placeholder="rtsp://user:pass@192.168.1.20/stream1" required></label>
     <label class="check"><input type="checkbox" name="enabled" ${camera.enabled === false ? '' : 'checked'}> On</label>
-    <button type="button" class="bad drop" aria-label="Remove camera">Remove</button>`;
+    <button type="button" class="bad drop" aria-label="Remove camera">Remove</button>
+    <div class="zone-line"><button type="button" class="zone-edit" ${camera.id ? '' : 'disabled title="Save the camera first"'}>Draw zone</button>
+      <span class="zone-info muted"></span></div>`;
+  updateZoneInfo(row);
   return row;
+}
+
+function updateZoneInfo(row) {
+  const zone = JSON.parse(row.dataset.zone || 'null');
+  $('.zone-info', row).textContent = zone ? `Zone: ${zone.length} points` : 'Zone: whole picture';
+}
+
+const zoneEditor = {row: null, points: []};
+function renderZone() {
+  const points = zoneEditor.points;
+  const polygon = points.length >= 3 ? `<polygon class="zone-shape" points="${points.map(p => p.join(',')).join(' ')}"></polygon>`
+    : points.length === 2 ? `<polyline class="zone-shape" points="${points.map(p => p.join(',')).join(' ')}"></polyline>` : '';
+  $('#zone-svg').innerHTML = polygon + points.map(([x, y]) => `<circle class="zone-dot" cx="${x}" cy="${y}" r="0.008"></circle>`).join('');
+  setText('#zone-msg', points.length ? `${points.length} point(s)` : 'No zone: the whole picture is watched.');
+}
+
+function openZoneEditor(row) {
+  zoneEditor.row = row;
+  zoneEditor.points = JSON.parse(row.dataset.zone || 'null') || [];
+  const image = $('#zone-img');
+  image.onerror = () => setText('#zone-msg', 'No picture from this camera yet. Check it is connected and enabled, then retry.');
+  image.src = `/api/cameras/${encodeURIComponent(row.dataset.id)}/snapshot?t=${Date.now()}`;
+  renderZone();
+  const dialog = $('#zone-dialog');
+  if (dialog.showModal) dialog.showModal(); else dialog.setAttribute('open', '');
+}
+
+function addZonePoint(event) {
+  if (zoneEditor.points.length >= 20) { setText('#zone-msg', 'A zone can have at most 20 points.'); return; }
+  const box = $('#zone-svg').getBoundingClientRect();
+  if (!box.width || !box.height) return;
+  const clamp = value => Math.round(Math.min(1, Math.max(0, value)) * 10000) / 10000;
+  zoneEditor.points.push([clamp((event.clientX - box.left) / box.width), clamp((event.clientY - box.top) / box.height)]);
+  renderZone();
+}
+
+function finishZone() {
+  const points = zoneEditor.points;
+  if (points.length && points.length < 3) { setText('#zone-msg', 'Add at least 3 points, or choose Whole picture.'); return; }
+  zoneEditor.row.dataset.zone = JSON.stringify(points.length ? points : null);
+  updateZoneInfo(zoneEditor.row);
+  setText('#cameras-msg', 'Zone set. Press Save cameras to apply it.');
+  const dialog = $('#zone-dialog');
+  if (dialog.close) dialog.close(); else dialog.removeAttribute('open');
 }
 
 async function loadSettings() {
@@ -660,6 +708,7 @@ async function saveCameras(event) {
   const cameras = $$('#camera-rows .camera-row').map(row => ({
     id: row.dataset.id || undefined, name: $('[name="name"]', row).value.trim(), site: $('[name="site"]', row).value.trim(),
     url: $('[name="url"]', row).value.trim(), enabled: $('[name="enabled"]', row).checked,
+    zone: JSON.parse(row.dataset.zone || 'null'),
   }));
   try {
     await api('/api/cameras', {method: 'PUT', json: {cameras}});
@@ -807,7 +856,14 @@ function bindOnce() {
   });
   $('#cameras-form').addEventListener('submit', saveCameras);
   $('#camera-add').addEventListener('click', () => { $('#camera-rows .empty')?.remove(); $('#camera-rows').appendChild(cameraRow()); });
-  $('#camera-rows').addEventListener('click', event => { if (event.target.classList.contains('drop')) event.target.closest('.camera-row').remove(); });
+  $('#camera-rows').addEventListener('click', event => {
+    if (event.target.classList.contains('drop')) event.target.closest('.camera-row').remove();
+    else if (event.target.classList.contains('zone-edit')) openZoneEditor(event.target.closest('.camera-row'));
+  });
+  $('#zone-svg').addEventListener('click', addZonePoint);
+  $('#zone-undo').addEventListener('click', () => { zoneEditor.points.pop(); renderZone(); });
+  $('#zone-clear').addEventListener('click', () => { zoneEditor.points = []; renderZone(); });
+  $('#zone-done').addEventListener('click', finishZone);
   $('#alerts-form').addEventListener('submit', saveAlerts);
   $('#alert-test').addEventListener('click', testAlert);
   $('#user-rows').addEventListener('change', onUserTable);

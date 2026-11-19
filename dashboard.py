@@ -675,6 +675,18 @@ class DashboardServer:
                                                        **metrics.get(f"camera:{camera['id']}", {})})
                                 for camera in load_cameras(owner.storage)]}
 
+        @app.get("/api/cameras/{camera_id}/snapshot")
+        def camera_snapshot(request: Request, camera_id: str):
+            """Latest processed picture from a CCTV camera, used to draw its watch zone."""
+            require(request, "admin")
+            if not re.fullmatch(r"[0-9a-f]{1,32}", camera_id):
+                raise HTTPException(404, "Not found")
+            with owner.frame_lock:
+                frame = owner.frames.get(f"camera:{camera_id}")
+            if frame is None:
+                raise HTTPException(404, "No picture from this camera yet. Check that it is connected.")
+            return Response(frame, media_type="image/jpeg", headers={"Cache-Control": "no-store"})
+
         @app.put("/api/cameras")
         async def cameras_save(request: Request):
             user = require(request, "admin")

@@ -167,6 +167,17 @@ class ServerFeatureTests(unittest.TestCase):
         self.assertEqual(stored["name"], "Gate 1 north")
         self.assertEqual(admin.status_of("/api/cameras", {"cameras": [{"name": "x", "url": "file:///etc/passwd"}]},
                                          method="PUT"), 400)
+        zone = [[0.1, 0.5], [0.9, 0.5], [0.9, 1.0], [0.1, 1.0]]
+        admin.call("/api/cameras", {"cameras": [dict(listed[0], name="Gate 1 north", zone=zone)]}, method="PUT")
+        self.assertEqual(load_cameras(self.root)[0]["zone"], zone)
+        self.assertEqual(admin.call("/api/cameras")["cameras"][0]["zone"], zone)
+        self.assertEqual(admin.status_of("/api/cameras", {"cameras": [dict(listed[0], zone=[[0, 0], [2, 2], [0, 1]])]},
+                                         method="PUT"), 400)
+        camera_id = stored["id"]
+        self.assertEqual(admin.status_of(f"/api/cameras/{camera_id}/snapshot"), 404)
+        self.server.update_frame(b"\xff\xd8snapshot", source=f"camera:{camera_id}")
+        response, body = admin.call(f"/api/cameras/{camera_id}/snapshot", raw=True)
+        self.assertEqual(body, b"\xff\xd8snapshot")
 
     def test_alert_secrets_are_never_returned(self):
         admin = self.admin()

@@ -39,7 +39,36 @@ def validate_camera(camera):
     if not (url.isdigit() or urlsplit(url).scheme in {"rtsp", "rtsps", "http", "https"}):
         raise ValueError("Camera URL must be rtsp://, http(s)://, or a local device number")
     return {"id": str(camera.get("id") or secrets.token_hex(4)), "name": name, "url": url, "site": site,
-            "enabled": bool(camera.get("enabled", True))}
+            "enabled": bool(camera.get("enabled", True)), "zone": validate_zone(camera.get("zone"))}
+
+
+def validate_zone(zone):
+    """A watch area: 3-20 points as [x, y] fractions of the frame (0-1). Empty/None means the whole frame."""
+    if not zone:
+        return None
+    if not isinstance(zone, list) or not 3 <= len(zone) <= 20:
+        raise ValueError("A zone needs 3 to 20 points")
+    points = []
+    for point in zone:
+        if not isinstance(point, (list, tuple)) or len(point) != 2:
+            raise ValueError("Each zone point must be [x, y]")
+        x, y = (float(value) for value in point)
+        if not (0 <= x <= 1 and 0 <= y <= 1):
+            raise ValueError("Zone points must lie inside the picture")
+        points.append([round(x, 4), round(y, 4)])
+    return points
+
+
+def in_zone(zone, box, width, height):
+    """True if the centre of a detection box lies inside the zone (or there is no zone)."""
+    if not zone:
+        return True
+    x, y = (box[0] + box[2]) / 2 / width, (box[1] + box[3]) / 2 / height
+    inside = False
+    for (x1, y1), (x2, y2) in zip(zone, zone[1:] + zone[:1], strict=True):
+        if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1) + x1:
+            inside = not inside
+    return inside
 
 
 def load_cameras(root):
@@ -59,7 +88,8 @@ def save_cameras(root, cameras):
 
 def public_camera(camera, status=None):
     return {"id": camera["id"], "name": camera["name"], "site": camera.get("site", ""),
-            "enabled": camera["enabled"], "url": redact_url(camera["url"]), **(status or {})}
+            "enabled": camera["enabled"], "url": redact_url(camera["url"]), "zone": camera.get("zone"),
+            **(status or {})}
 
 
 class CameraReader:
@@ -149,10 +179,13 @@ class CameraManager:
     def sync(self, cameras=None):
         cameras = load_cameras(self.root) if cameras is None else cameras
         wanted = {camera["id"]: camera for camera in cameras if camera.get("enabled")}
-        signature = sorted((key, value["url"], value["name"]) for key, value in wanted.items())
+        signature = sorted((key, value["url"], value["name"], str(value.get("zone"))) for key, value in wanted.items())
         if signature == self.signature:
             return
         self.signature = signature
+        for key, reader in self.readers.items():
+            if key in wanted and wanted[key]["url"] == reader.camera["url"]:
+                reader.camera = {**reader.camera, "zone": wanted[key].get("zone")}  # zone edits need no reconnect
         for key in list(self.readers):
             reader = self.readers[key]
             if key not in wanted or wanted[key]["url"] != reader.camera["url"] or wanted[key]["name"] != reader.camera["name"]:
