@@ -35,6 +35,10 @@ ZOOM_CONFIDENCE = 0.50
 CONFIRMATION_FRAMES = 3
 FOCUS_FRAME_LIMIT = 8
 CAPTURE_COOLDOWN = 30
+# Run the face locator on every Nth processed frame (1 = every frame).
+FACE_EVERY = max(1, int(os.environ.get("HELMET_FACE_EVERY", "2")))
+# Optional inference device, e.g. HELMET_DEVICE=mps for the Apple GPU (off by default: an MPS run hung once).
+DEVICE = {"device": os.environ["HELMET_DEVICE"]} if os.environ.get("HELMET_DEVICE") else {}
 EXPECTED_CLASSES = ["helmet", "no-helmet", "number-plate", "rider", "bike"]
 FULL_FRAME_THRESHOLDS = {"helmet": DETECTION_CONFIDENCE, "no-helmet": DETECTION_CONFIDENCE}
 
@@ -350,6 +354,7 @@ class SourcePipeline:
         self.captures = CaptureState()
         self.confirmations = EventConfirmation()
         self.last_faces, self.face_misses = [], 0
+        self.cached_faces = []
         reset_tracks(self.model)
 
     def _qualifies(self, detection):
@@ -367,10 +372,14 @@ class SourcePipeline:
             imgsz=INFERENCE_SIZE,
             classes=[0, 1, 2, 3, 4],
             verbose=False,
+            **DEVICE,
         )[0]
         detections = read_detections(result, self.model, locator=True)
+        # Faces only steer zoom focus, so refreshing them every FACE_EVERY frames is enough.
+        if self.frames % FACE_EVERY == 0:
+            self.cached_faces = detect_faces(frame, self.face_detector)
         faces, self.last_faces, self.face_misses = face_targets(
-            detect_faces(frame, self.face_detector), self.last_faces, self.face_misses
+            self.cached_faces, self.last_faces, self.face_misses
         )
         detections.extend(faces)
         target = self.captures.select(detections, self.frames, time.monotonic())
@@ -381,7 +390,7 @@ class SourcePipeline:
         if target and region and not focused_head:
             left, top, zoom = region
             close_result = self.model.predict(zoomed, conf=self.zoom_threshold, imgsz=INFERENCE_SIZE,
-                                              classes=[0, 1, 2, 4], verbose=False)[0]
+                                              classes=[0, 1, 2, 4], verbose=False, **DEVICE)[0]
             detections.extend(read_detections(close_result, self.model, min_confidence=self.zoom_threshold,
                                               offset=(left, top), scale=zoom,
                                               track_id_override=target.get("track_id") if target else None))

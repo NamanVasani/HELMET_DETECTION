@@ -236,3 +236,5 @@ CI runs the same lint and tests on every push (`.github/workflows/ci.yml`).
 | `HELMET_RETENTION_DAYS` | `30` | delete evidence older than this (`0` = never) |
 | `HELMET_KEEP_CONFIRMED` | `1` | keep confirmed events past retention |
 | `HELMET_PRIVACY` | `1` | blur faces / drop plates for helmet-compliant riders |
+| `HELMET_FACE_EVERY` | `2` | run the face locator every Nth frame (busy scene 3.8 → 4.8 fps, same saved events) |
+| `HELMET_DEVICE` | — | inference device, e.g. `mps`; off by default (mixed speed results, and one MPS run hung) |

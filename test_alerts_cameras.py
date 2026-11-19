@@ -208,6 +208,25 @@ class CameraTests(unittest.TestCase):
 
 
 class MultiSourceDetectorTests(unittest.TestCase):
+    def test_face_locator_runs_every_second_frame_and_reuses_faces(self):
+        import app
+        face = {"class_name": "face", "confidence": 0.9, "track_id": None, "box": [10, 10, 30, 30], "zoomed": False}
+        model = Mock(names=dict(enumerate(app.EXPECTED_CLASSES)), predictor=None)
+        model.track.return_value = [None]
+        dashboard = Mock(storage=Path("."), url="http://test")
+        pipeline = app.SourcePipeline("browser", model, Mock(), {"helmet": 0.8, "no-helmet": 0.8})
+        seen = []
+        with patch.object(app, "FACE_EVERY", 2), \
+             patch.object(app, "detect_faces", return_value=[face]) as faces, \
+             patch.object(app, "read_detections", side_effect=lambda *a, **k: []), \
+             patch.object(app, "zoom_region", side_effect=lambda frame, detections, target: (frame, None)), \
+             patch.object(app.CaptureState, "select", side_effect=lambda detections, *a: seen.append(
+                 [d for d in detections if d["class_name"] == "face"])):
+            for _ in range(4):
+                pipeline.process(np.zeros((60, 80, 3), dtype=np.uint8), {"type": "camera"}, dashboard)
+        self.assertEqual(faces.call_count, 2)
+        self.assertTrue(all(found == [face] for found in seen), "faces are reused on skipped frames")
+
     def test_cctv_frames_get_their_own_pipeline_and_camera_source(self):
         import app
         from dashboard import DashboardServer
