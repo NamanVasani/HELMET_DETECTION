@@ -1,0 +1,40 @@
+# Local Python environment and generated files
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.DS_Store
+.idea/
+
+# Downloaded training data and generated experiments
+/Helmet-Detection_YOLOv8-3/
+/Helmet-and-no-helmet-rider-detection-6/
+/merged_dataset/
+/runs/
+/output/
+/storage
+
+# Invalid old inference placeholder
+/helmet.pt
+
+# Old experiments, backups, and local sample files not part of the documented app
+/TIMEPASS.ipynb
+/HELMET!.pages
+/main.py.save
+/nano train.py
+/hi_show.py
+/test_cam.py
+/web.py
+/image.jpg
+/yolov8n.pt
+
+# Curated copy for direct GitHub upload
+/HELMET_GITHUB_UPLOAD/
+
+# Rollback copy of private event data
+/storage.before-login-service/
+# Evaluation scratch paths and image lists are machine-specific
+/reports/val/
+/reports/test/
+/reports/*-images.txt
+/reports/evaluation-data.yaml

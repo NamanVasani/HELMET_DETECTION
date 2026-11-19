@@ -1,0 +1,12 @@
+{
+  "file": "best.pt",
+  "sha256": "ad241f161cc7ac2d0f269939d37f7408a26fe529c2a005cfb47e244c25e77894",
+  "classes": [
+    "helmet",
+    "no-helmet",
+    "number-plate",
+    "rider",
+    "bike"
+  ],
+  "source": "Local runs/detect/helmet_v3/weights/best.pt; no public model download is provided."
+}

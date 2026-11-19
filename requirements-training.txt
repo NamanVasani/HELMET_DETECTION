@@ -1,0 +1,3 @@
+# Dataset downloads use a separate Python 3.10+ environment.
+-r requirements.txt
+roboflow==1.7.1
