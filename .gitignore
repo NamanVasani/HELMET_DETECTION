@@ -38,3 +38,6 @@ __pycache__/
 /reports/test/
 /reports/*-images.txt
 /reports/evaluation-data.yaml
+
+# JavaScript test dependencies
+/node_modules/

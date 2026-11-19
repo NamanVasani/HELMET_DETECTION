@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Helmet Review</title>
+<link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/app.css">
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<div id="auth-view" class="auth" hidden>
+  <form id="auth-form" class="auth-card" autocomplete="on">
+    <div class="brand"><span class="logo" aria-hidden="true"></span><b>Helmet</b></div>
+    <h1 id="auth-title">Sign in</h1>
+    <p id="auth-help" class="muted">Sign in to review helmet detections.</p>
+    <label>Username <input id="auth-user" name="username" autocomplete="username" required minlength="3" maxlength="64"></label>
+    <label>Password <input id="auth-pass" name="password" type="password" autocomplete="current-password" required></label>
+    <label id="auth-confirm-row" hidden>Confirm password <input id="auth-confirm" type="password" autocomplete="new-password"></label>
+    <button type="submit" class="primary" id="auth-submit">Sign in</button>
+    <p id="auth-error" class="error" role="alert"></p>
+  </form>
+</div>
+
+<div id="app" hidden>
+<header class="topbar">
+  <div class="brand"><span class="logo" aria-hidden="true"></span><b>Helmet</b></div>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" data-tab="review" aria-selected="true">Review</button>
+    <button role="tab" data-tab="live" aria-selected="false">Live</button>
+    <button role="tab" data-tab="analytics" aria-selected="false">Analytics</button>
+    <button role="tab" data-tab="settings" aria-selected="false" data-perm="admin">Settings</button>
+  </nav>
+  <div class="account">
+    <span id="detector-pill" class="pill" title="Detector status">Detector…</span>
+    <button id="theme-toggle" class="ghost" type="button" aria-label="Switch colour theme">Theme</button>
+    <button id="help-button" class="ghost" type="button" aria-label="Keyboard shortcuts">?</button>
+    <span id="who" class="muted"></span>
+    <button id="logout" class="ghost" type="button">Sign out</button>
+  </div>
+</header>
+
+<main>
+<!-- REVIEW -->
+<section id="tab-review" class="tab" role="tabpanel">
+  <div class="filters panel">
+    <div class="filter-row">
+      <label>From <input id="f-start" type="date"></label>
+      <label>To <input id="f-end" type="date"></label>
+      <div class="quick" role="group" aria-label="Quick ranges">
+        <button type="button" data-range="0">Today</button>
+        <button type="button" data-range="6">7 days</button>
+        <button type="button" data-range="29">30 days</button>
+      </div>
+      <div class="segmented" role="group" aria-label="Category">
+        <button type="button" class="category-filter" data-category="no_helmet" aria-pressed="true">No helmet</button>
+        <button type="button" class="category-filter" data-category="helmet" aria-pressed="false">Helmet</button>
+        <button type="button" class="category-filter" data-category="" aria-pressed="false">All</button>
+      </div>
+    </div>
+    <div class="filter-row">
+      <label>Status
+        <select id="f-status">
+          <option value="needs_review">Needs review</option>
+          <option value="">Any status</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="false_positive">False positive</option>
+        </select>
+      </label>
+      <label>Camera <select id="f-camera"><option value="">All cameras</option></select></label>
+      <label class="grow">Search plate or event <input id="f-q" type="search" placeholder="e.g. GJ01" maxlength="32" autocomplete="off"></label>
+      <div class="exports" data-perm="export">
+        <a id="export-csv" class="button" href="#" download>CSV</a>
+        <a id="export-zip" class="button" href="#" download>ZIP evidence</a>
+        <a id="export-pdf" class="button" href="#" download>PDF report</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="stats" class="stats" aria-live="polite"></div>
+
+  <div id="bulkbar" class="bulkbar" data-perm="review">
+    <label class="check"><input id="select-all" type="checkbox"> Select page</label>
+    <span id="selected-count" class="muted">0 selected</span>
+    <button type="button" class="ok" data-bulk="confirmed" disabled>Confirm</button>
+    <button type="button" data-bulk="false_positive" disabled>False positive</button>
+    <button type="button" data-bulk="needs_review" disabled>Needs review</button>
+    <button type="button" class="bad" data-bulk="delete" data-perm="delete" disabled>Delete</button>
+    <span id="status" role="status" class="status"></span>
+  </div>
+
+  <section id="events" class="grid" aria-label="Events"></section>
+  <div class="more"><button id="load-more" type="button" hidden>Load more</button></div>
+</section>
+
+<!-- LIVE -->
+<section id="tab-live" class="tab" role="tabpanel" hidden>
+  <div class="live-grid">
+    <div class="panel">
+      <h2>Browser camera</h2>
+      <div class="viewer"><img id="live-stream" alt="Live camera detections" hidden><p id="live-empty" class="muted">The preview appears here once the camera is running.</p></div>
+      <div id="camera-status" class="notice" role="status">Checking camera detector…</div>
+      <div class="row" data-perm="camera">
+        <button type="button" id="camera-start" class="primary">Start camera</button>
+        <button type="button" id="camera-stop">Stop camera</button>
+        <button type="button" id="detector-restart">Restart detector</button>
+      </div>
+      <p class="notice">Frames go only to this Helmet server for detection. A capture needs three agreeing processed frames.</p>
+      <video id="camera-source" autoplay muted playsinline hidden></video><canvas id="camera-frame" hidden></canvas>
+    </div>
+    <div class="panel">
+      <h2>Analyze a saved video</h2>
+      <div class="row" data-perm="video">
+        <input id="video-file" type="file" accept="video/*" aria-label="Choose a video file">
+        <button id="analyze-video" class="primary" type="button">Analyze</button>
+        <button id="cancel-video" type="button" hidden>Cancel</button>
+      </div>
+      <progress id="video-progress" max="100" value="0" hidden></progress>
+      <div id="video-status" class="notice" role="status">The live camera pauses during analysis. Uploaded video is deleted after processing.</div>
+      <h2 class="spaced">Detector</h2>
+      <div id="metrics" class="metrics"></div>
+    </div>
+  </div>
+  <h2 class="spaced">CCTV cameras</h2>
+  <div id="camera-streams" class="grid streams"></div>
+</section>
+
+<!-- ANALYTICS -->
+<section id="tab-analytics" class="tab" role="tabpanel" hidden>
+  <div class="panel">
+    <div class="filter-row">
+      <label>From <input id="a-start" type="date"></label>
+      <label>To <input id="a-end" type="date"></label>
+      <label>Camera <select id="a-camera"><option value="">All cameras</option></select></label>
+    </div>
+    <div id="a-totals" class="stats"></div>
+    <figure class="chart">
+      <figcaption>Events per day <span class="legend"><i class="sw helmet"></i>Helmet <i class="sw violation"></i>No helmet</span></figcaption>
+      <div id="a-chart"></div>
+    </figure>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section id="tab-settings" class="tab" role="tabpanel" hidden>
+  <div class="settings-grid">
+    <form id="cameras-form" class="panel">
+      <h2>CCTV cameras</h2>
+      <p class="notice">RTSP or HTTP stream URLs, or a local device number. Stored passwords are never shown again.</p>
+      <div id="camera-rows"></div>
+      <div class="row"><button type="button" id="camera-add">Add camera</button><button type="submit" class="primary">Save cameras</button></div>
+      <p id="cameras-msg" class="notice" role="status"></p>
+    </form>
+
+    <form id="alerts-form" class="panel">
+      <h2>Alerts</h2>
+      <label class="check"><input type="checkbox" name="enabled"> Send alerts for new events</label>
+      <fieldset class="row"><legend>Alert on</legend>
+        <label class="check"><input type="checkbox" name="cat_no_helmet"> No helmet</label>
+        <label class="check"><input type="checkbox" name="cat_helmet"> Helmet</label>
+      </fieldset>
+      <label>Minimum seconds between alerts <input type="number" name="min_interval_seconds" min="0" max="86400"></label>
+      <label>Dashboard link in alerts <input type="url" name="dashboard_url"></label>
+      <h3>Webhook (Slack, Teams, WhatsApp gateway…)</h3>
+      <label>Webhook URL <input type="url" name="webhook_url" placeholder="https://"></label>
+      <label>Bearer token <input type="password" name="webhook_token" autocomplete="off" placeholder="unchanged"></label>
+      <h3>Email</h3>
+      <label class="check"><input type="checkbox" name="email_enabled"> Send email</label>
+      <div class="two">
+        <label>SMTP host <input name="smtp_host"></label>
+        <label>Port <input type="number" name="smtp_port" min="1" max="65535"></label>
+        <label>SMTP user <input name="smtp_user" autocomplete="off"></label>
+        <label>SMTP password <input type="password" name="smtp_password" autocomplete="off" placeholder="unchanged"></label>
+        <label>From <input type="email" name="smtp_from"></label>
+        <label>To (comma separated) <input name="email_to"></label>
+      </div>
+      <div class="row"><button type="submit" class="primary">Save alerts</button><button type="button" id="alert-test">Send test alert</button></div>
+      <p id="alerts-msg" class="notice" role="status"></p>
+    </form>
+
+    <div class="panel">
+      <h2>Users</h2>
+      <table class="table"><thead><tr><th>User</th><th>Role</th><th></th></tr></thead><tbody id="user-rows"></tbody></table>
+      <form id="user-form" class="row">
+        <input name="username" placeholder="username" required minlength="3" maxlength="64" aria-label="New username">
+        <input name="password" type="password" placeholder="password (10+ chars)" required minlength="10" aria-label="New user password" autocomplete="new-password">
+        <select name="role" aria-label="New user role"><option value="reviewer">Reviewer</option><option value="viewer">Viewer</option><option value="admin">Admin</option></select>
+        <button type="submit">Add user</button>
+      </form>
+      <p id="users-msg" class="notice" role="status"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Privacy and retention</h2>
+      <div id="privacy-info" class="notice"></div>
+      <h2 class="spaced">Audit log</h2>
+      <div class="audit-wrap"><table class="table"><thead><tr><th>When</th><th>User</th><th>Action</th><th>Target</th></tr></thead><tbody id="audit-rows"></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<section class="panel account-panel" id="account-panel" hidden>
+  <h2>Change password</h2>
+  <form id="password-form" class="row">
+    <input name="current" type="password" placeholder="current password" required autocomplete="current-password" aria-label="Current password">
+    <input name="password" type="password" placeholder="new password (10+ chars)" required minlength="10" autocomplete="new-password" aria-label="New password">
+    <button type="submit">Change</button>
+  </form>
+  <p id="password-msg" class="notice" role="status"></p>
+</section>
+</main>
+</div>
+
+<dialog id="lightbox" aria-label="Image preview"><form method="dialog"><button class="close" aria-label="Close">×</button></form><img id="lightbox-img" alt=""><p id="lightbox-caption" class="muted"></p></dialog>
+<dialog id="help" aria-labelledby="help-title"><form method="dialog"><button class="close" aria-label="Close">×</button></form>
+  <h2 id="help-title">Keyboard shortcuts</h2>
+  <dl class="keys">
+    <dt>j / k</dt><dd>Next / previous event</dd>
+    <dt>c</dt><dd>Confirm focused event</dd>
+    <dt>f</dt><dd>Mark false positive</dd>
+    <dt>n</dt><dd>Back to needs review</dd>
+    <dt>x</dt><dd>Select / unselect</dd>
+    <dt>Delete</dt><dd>Delete focused event</dd>
+    <dt>o</dt><dd>Open context image</dd>
+    <dt>/</dt><dd>Search</dd>
+    <dt>?</dt><dd>This help</dd>
+  </dl>
+</dialog>
+</body>
+</html>

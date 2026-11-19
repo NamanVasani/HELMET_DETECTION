@@ -7,14 +7,16 @@ from unittest.mock import patch
 
 import numpy as np
 
-from event_store import (associate_objects, clean_expired_events, delete_event, list_events,
-                         read_plate_text, save_event, update_review)
+from event_store import (associate_objects, bulk_apply, clean_expired_events, delete_event, event_stats,
+                         export_csv, export_zip, get_setting, import_storage, list_audit, list_events,
+                         normalize_plate, query_events, read_plate_text, record_audit, save_event,
+                         set_setting, update_review)
 
 
 class EventStoreTests(unittest.TestCase):
     def test_reopening_review_resets_plate_association(self):
         with tempfile.TemporaryDirectory() as temp:
-            head = {"class_name": "helmet", "confidence": 0.9, "track_id": 1, "box": [10, 10, 30, 30]}
+            head = {"class_name": "no-helmet", "confidence": 0.9, "track_id": 1, "box": [10, 10, 30, 30]}
             plate = dict(head, class_name="number-plate", box=[20, 50, 40, 60])
             event = save_event(np.zeros((80, 100, 3), dtype=np.uint8), head, [head, plate],
                                {"rider": None, "bike": None, "plate": plate}, root=temp, ocr=lambda _: "")
@@ -171,6 +173,134 @@ class EventStoreTests(unittest.TestCase):
             self.assertEqual(list_events(event["date"], root), [event])
             self.assertTrue(delete_event(event["date"], event["id"], root))
             self.assertFalse(folder.exists())
+
+
+    def _event(self, root, name="no-helmet", **kwargs):
+        detection = {"class_name": name, "confidence": 0.9, "track_id": 1, "box": [10, 10, 40, 40]}
+        return save_event(np.zeros((80, 100, 3), dtype=np.uint8), detection, [detection],
+                          associate_objects(detection, [detection]), root=root, **kwargs)
+
+    def _age(self, root, event, day):
+        """Move an event to an older date folder and record (simulates aged evidence)."""
+        import sqlite3
+        import shutil
+        old_folder = Path(root) / event["date"] / event["category"] / event["id"]
+        new_folder = Path(root) / day / event["category"] / event["id"]
+        new_folder.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(old_folder), str(new_folder))
+        event = dict(event, date=day, timestamp=day + event["timestamp"][10:])
+        connection = sqlite3.connect(Path(root) / "events.db")
+        connection.execute("UPDATE events SET date=?, timestamp=?, data=? WHERE id=?",
+                           (day, event["timestamp"], json.dumps(event), event["id"]))
+        connection.commit()
+        connection.close()
+        return event
+
+    def test_retention_keeps_confirmed_evidence_and_removes_the_rest(self):
+        with tempfile.TemporaryDirectory() as temp:
+            keep = self._age(temp, self._event(temp), "2025-01-01")
+            drop = self._age(temp, self._event(temp), "2025-01-01")
+            update_review(keep["date"], keep["id"], "confirmed", root=temp)
+            self.assertEqual(clean_expired_events(temp, today=date(2025, 3, 1), retention_days=30,
+                                                  keep_confirmed=True), 0)
+            remaining = list_events("2025-01-01", temp)
+            self.assertEqual([event["id"] for event in remaining], [keep["id"]])
+            self.assertTrue((Path(temp) / "2025-01-01" / "no_helmet" / keep["id"] / "person.jpg").is_file())
+            self.assertFalse((Path(temp) / "2025-01-01" / "no_helmet" / drop["id"]).exists())
+            self.assertEqual(clean_expired_events(temp, today=date(2025, 3, 1), retention_days=30,
+                                                  keep_confirmed=False), 1)
+            self.assertEqual(list_events("2025-01-01", temp), [])
+
+    def test_retention_zero_keeps_everything(self):
+        with tempfile.TemporaryDirectory() as temp:
+            event = self._age(temp, self._event(temp), "2020-01-01")
+            self.assertEqual(clean_expired_events(temp, today=date(2025, 3, 1), retention_days=0), 0)
+            self.assertEqual(len(list_events(event["date"], temp)), 1)
+
+    def test_privacy_mode_blurs_faces_and_drops_plates_for_helmet_riders(self):
+        with tempfile.TemporaryDirectory() as temp:
+            frame = np.zeros((120, 160, 3), dtype=np.uint8)
+            frame[20:60, 20:60] = np.indices((40, 40)).sum(axis=0)[..., None] % 2 * 255
+            head = {"class_name": "helmet", "confidence": 0.9, "track_id": 1, "box": [15, 5, 65, 65]}
+            face = {"class_name": "face", "confidence": 0.9, "track_id": None, "box": [20, 20, 60, 60]}
+            plate = {"class_name": "number-plate", "confidence": 0.9, "track_id": 2, "box": [100, 90, 150, 110]}
+            event = save_event(frame, head, [head, face, plate], {"rider": None, "bike": None, "plate": plate},
+                               root=temp, ocr=lambda _: "GJ01AB1234", privacy=True)
+            self.assertIsNone(event["plate"])
+            self.assertEqual(event["plate_text"], "")
+            self.assertEqual(event["privacy"], {"faces_blurred": 1, "plate_dropped": True})
+            import cv2
+            saved = cv2.imread(str(Path(temp) / event["date"] / "helmet" / event["id"] / "person.jpg"))
+            self.assertLess(saved.std(), frame[20:60, 20:60].std() / 2)
+            violation = save_event(frame, dict(head, class_name="no-helmet"), [head, face, plate],
+                                   {"rider": None, "bike": None, "plate": plate}, root=temp,
+                                   ocr=lambda _: "GJ01AB1234", privacy=True)
+            self.assertEqual(violation["plate_text"], "GJ01AB1234")
+            self.assertEqual(violation["privacy"], {"faces_blurred": 0, "plate_dropped": False})
+
+    def test_plate_normalisation_fixes_common_ocr_confusions(self):
+        self.assertEqual(normalize_plate("GJO1AB1234"), ("GJ01AB1234", True))
+        self.assertEqual(normalize_plate("6J01A8I234"), ("GJ01AB1234", True))
+        self.assertEqual(normalize_plate("22BH1234AA"), ("22BH1234AA", True))
+        self.assertEqual(normalize_plate("dl3cab1234"), ("DL3CAB1234", True))
+        self.assertEqual(normalize_plate("HELLO"), ("HELLO", False))
+
+    def test_query_filters_stats_and_bulk_actions(self):
+        with tempfile.TemporaryDirectory() as temp:
+            violation = self._event(temp, ocr=lambda _: "", source={"type": "rtsp", "camera": "Gate 1"})
+            helmet = self._event(temp, "helmet")
+            update_review(violation["date"], violation["id"], "confirmed", "GJ01AB1234", temp)
+            events, total = query_events(temp, category="no_helmet")
+            self.assertEqual((total, events[0]["id"]), (1, violation["id"]))
+            self.assertEqual(query_events(temp, q="ab12")[1], 1)
+            self.assertEqual(query_events(temp, status="needs_review")[0][0]["id"], helmet["id"])
+            self.assertEqual(query_events(temp, camera="Gate 1")[1], 1)
+            self.assertEqual(query_events(temp, limit=1, offset=1)[1], 2)
+            self.assertEqual(len(query_events(temp, limit=1, offset=1)[0]), 1)
+            with self.assertRaises(ValueError):
+                query_events(temp, status="bogus")
+            stats = event_stats(temp)
+            self.assertEqual(stats["totals"]["events"], 2)
+            self.assertEqual(stats["totals"]["confirmed"], 1)
+            self.assertEqual(stats["totals"]["false_positive_rate"], 0.0)
+            self.assertIn("Gate 1", stats["cameras"])
+            results = bulk_apply([{"date": helmet["date"], "id": helmet["id"]}, {"date": "x", "id": "y"}],
+                                 "review", temp, status="false_positive")
+            self.assertEqual([item["ok"] for item in results], [True, False])
+            self.assertEqual(event_stats(temp)["totals"]["false_positive"], 1)
+            results = bulk_apply([{"date": helmet["date"], "id": helmet["id"]}], "delete", temp)
+            self.assertTrue(results[0]["ok"])
+            self.assertEqual(query_events(temp)[1], 1)
+
+    def test_csv_and_zip_export_include_evidence_and_block_formulas(self):
+        import io
+        import zipfile
+        with tempfile.TemporaryDirectory() as temp:
+            event = self._event(temp, source={"type": "video", "filename": "=cmd().mp4", "id": "c",
+                                               "frame": 1, "position_seconds": 0.1})
+            text = export_csv([event])
+            self.assertIn("'=cmd().mp4", text)
+            self.assertIn(event["id"], text)
+            archive = zipfile.ZipFile(export_zip([event], temp, io.BytesIO()))
+            names = archive.namelist()
+            self.assertIn("events.csv", names)
+            self.assertIn(f"{event['date']}/no_helmet/{event['id']}/person.jpg", names)
+
+    def test_import_storage_merges_backup_without_overwriting(self):
+        with tempfile.TemporaryDirectory() as source, tempfile.TemporaryDirectory() as target:
+            event = self._event(source)
+            self.assertEqual(import_storage(source, target), 1)
+            self.assertEqual(import_storage(source, target), 0)
+            self.assertTrue((Path(target) / event["date"] / "no_helmet" / event["id"] / "event.jpg").is_file())
+            self.assertEqual(list_events(event["date"], target)[0]["id"], event["id"])
+
+    def test_audit_log_and_settings_round_trip(self):
+        with tempfile.TemporaryDirectory() as temp:
+            record_audit(temp, "admin", "review", "2025-01-01/event_1", {"status": "confirmed"})
+            self.assertEqual(list_audit(temp)[0]["details"], {"status": "confirmed"})
+            self.assertIsNone(get_setting(temp, "alerts"))
+            set_setting(temp, "alerts", {"webhook_url": "https://example.test"})
+            self.assertEqual(get_setting(temp, "alerts")["webhook_url"], "https://example.test")
 
 
 if __name__ == "__main__":

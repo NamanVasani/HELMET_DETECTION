@@ -1,0 +1,14 @@
+[project]
+name = "helmet"
+version = "2.0.0"
+description = "Helmet compliance detection with a local review dashboard"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 130
+target-version = "py311"
+extend-exclude = [".venv", ".venv-py39", "_archive", "node_modules", "merged_dataset", "runs",
+                  "Helmet-Detection_YOLOv8-3", "Helmet-and-no-helmet-rider-detection-6"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B"]

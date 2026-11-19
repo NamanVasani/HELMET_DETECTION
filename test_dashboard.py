@@ -12,14 +12,17 @@ from urllib.error import HTTPError
 import cv2
 import numpy as np
 
-from dashboard import DashboardServer, PAGE
+from dashboard import DashboardServer
 from event_store import associate_objects, save_event
+
+STATIC = Path(__file__).resolve().parent / "static"
+PAGE = (STATIC / "index.html").read_text() + (STATIC / "app.js").read_text()
 
 
 class DashboardTests(unittest.TestCase):
     def test_retention_runs_while_server_stays_open_and_retries_failures(self):
         with tempfile.TemporaryDirectory() as temp:
-            server = DashboardServer(port=0, storage=Path(temp))
+            server = DashboardServer(port=0, storage=Path(temp), require_auth=False)
             try:
                 deadline = server.cleanup_after
                 with patch("dashboard.time.monotonic", return_value=deadline - 1), \
@@ -36,7 +39,7 @@ class DashboardTests(unittest.TestCase):
                     server.cleanup_expired()
                     cleanup.assert_called_once_with(Path(temp))
             finally:
-                server.server.server_close()
+                server.close()
 
     def test_full_frame_people_confirm_together_with_video_provenance(self):
         import hi
@@ -44,7 +47,7 @@ class DashboardTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             video = Path(temp) / "clip.mp4"
             video.write_bytes(b"test")
-            server = DashboardServer(port=0, storage=Path(temp) / "events")
+            server = DashboardServer(port=0, storage=Path(temp) / "events", require_auth=False)
             server.next_video = Mock(side_effect=[{"path": str(video), "filename": "junction.mp4", "id": "clip1"}, None, None])
             server.next_frame = Mock(side_effect=KeyboardInterrupt)
             capture = Mock()
@@ -73,14 +76,14 @@ class DashboardTests(unittest.TestCase):
                 self.assertEqual(event["source"], {"type": "video", "filename": "junction.mp4", "id": "clip1",
                                                    "frame": 2, "position_seconds": 0.2})
             self.assertFalse(video.exists())
-            server.server.server_close()
+            server.close()
 
     def test_opened_video_with_no_readable_frames_reports_failure_and_is_deleted(self):
         import hi
         with tempfile.TemporaryDirectory() as temp:
             video = Path(temp) / "empty.mp4"
             video.write_bytes(b"empty")
-            server = DashboardServer(port=0, storage=Path(temp) / "events")
+            server = DashboardServer(port=0, storage=Path(temp) / "events", require_auth=False)
             server.next_video = Mock(side_effect=[{"path": str(video), "filename": "empty.mp4", "id": "empty"}, None, None])
             server.next_frame = Mock(side_effect=KeyboardInterrupt)
             capture = Mock()
@@ -97,15 +100,15 @@ class DashboardTests(unittest.TestCase):
             self.assertEqual(server.video["state"], "failed")
             self.assertIn("no decodable frames", server.video["error"])
             self.assertFalse(video.exists())
-            server.server.server_close()
+            server.close()
 
     def test_detector_failure_keeps_event_review_available(self):
         import hi
         with tempfile.TemporaryDirectory() as temp:
-            server = DashboardServer(port=0, storage=Path(temp))
+            server = DashboardServer(port=0, storage=Path(temp), require_auth=False)
 
             def check_review(_seconds):
-                base = f"http://127.0.0.1:{server.server.server_address[1]}"
+                base = f"http://127.0.0.1:{server.port}"
                 with urlopen(base + "/api/status") as response:
                     status = json.load(response)
                 self.assertFalse(status["camera_enabled"])
@@ -125,7 +128,7 @@ class DashboardTests(unittest.TestCase):
     def test_failed_detector_is_retried_without_rebinding_dashboard(self):
         import hi
         with tempfile.TemporaryDirectory() as temp:
-            server = DashboardServer(port=0, storage=Path(temp))
+            server = DashboardServer(port=0, storage=Path(temp), require_auth=False)
             with patch.object(hi, "DashboardServer", return_value=server), \
                  patch.object(hi, "run_detector", side_effect=[RuntimeError("transient"), KeyboardInterrupt]) as detector, \
                  patch.object(server.restart_detector, "wait", return_value=False), \
@@ -140,8 +143,8 @@ class DashboardTests(unittest.TestCase):
             detection = {"class_name": "helmet", "confidence": 0.9, "track_id": 1, "box": [10, 10, 40, 40]}
             event = save_event(np.zeros((80, 100, 3), dtype=np.uint8), detection, [detection],
                                associate_objects(detection, [detection]), root=root)
-            server = DashboardServer(port=0, storage=root).start()
-            base = f"http://127.0.0.1:{server.server.server_address[1]}"
+            server = DashboardServer(port=0, storage=root, require_auth=False).start()
+            base = f"http://127.0.0.1:{server.port}"
             try:
                 with self.assertRaises(HTTPError) as error:
                     urlopen(Request(base + "/api/detector/restart", data=b""))
@@ -164,9 +167,9 @@ class DashboardTests(unittest.TestCase):
 
     def test_local_dashboard_rejects_foreign_hosts_and_camera_origins(self):
         with tempfile.TemporaryDirectory() as temp:
-            server = DashboardServer(port=0, storage=Path(temp), accept_frames=True).start()
+            server = DashboardServer(port=0, storage=Path(temp), accept_frames=True, require_auth=False).start()
             try:
-                base = f"http://127.0.0.1:{server.server.server_address[1]}"
+                base = f"http://127.0.0.1:{server.port}"
                 requests = [
                     Request(base + "/api/status", headers={"Host": "attacker.example"}),
                     Request(base + "/api/frame", data=b"\xff\xd8test",
@@ -184,9 +187,9 @@ class DashboardTests(unittest.TestCase):
 
     def test_review_mode_reports_camera_disabled_and_rejects_frames(self):
         with tempfile.TemporaryDirectory() as temp:
-            server = DashboardServer(port=0, storage=Path(temp)).start()
+            server = DashboardServer(port=0, storage=Path(temp), require_auth=False).start()
             try:
-                base = f"http://127.0.0.1:{server.server.server_address[1]}"
+                base = f"http://127.0.0.1:{server.port}"
                 with urlopen(base + "/api/status") as response:
                     status = json.load(response)
                 self.assertFalse(status["camera_enabled"])
@@ -208,10 +211,10 @@ class DashboardTests(unittest.TestCase):
                              "box": [10, 10, 40, 40]}
                 save_event(frame, detection, [detection], associate_objects(detection, [detection]), root=root)
 
-            server = DashboardServer(port=0, storage=root, accept_video=True, accept_frames=True).start()
+            server = DashboardServer(port=0, storage=root, accept_video=True, accept_frames=True, require_auth=False).start()
             queued = None
             try:
-                port = server.server.server_address[1]
+                port = server.port
                 server.update_status("Camera permission denied")
                 server.update_frame(b"test-frame")
                 with urlopen(f"http://127.0.0.1:{port}/api/status") as response:

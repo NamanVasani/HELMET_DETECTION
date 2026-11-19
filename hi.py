@@ -38,7 +38,7 @@ def load_thresholds(model_path, path):
     if not path.is_file():
         return {"helmet": DETECTION_CONFIDENCE, "no-helmet": DETECTION_CONFIDENCE}
     calibration = json.loads(path.read_text())
-    if calibration["model_sha256"] != hashlib.sha256(model_path.read_bytes()).hexdigest():
+    if calibration["model_sha256"] != model_digest(model_path):
         raise ValueError("Threshold calibration does not match this model; rerun evaluate_model.py")
     thresholds = calibration["full_frame"]
     if set(thresholds) != {"helmet", "no-helmet"} or any(
@@ -154,7 +154,8 @@ def event_track_keys(event_detection, association, target=None):
 
 
 def meets_detection_threshold(detection):
-    threshold = ZOOM_CONFIDENCE if detection.get("zoomed") else FULL_FRAME_THRESHOLDS.get(detection.get("class_name"), DETECTION_CONFIDENCE)
+    threshold = ZOOM_CONFIDENCE if detection.get("zoomed") else \
+        FULL_FRAME_THRESHOLDS.get(detection.get("class_name"), DETECTION_CONFIDENCE)
     return detection["confidence"] >= threshold
 
 
@@ -243,7 +244,7 @@ def read_detections(result, model, min_confidence=0.80, offset=(0, 0), scale=1.0
     detections = []
     if result.boxes is None:
         return detections
-    for index, box in enumerate(result.boxes):
+    for box in result.boxes:
         confidence = float(box.conf[0].item())
         class_id = int(box.cls[0].item())
         class_name = model.names[class_id]
@@ -299,7 +300,123 @@ def reset_tracks(model):
         tracker.reset()
 
 
-def run_detector(dashboard):
+def model_digest(model_path):
+    """SHA-256 of a checkpoint file, or of every file inside an exported model directory."""
+    model_path = Path(model_path)
+    digest = hashlib.sha256()
+    if model_path.is_dir():
+        for path in sorted(item for item in model_path.rglob("*") if item.is_file()):
+            digest.update(path.relative_to(model_path).as_posix().encode())
+            digest.update(path.read_bytes())
+    else:
+        digest.update(model_path.read_bytes())
+    return digest.hexdigest()
+
+
+def load_zoom_threshold(model_path, path):
+    """Calibrated enlarged-crop threshold bound to the same checkpoint, else the 0.50 default."""
+    if not path.is_file():
+        return ZOOM_CONFIDENCE
+    calibration = json.loads(path.read_text())
+    value = calibration.get("zoom_crop", ZOOM_CONFIDENCE)
+    if calibration.get("model_sha256") != model_digest(model_path) or type(value) not in (int, float) \
+            or not math.isfinite(value) or not 0 < value < 1:
+        return ZOOM_CONFIDENCE
+    return float(value)
+
+
+class SourcePipeline:
+    """Detection, confirmation and capture state for one input source (browser, video, or a CCTV camera)."""
+
+    def __init__(self, key, model, face_detector, thresholds, zoom_threshold=ZOOM_CONFIDENCE):
+        self.key = key
+        self.model = model
+        self.face_detector = face_detector
+        self.thresholds = thresholds
+        self.zoom_threshold = zoom_threshold
+        self.frames = 0
+        self.started = time.monotonic()
+        self.fps = 0.0
+        self.events = 0
+        self.reset()
+
+    def reset(self):
+        self.captures = CaptureState()
+        self.confirmations = EventConfirmation()
+        self.last_faces, self.face_misses = [], 0
+        reset_tracks(self.model)
+
+    def _qualifies(self, detection):
+        threshold = self.zoom_threshold if detection.get("zoomed") else \
+            self.thresholds.get(detection.get("class_name"), DETECTION_CONFIDENCE)
+        return detection["confidence"] >= threshold
+
+    def process(self, frame, source, dashboard, alerts=None):
+        result = self.model.track(
+            frame,
+            persist=True,
+            tracker="bytetrack.yaml",
+            conf=0.15,
+            iou=0.4,
+            imgsz=INFERENCE_SIZE,
+            classes=[0, 1, 2, 3, 4],
+            verbose=False,
+        )[0]
+        detections = read_detections(result, self.model, locator=True)
+        faces, self.last_faces, self.face_misses = face_targets(
+            detect_faces(frame, self.face_detector), self.last_faces, self.face_misses
+        )
+        detections.extend(faces)
+        target = self.captures.select(detections, self.frames, time.monotonic())
+        zoomed, region = zoom_region(frame, detections, target)
+        focused_head = any(self._qualifies(item) and belongs_to_focus(
+            associate_objects(item, detections), target, item
+        ) for item in detections if item["class_name"] in {"helmet", "no-helmet"})
+        if target and region and not focused_head:
+            left, top, zoom = region
+            close_result = self.model.predict(zoomed, conf=self.zoom_threshold, imgsz=INFERENCE_SIZE,
+                                              classes=[0, 1, 2, 4], verbose=False)[0]
+            detections.extend(read_detections(close_result, self.model, min_confidence=self.zoom_threshold,
+                                              offset=(left, top), scale=zoom,
+                                              track_id_override=target.get("track_id") if target else None))
+
+        eligible = []
+        for event_detection in (item for item in detections if item["class_name"] in {"helmet", "no-helmet"}):
+            association = associate_objects(event_detection, detections)
+            if self._qualifies(event_detection) and (
+                not event_detection.get("zoomed") or belongs_to_focus(association, target, event_detection)
+            ):
+                eligible.append((event_detection, association))
+        now = time.monotonic()
+        saved = []
+        for event_detection, association in self.confirmations.update(eligible, now):
+            event = save_event(frame, event_detection, detections, association, root=dashboard.storage,
+                               confirmation_frames=CONFIRMATION_FRAMES, source=source)
+            self.confirmations.saved(event_detection, association, now)
+            if self.captures.current and belongs_to_focus(association, target, event_detection):
+                self.captures.saved(now)
+            self.events += 1
+            saved.append(event)
+            print(f"Saved {event['category']} {event['id']} from {self.key} — review at {dashboard.url}")
+            if alerts is not None:
+                folder = Path(dashboard.storage) / event["date"] / event["category"] / event["id"]
+                alerts.notify(event, folder / "person.jpg")
+
+        visible = [item for item in detections
+                   if item["class_name"] not in {"helmet", "no-helmet"} or self._qualifies(item)]
+        preview = adaptive_zoom(draw_detections(frame.copy(), visible), detections, target)
+        ok, encoded = cv2.imencode(".jpg", preview, [cv2.IMWRITE_JPEG_QUALITY, 78])
+        if ok:
+            dashboard.update_frame(encoded.tobytes(), source=self.key)
+        self.frames += 1
+        elapsed = time.monotonic() - self.started
+        if elapsed >= 2:
+            self.fps = self.frames / elapsed
+        dashboard.update_metrics(self.key, {"fps": round(self.fps, 2), "frames": self.frames, "events": self.events})
+        return saved
+
+
+def run_detector(dashboard, cameras=None, alerts=None):
     cv2.setNumThreads(min(2, os.cpu_count() or 1))
     clean_expired_events(dashboard.storage)
     print(f"Events save locally under: {dashboard.storage}")
@@ -316,33 +433,44 @@ def run_detector(dashboard):
         names = [model.names[index] for index in range(len(model.names))]
         if names != EXPECTED_CLASSES:
             raise ValueError(f"Helmet model classes must be {EXPECTED_CLASSES}; got {names}")
-        FULL_FRAME_THRESHOLDS.update(load_thresholds(MODEL_PATH, PROJECT / "thresholds.json"))
-        face_detector = cv2.FaceDetectorYN.create(
-            str(FACE_MODEL_PATH), "", (CAMERA_WIDTH, CAMERA_HEIGHT),
-            0.6, 0.3, 5000,
-        )
+        thresholds = {**FULL_FRAME_THRESHOLDS, **load_thresholds(MODEL_PATH, PROJECT / "thresholds.json")}
+        try:
+            zoom_threshold = load_zoom_threshold(MODEL_PATH, PROJECT / "thresholds.json")
+        except (OSError, ValueError):
+            zoom_threshold = ZOOM_CONFIDENCE
+        pipelines = {}
+
+        def pipeline(key):
+            if key not in pipelines:
+                face_detector = cv2.FaceDetectorYN.create(
+                    str(FACE_MODEL_PATH), "", (CAMERA_WIDTH, CAMERA_HEIGHT), 0.6, 0.3, 5000,
+                )
+                # Each source needs its own tracker state, so later sources get their own model instance.
+                pipelines[key] = SourcePipeline(key, model if not pipelines else YOLO(MODEL_PATH), face_detector,
+                                                thresholds, zoom_threshold)
+            return pipelines[key]
+
+        pipeline("browser")
         dashboard.accept_frames = True
         dashboard.accept_video = True
         dashboard.update_status("Detector ready. Waiting for browser camera permission.")
         print("Detector ready. Allow camera access in the website to start live detection.")
-        frame_count = 0
-        start = time.time()
-        captures = CaptureState()
-        confirmations = EventConfirmation()
-        last_faces, face_misses = [], 0
+        next_sync = 0
         while not dashboard.restart_detector.is_set():
+            if cameras is not None and time.monotonic() >= next_sync:
+                cameras.sync()
+                dashboard.update_cameras(cameras.statuses())
+                next_sync = time.monotonic() + 2
             if video_path is None:
                 requested_video = dashboard.next_video()
                 if requested_video:
+                    dashboard.cancel_video.clear()
                     video_cap = cv2.VideoCapture(requested_video["path"])
                     if video_cap.isOpened():
                         dashboard.update_status("Analyzing uploaded video; live camera is paused.")
                         video_path = requested_video["path"]
                         video_source = {key: requested_video[key] for key in ("filename", "id")}
-                        captures = CaptureState()
-                        confirmations = EventConfirmation()
-                        last_faces, face_misses = [], 0
-                        reset_tracks(model)
+                        pipeline("video").reset()
                         dashboard.update_video("processing", frames=0, total=int(video_cap.get(cv2.CAP_PROP_FRAME_COUNT)))
                         print("Analyzing uploaded video...")
                     else:
@@ -353,7 +481,8 @@ def run_detector(dashboard):
                         print("Could not open uploaded video.")
 
             if video_path:
-                ret, frame = video_cap.read()
+                canceled = dashboard.cancel_video.is_set()
+                ret, frame = (False, None) if canceled else video_cap.read()
                 if not ret:
                     completed_frames = int(video_cap.get(cv2.CAP_PROP_POS_FRAMES))
                     video_cap.release()
@@ -361,61 +490,16 @@ def run_detector(dashboard):
                     Path(video_path).unlink(missing_ok=True)
                     video_path = None
                     video_source = None
-                    captures = CaptureState()
-                    confirmations = EventConfirmation()
-                    last_faces, face_misses = [], 0
-                    reset_tracks(model)
-                    dashboard.update_video("complete" if completed_frames else "failed",
-                                           error="" if completed_frames else "The video contains no decodable frames.")
+                    pipeline("video").reset()
+                    if canceled:
+                        dashboard.cancel_video.clear()
+                        dashboard.update_video("failed", error="Video analysis canceled. Events saved so far remain.")
+                    else:
+                        dashboard.update_video("complete" if completed_frames else "failed",
+                                               error="" if completed_frames else "The video contains no decodable frames.")
                     dashboard.update_status("Video analysis complete. Waiting for browser camera frames.")
                     print("Video analysis complete. Live browser camera resumed.")
                     continue
-            else:
-                frame_data = dashboard.next_frame(timeout=1)
-                if frame_data is None:
-                    continue
-                frame = cv2.imdecode(np.frombuffer(frame_data, dtype=np.uint8), cv2.IMREAD_COLOR)
-                if frame is None:
-                    continue
-                dashboard.update_status("Live browser camera and helmet detection are running.")
-
-            result = model.track(
-                frame,
-                persist=True,
-                tracker="bytetrack.yaml",
-                conf=0.15,
-                iou=0.4,
-                imgsz=INFERENCE_SIZE,
-                classes=[0, 1, 2, 3, 4],
-                verbose=False,
-            )[0]
-            detections = read_detections(result, model, locator=True)
-            faces, last_faces, face_misses = face_targets(
-                detect_faces(frame, face_detector), last_faces, face_misses
-            )
-            detections.extend(faces)
-            target = captures.select(detections, frame_count, time.monotonic())
-            zoomed, region = zoom_region(frame, detections, target)
-            focused_head = any(should_save_detection(item) and belongs_to_focus(
-                associate_objects(item, detections), target, item
-            ) for item in detections if item["class_name"] in {"helmet", "no-helmet"})
-            if target and region and not focused_head:
-                left, top, zoom = region
-                close_result = model.predict(zoomed, conf=ZOOM_CONFIDENCE, imgsz=INFERENCE_SIZE,
-                                             classes=[0, 1, 2, 4], verbose=False)[0]
-                detections.extend(read_detections(close_result, model, min_confidence=ZOOM_CONFIDENCE,
-                                                  offset=(left, top), scale=zoom,
-                                                  track_id_override=target.get("track_id") if target else None))
-
-            eligible = []
-            for event_detection in (item for item in detections if item["class_name"] in {"helmet", "no-helmet"}):
-                association = associate_objects(event_detection, detections)
-                if should_save_detection(event_detection) and (
-                    not event_detection.get("zoomed") or belongs_to_focus(association, target, event_detection)
-                ):
-                    eligible.append((event_detection, association))
-            source = {"type": "camera"}
-            if video_path:
                 frame_index = max(0, int(video_cap.get(cv2.CAP_PROP_POS_FRAMES)) - 1)
                 position = video_cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
                 if not math.isfinite(position) or position < 0 or (position == 0 and frame_index > 0):
@@ -423,27 +507,27 @@ def run_detector(dashboard):
                     position = frame_index / fps if math.isfinite(fps) and fps > 0 else None
                 source = dict(video_source, type="video", frame=frame_index,
                               position_seconds=round(position, 3) if position is not None else None)
-            now = time.monotonic()
-            for event_detection, association in confirmations.update(eligible, now):
-                event = save_event(frame, event_detection, detections, association, root=dashboard.storage,
-                                   confirmation_frames=CONFIRMATION_FRAMES, source=source)
-                confirmations.saved(event_detection, association, now)
-                if captures.current and belongs_to_focus(association, target, event_detection):
-                    captures.saved(now)
-                print(f"Saved {event['category']} {event['id']} — review at http://127.0.0.1:8003")
-
-            preview = adaptive_zoom(draw_detections(frame.copy(), visible_detections(detections)),
-                                    detections, target)
-            ok, encoded = cv2.imencode(".jpg", preview, [cv2.IMWRITE_JPEG_QUALITY, 78])
-            if ok:
-                dashboard.update_frame(encoded.tobytes())
-
-            frame_count += 1
-            if video_path:
+                pipeline("video").process(frame, source, dashboard, alerts)
                 dashboard.update_video("processing", frames=int(video_cap.get(cv2.CAP_PROP_POS_FRAMES)))
-            if frame_count % 30 == 0:
-                fps = frame_count / max(time.time() - start, 0.001)
-                print(f"Running... ~{fps:.1f} FPS")
+                continue
+
+            worked = False
+            for key, reader in list(cameras.readers.items()) if cameras is not None else []:
+                camera_frame = reader.latest()
+                if camera_frame is None:
+                    continue
+                worked = True
+                source = {"type": "rtsp", "camera": reader.camera["name"], "camera_id": key,
+                          "site": reader.camera.get("site", "")}
+                pipeline(f"camera:{key}").process(camera_frame, source, dashboard, alerts)
+            frame_data = dashboard.next_frame(timeout=0 if worked else 0.05 if cameras and cameras.readers else 1)
+            if frame_data is None:
+                continue
+            frame = cv2.imdecode(np.frombuffer(frame_data, dtype=np.uint8), cv2.IMREAD_COLOR)
+            if frame is None:
+                continue
+            dashboard.update_status("Live browser camera and helmet detection are running.")
+            pipeline("browser").process(frame, {"type": "camera", "camera": "browser"}, dashboard, alerts)
 
     finally:
         if video_path:
@@ -461,25 +545,33 @@ def run_detector(dashboard):
 
 
 def main():
+    from alerts import AlertDispatcher
+    from cameras import CameraManager
+
     dashboard = DashboardServer().start()
     dashboard.detector_managed = True
-    print(f"Dashboard: http://127.0.0.1:{dashboard.server.server_address[1]}")
+    alerts = AlertDispatcher(dashboard.storage)
+    cameras = CameraManager(dashboard.storage)
+    dashboard.alerts = alerts
+    print(f"Dashboard: {dashboard.url}")
     try:
         while True:
             dashboard.restart_detector.clear()
             dashboard.accept_frames = False
             dashboard.accept_video = False
             try:
-                run_detector(dashboard)
+                run_detector(dashboard, cameras, alerts)
             except Exception as exc:
                 dashboard.accept_frames = False
                 dashboard.accept_video = False
-                dashboard.update_status(f"Camera detector stopped: {exc}. Retrying in 5 seconds; saved-event review remains available.")
+                dashboard.update_status(f"Camera detector stopped: {exc}. Retrying in 5 seconds; "
+                                        "saved-event review remains available.")
                 traceback.print_exc()
                 dashboard.restart_detector.wait(5)
     except KeyboardInterrupt:
         print("Stopped.")
     finally:
+        cameras.stop_all()
         dashboard.close()
 
 
