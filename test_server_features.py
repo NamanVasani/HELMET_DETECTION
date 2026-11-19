@@ -121,6 +121,11 @@ class ServerFeatureTests(unittest.TestCase):
         self.assertEqual([item["id"] for item in data["events"]], [violation["id"]])
         self.assertEqual(admin.status_of("/api/events?status=bogus"), 400)
         self.assertEqual(admin.call("/api/stats")["totals"]["events"], 2)
+        admin.call("/api/review", {"date": violation["date"], "id": violation["id"], "status": "needs_review",
+                                   "plate_text": "GJ01AB1234"})
+        offenders = admin.call("/api/offenders?min=1")["offenders"]
+        self.assertEqual([row["plate_text"] for row in offenders], ["GJ01AB1234"])
+        self.assertEqual(admin.call("/api/offenders")["offenders"], [])
         response, body = admin.call(f"/api/export.csv?date={today}", raw=True)
         self.assertIn("attachment", response.headers["Content-Disposition"])
         self.assertIn(violation["id"], body.decode())

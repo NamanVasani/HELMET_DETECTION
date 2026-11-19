@@ -458,6 +458,28 @@ def event_stats(root=STORAGE, start=None, end=None, camera=None):
     return {"days": list(days.values()), "totals": totals, "cameras": cameras}
 
 
+def repeat_offenders(root=STORAGE, start=None, end=None, camera=None, min_count=2, limit=50):
+    """No-helmet events grouped by plate text (false positives excluded), most frequent first."""
+    where, params = _filters(start, end, "no_helmet", None, None, camera)
+    where += (" AND " if where else " WHERE ") + "status != 'false_positive' AND plate_text != ''"
+    with _database(root) as connection:
+        rows = connection.execute(
+            f"SELECT plate_text, COUNT(*), SUM(status = 'confirmed'), MIN(timestamp), MAX(timestamp), "
+            f"GROUP_CONCAT(DISTINCT camera) FROM events{where} GROUP BY plate_text HAVING COUNT(*) >= ? "
+            f"ORDER BY COUNT(*) DESC, MAX(timestamp) DESC LIMIT ?",
+            params + [max(1, int(min_count)), max(1, min(int(limit), 500))]).fetchall()
+        result = []
+        for plate, count, confirmed, first, last, cameras in rows:
+            latest = connection.execute(
+                f"SELECT date, id FROM events{where} AND plate_text = ? ORDER BY timestamp DESC, id DESC LIMIT 1",
+                params + [plate]).fetchone()
+            result.append({"plate_text": plate, "events": count, "confirmed": confirmed or 0,
+                           "first_seen": first, "last_seen": last,
+                           "cameras": sorted(filter(None, (cameras or "").split(","))),
+                           "latest": {"date": latest[0], "id": latest[1]} if latest else None})
+    return result
+
+
 def get_event(day, event_id, root=STORAGE):
     _validate_ref(day, event_id)
     with _database(root) as connection:

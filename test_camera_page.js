@@ -34,6 +34,8 @@ function makePage({session, status, events = [], role = 'admin'}) {
     else if (url.startsWith('/api/status')) body = env.status;
     else if (url.startsWith('/api/bulk')) { env.bulk = JSON.parse(options.body); body = {results: env.bulk.items.map(i => ({...i, ok: true}))}; }
     else if (url.startsWith('/api/cameras')) body = {cameras: []};
+    else if (url.startsWith('/api/offenders')) body = {offenders: [{plate_text: 'GJ01AB1234', events: 3, confirmed: 1,
+      cameras: ['Gate 1'], last_seen: '2026-11-19T10:00:00+05:30', latest: {date: '2026-11-19', id: 'event_9'}}]};
     else if (url.startsWith('/api/review') && env.reviewFails) { code = 500; body = {error: 'disk full'}; }
     return {ok: code < 400, status: code, json: async () => body};
   };
@@ -218,6 +220,15 @@ async function testViewerRoleAndAnalytics() {
   await settle();
   assert.ok(document.querySelector('#a-chart svg'), 'Chart renders');
   assert.ok(document.querySelectorAll('#a-chart rect').length >= 2);
+  // Repeat plates table, and clicking a plate opens Review filtered to it.
+  assert.match(document.querySelector('#offender-rows').textContent, /GJ01AB1234\s*3\s*1\s*Gate 1/);
+  document.querySelector('#offender-rows .plate-link').click();
+  await settle();
+  assert.equal(document.querySelector('#tab-review').hidden, false);
+  assert.equal(document.querySelector('#f-q').value, 'GJ01AB1234');
+  const filtered = page.env.requests.filter(r => r.url.startsWith('/api/events')).pop();
+  assert.match(filtered.url, /q=GJ01AB1234/);
+  assert.match(filtered.url, /category=no_helmet/);
 }
 
 (async () => {

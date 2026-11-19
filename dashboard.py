@@ -23,7 +23,7 @@ import uvicorn
 
 import auth
 from event_store import (STORAGE, RETENTION_DAYS, KEEP_CONFIRMED, PRIVACY_MODE, bulk_apply, clean_expired_events,
-                         delete_event, event_folder, event_stats, export_csv, export_zip, list_audit,
+                         delete_event, event_folder, event_stats, repeat_offenders, export_csv, export_zip, list_audit,
                          query_events, record_audit, update_review)
 
 PROJECT = Path(__file__).resolve().parent
@@ -433,6 +433,15 @@ class DashboardServer:
             end = params.get("end") or date.today().isoformat()
             start = params.get("start") or (date.fromisoformat(end) - timedelta(days=29)).isoformat()
             return event_stats(owner.storage, start, end, params.get("camera") or None)
+
+        @app.get("/api/offenders")
+        def offenders(request: Request):
+            require(request, "view")
+            params = request.query_params
+            end = params.get("end") or date.today().isoformat()
+            start = params.get("start") or (date.fromisoformat(end) - timedelta(days=29)).isoformat()
+            return {"offenders": repeat_offenders(owner.storage, start, end, params.get("camera") or None,
+                                                  min_count=int(params.get("min", 2)))}
 
         @app.post("/api/review")
         async def review(request: Request):

@@ -303,5 +303,26 @@ class EventStoreTests(unittest.TestCase):
             self.assertEqual(get_setting(temp, "alerts")["webhook_url"], "https://example.test")
 
 
+    def test_repeat_offenders_group_plates_and_skip_false_positives(self):
+        from event_store import repeat_offenders
+        with tempfile.TemporaryDirectory() as temp:
+            events = [self._event(temp, source={"type": "rtsp", "camera": cam}) for cam in ("Gate 1", "Gate 2", "Gate 1")]
+            for event in events:
+                update_review(event["date"], event["id"], "needs_review", "GJ01AB1234", temp)
+            update_review(events[2]["date"], events[2]["id"], "confirmed", "GJ01AB1234", temp)
+            once = self._event(temp)
+            update_review(once["date"], once["id"], "needs_review", "MH12XY0001", temp)
+            wrong = self._event(temp)
+            update_review(wrong["date"], wrong["id"], "false_positive", "MH12XY0001", temp)
+            helmet = self._event(temp, "helmet")
+            update_review(helmet["date"], helmet["id"], "needs_review", "MH12XY0001", temp)
+            result = repeat_offenders(temp)
+            self.assertEqual([row["plate_text"] for row in result], ["GJ01AB1234"])
+            self.assertEqual((result[0]["events"], result[0]["confirmed"]), (3, 1))
+            self.assertEqual(result[0]["cameras"], ["Gate 1", "Gate 2"])
+            self.assertEqual(result[0]["latest"]["id"], events[2]["id"])
+            self.assertEqual(len(repeat_offenders(temp, min_count=1)), 2)
+
+
 if __name__ == "__main__":
     unittest.main()

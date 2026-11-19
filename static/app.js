@@ -608,6 +608,12 @@ async function loadAnalytics() {
     renderTotals($('#a-totals'), data.totals);
     fillCameraSelects(data.cameras);
     $('#a-chart').innerHTML = data.days.length ? chartSvg(data.days, start, end) : '<p class="muted">No events in this period.</p>';
+    const repeat = await api('/api/offenders?' + params);
+    $('#offender-rows').innerHTML = repeat.offenders.map(row => `<tr>
+      <td><button type="button" class="ghost plate-link" data-plate="${esc(row.plate_text)}">${esc(row.plate_text)}</button></td>
+      <td>${esc(row.events)}</td><td>${esc(row.confirmed)}</td><td>${esc(row.cameras.join(', ') || '—')}</td>
+      <td>${esc(String(row.last_seen).replace('T', ' ').slice(0, 16))}</td></tr>`).join('')
+      || '<tr><td colspan="5" class="muted">No plate appears twice in this period.</td></tr>';
   } catch (error) { $('#a-chart').innerHTML = `<p class="error">${esc(error.message)}</p>`; }
 }
 
@@ -784,6 +790,18 @@ function bindOnce() {
   $('#analyze-video').addEventListener('click', analyzeVideo);
   $('#cancel-video').addEventListener('click', cancelVideo);
   ['#a-start', '#a-end', '#a-camera'].forEach(id => $(id).addEventListener('change', loadAnalytics));
+  $('#offender-rows').addEventListener('click', event => {
+    const link = event.target.closest('.plate-link');
+    if (!link) return;
+    $('#f-start').value = $('#a-start').value;
+    $('#f-end').value = $('#a-end').value;
+    $('#f-q').value = link.dataset.plate;
+    $('#f-status').value = '';
+    state.category = 'no_helmet';
+    $$('.category-filter').forEach(item => item.setAttribute('aria-pressed', String(item.dataset.category === 'no_helmet')));
+    selectTab('review');
+    filtersChanged();
+  });
   $('#cameras-form').addEventListener('submit', saveCameras);
   $('#camera-add').addEventListener('click', () => { $('#camera-rows .empty')?.remove(); $('#camera-rows').appendChild(cameraRow()); });
   $('#camera-rows').addEventListener('click', event => { if (event.target.classList.contains('drop')) event.target.closest('.camera-row').remove(); });
