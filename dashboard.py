@@ -134,6 +134,7 @@ class DashboardServer:
         cert, key = tls_cert or os.environ.get("HELMET_TLS_CERT"), tls_key or os.environ.get("HELMET_TLS_KEY")
         if cert and key:
             tls = {"ssl_certfile": str(cert), "ssl_keyfile": str(key)}
+        self.tls_cert = Path(cert) if tls else None
         self.scheme = "https" if tls else "http"
         config = uvicorn.Config(HostOriginMiddleware(self.app, self), log_level="warning", access_log=False,
                                 lifespan="off", timeout_graceful_shutdown=1, proxy_headers=False, ws="none", **tls)
@@ -324,6 +325,14 @@ class DashboardServer:
             if name not in STATIC_FILES:
                 raise HTTPException(404, "Not found")
             return FileResponse(STATIC / name, media_type=STATIC_FILES[name], headers={"Cache-Control": "no-cache"})
+
+        @app.get("/helmet-certificate.crt")
+        def certificate():
+            """Public TLS certificate, so phones can trust this Mac's dashboard. Never the private key."""
+            cert = owner.tls_cert
+            if not cert or not cert.is_file():
+                raise HTTPException(404, "Not found")
+            return FileResponse(cert, media_type="application/x-x509-ca-cert", filename="Helmet-Mac-certificate.crt")
 
         @app.get("/healthz")
         def health():

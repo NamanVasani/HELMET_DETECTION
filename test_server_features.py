@@ -252,6 +252,10 @@ class ServerConfigTests(unittest.TestCase):
                 with opener.open(request, timeout=10) as response:
                     cookie = response.headers["Set-Cookie"]
                 self.assertIn("Secure", cookie)
+                with opener.open(base + "/helmet-certificate.crt", timeout=10) as response:
+                    body = response.read()
+                self.assertTrue(body.startswith(b"-----BEGIN CERTIFICATE-----"))
+                self.assertNotIn(b"PRIVATE KEY", body)
                 self.assertIn("HttpOnly", cookie)
             finally:
                 server.close()
