@@ -21,8 +21,8 @@ RUNTIME_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.
                  "manage.py", "model-manifest.json")
 
 
-def service_config(runtime):
-    return {"Label": LABEL,
+def service_config(runtime, lan_hosts=None):
+    config = {"Label": LABEL,
             "ProgramArguments": [str(runtime / ".venv/bin/python"), "-u", str(runtime / ENTRY)],
             "WorkingDirectory": str(runtime), "RunAtLoad": True, "KeepAlive": True,
             "ThrottleInterval": 5, "Umask": 0o077,
@@ -30,6 +30,24 @@ def service_config(runtime):
                                      "PATH": "/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"},
             "StandardOutPath": str(runtime / "service.log"),
             "StandardErrorPath": str(runtime / "service-error.log")}
+    if lan_hosts:
+        # Reachable from phones on the same Wi-Fi; login stays required (the dashboard refuses otherwise).
+        config["EnvironmentVariables"].update({"HELMET_HOST": "0.0.0.0", "HELMET_AUTH": "1",
+                                               "HELMET_ALLOWED_HOSTS": ",".join(lan_hosts)})
+    return config
+
+
+def lan_hosts():
+    """This Mac's Wi-Fi/Ethernet addresses and Bonjour name, as host:port entries for the Host check."""
+    hosts = []
+    for interface in ("en0", "en1"):
+        result = subprocess.run(["ipconfig", "getifaddr", interface], capture_output=True, text=True)
+        if result.returncode == 0 and result.stdout.strip():
+            hosts.append(f"{result.stdout.strip()}:8003")
+    name = subprocess.run(["scutil", "--get", "LocalHostName"], capture_output=True, text=True).stdout.strip()
+    if name:
+        hosts.append(f"{name.lower()}.local:8003")
+    return hosts
 
 
 def prepare_runtime(project, runtime):
@@ -107,6 +125,7 @@ def main():
     parser.add_argument("--project", type=Path, default=Path(__file__).resolve().parent)
     parser.add_argument("--replace-pid", type=int, help="Existing Helmet PID to replace after preparation")
     parser.add_argument("--check", action="store_true", help="Only report whether the service is up to date")
+    parser.add_argument("--lan", action="store_true", help="Also serve phones/computers on the same Wi-Fi (login required)")
     args = parser.parse_args()
     if args.check:
         raise SystemExit(check(args.project.resolve()))
@@ -158,7 +177,7 @@ def main():
             storage.symlink_to(runtime / "storage", target_is_directory=True)
             linked = True
         (runtime / "storage").chmod(0o700)
-        agent.write_bytes(plistlib.dumps(service_config(runtime)))
+        agent.write_bytes(plistlib.dumps(service_config(runtime, lan_hosts() if args.lan else None)))
         agent.chmod(0o600)
         subprocess.run(["launchctl", "bootstrap", domain, str(agent)], check=True)
         wait_ready()

@@ -17,6 +17,14 @@ class ServiceTests(unittest.TestCase):
         self.assertNotIn("Desktop", str(config))
         self.assertEqual(config["EnvironmentVariables"]["HELMET_STORAGE"], str(runtime / "storage"))
 
+    def test_lan_mode_requires_login_and_lists_allowed_hosts(self):
+        runtime = Path("/Users/example/Library/Application Support/Helmet")
+        env = service_config(runtime, ["192.168.1.8:8003", "mac.local:8003"])["EnvironmentVariables"]
+        self.assertEqual(env["HELMET_HOST"], "0.0.0.0")
+        self.assertEqual(env["HELMET_AUTH"], "1")
+        self.assertEqual(env["HELMET_ALLOWED_HOSTS"], "192.168.1.8:8003,mac.local:8003")
+        self.assertNotIn("HELMET_HOST", service_config(runtime)["EnvironmentVariables"])
+
 
 if __name__ == "__main__":
     unittest.main()
