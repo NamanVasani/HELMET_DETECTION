@@ -224,5 +224,38 @@ class ServerConfigTests(unittest.TestCase):
                 server.close()
 
 
+    def test_https_serves_dashboard_and_secure_session_cookie(self):
+        import ssl
+        import subprocess
+        from install_service import ensure_certificate
+        with tempfile.TemporaryDirectory() as temp:
+            try:
+                cert, key = ensure_certificate(Path(temp), ["192.168.1.8:8003"])
+            except (OSError, subprocess.CalledProcessError):
+                self.skipTest("openssl unavailable")
+            self.assertIn(b"IP Address:192.168.1.8", subprocess.run(
+                ["openssl", "x509", "-in", str(cert), "-noout", "-text"], capture_output=True).stdout)
+            server = DashboardServer(port=0, storage=Path(temp) / "data", require_auth=True,
+                                     tls_cert=cert, tls_key=key).start()
+            try:
+                self.assertTrue(server.url.startswith("https://"))
+                context = ssl.create_default_context(cafile=str(cert))
+                context.check_hostname = False
+                opener = build_opener(HTTPCookieProcessor(CookieJar()),
+                                      __import__("urllib.request").request.HTTPSHandler(context=context))
+                base = f"https://127.0.0.1:{server.port}"
+                with opener.open(base + "/", timeout=10) as response:
+                    self.assertIn(b"/static/app.js", response.read())
+                request = Request(base + "/api/setup", data=json.dumps(
+                    {"username": "admin", "password": "correct horse battery"}).encode(),
+                    headers={"Content-Type": "application/json", "Origin": base})
+                with opener.open(request, timeout=10) as response:
+                    cookie = response.headers["Set-Cookie"]
+                self.assertIn("Secure", cookie)
+                self.assertIn("HttpOnly", cookie)
+            finally:
+                server.close()
+
+
 if __name__ == "__main__":
     unittest.main()

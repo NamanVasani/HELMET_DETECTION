@@ -123,8 +123,10 @@ See [PRIVACY.md](PRIVACY.md) for the full policy and the India DPDP Act 2023 che
 .venv/bin/python install_service.py --replace-pid $(lsof -tnP -iTCP:8003 -sTCP:LISTEN)
 ```
 
-Add `--lan` to also open the dashboard to phones and laptops on the same Wi-Fi (login stays required; the
-browser camera itself still needs localhost or HTTPS, so use it from the Mac).
+Add `--lan` to also open the dashboard to phones and laptops on the same Wi-Fi. It then serves **HTTPS** with a
+self-signed certificate for this Mac's IP and `.local` name (stored in the runtime's `tls/` folder), so open
+`https://<mac-ip>:8003` and accept the one-time browser warning. Login stays required, and the phone camera works
+because the page is secure.
 
 The installer copies the code, model and environment to `~/Library/Application Support/Helmet` (launchd cannot
 read the Desktop), verifies imports in a staging copy, swaps it in, and replaces the running process. Data lives in

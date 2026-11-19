@@ -13,6 +13,7 @@ import signal
 import subprocess
 import sys
 import time
+import ssl
 from urllib.request import urlopen
 
 LABEL = "com.helmet.dashboard"
@@ -21,7 +22,7 @@ RUNTIME_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.
                  "manage.py", "model-manifest.json")
 
 
-def service_config(runtime, lan_hosts=None):
+def service_config(runtime, lan_hosts=None, tls=None):
     config = {"Label": LABEL,
             "ProgramArguments": [str(runtime / ".venv/bin/python"), "-u", str(runtime / ENTRY)],
             "WorkingDirectory": str(runtime), "RunAtLoad": True, "KeepAlive": True,
@@ -34,6 +35,8 @@ def service_config(runtime, lan_hosts=None):
         # Reachable from phones on the same Wi-Fi; login stays required (the dashboard refuses otherwise).
         config["EnvironmentVariables"].update({"HELMET_HOST": "0.0.0.0", "HELMET_AUTH": "1",
                                                "HELMET_ALLOWED_HOSTS": ",".join(lan_hosts)})
+    if tls:
+        config["EnvironmentVariables"].update({"HELMET_TLS_CERT": str(tls[0]), "HELMET_TLS_KEY": str(tls[1])})
     return config
 
 
@@ -80,8 +83,36 @@ def prepare_runtime(project, runtime):
                     "print('Service environment imports passed')"], check=True, cwd=runtime)
 
 
+def local_get(path, timeout):
+    """GET the local service over HTTPS (self-signed, so unverified on loopback only) or HTTP."""
+    insecure = ssl.create_default_context()
+    insecure.check_hostname = False
+    insecure.verify_mode = ssl.CERT_NONE
+    try:
+        return urlopen(f"https://127.0.0.1:8003{path}", timeout=timeout, context=insecure)
+    except OSError:
+        return urlopen(f"http://127.0.0.1:8003{path}", timeout=timeout)
+
+
+def ensure_certificate(runtime, hosts):
+    """Self-signed certificate for this Mac's LAN names/IPs (10 years). Regenerated when the names change."""
+    folder = runtime / "tls"
+    folder.mkdir(mode=0o700, exist_ok=True)
+    cert, key, names_file = folder / "cert.pem", folder / "key.pem", folder / "names.txt"
+    names = sorted({host.rsplit(":", 1)[0] for host in hosts} | {"127.0.0.1", "localhost"})
+    if cert.is_file() and key.is_file() and names_file.is_file() and names_file.read_text() == ",".join(names):
+        return cert, key
+    san = ",".join(("IP:" if name.replace(".", "").isdigit() else "DNS:") + name for name in names)
+    subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-sha256", "-days", "3650", "-nodes",
+                    "-keyout", str(key), "-out", str(cert), "-subj", "/CN=Helmet local dashboard",
+                    "-addext", f"subjectAltName={san}"], check=True, capture_output=True)
+    key.chmod(0o600)
+    names_file.write_text(",".join(names))
+    return cert, key
+
+
 def running_version(timeout=3):
-    with urlopen("http://127.0.0.1:8003/healthz", timeout=timeout) as response:
+    with local_get("/healthz", timeout) as response:
         return json.load(response)["version"]
 
 
@@ -111,7 +142,7 @@ def wait_ready(seconds=20):
     deadline = time.monotonic() + seconds
     while time.monotonic() < deadline:
         try:
-            with urlopen("http://127.0.0.1:8003/healthz", timeout=2) as response:
+            with local_get("/healthz", 2) as response:
                 if json.load(response)["ok"]:
                     return
         except (OSError, ValueError):
@@ -177,11 +208,16 @@ def main():
             storage.symlink_to(runtime / "storage", target_is_directory=True)
             linked = True
         (runtime / "storage").chmod(0o700)
-        agent.write_bytes(plistlib.dumps(service_config(runtime, lan_hosts() if args.lan else None)))
+        hosts = lan_hosts() if args.lan else None
+        tls = ensure_certificate(runtime, hosts) if args.lan else None
+        agent.write_bytes(plistlib.dumps(service_config(runtime, hosts, tls)))
         agent.chmod(0o600)
         subprocess.run(["launchctl", "bootstrap", domain, str(agent)], check=True)
         wait_ready()
-        print(f"Helmet login service ready: http://127.0.0.1:8003; data: {runtime / 'storage'}")
+        scheme = "https" if args.lan else "http"
+        print(f"Helmet login service ready: {scheme}://127.0.0.1:8003; data: {runtime / 'storage'}")
+        for host in hosts or []:
+            print(f"  on your Wi-Fi: https://{host}")
         print("The original data folder remains in storage.before-login-service as a rollback copy.")
     except BaseException:
         subprocess.run(["launchctl", "bootout", job], capture_output=True)

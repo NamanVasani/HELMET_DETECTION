@@ -89,7 +89,7 @@ class HostOriginMiddleware:
 
 class DashboardServer:
     def __init__(self, host=None, port=DEFAULT_PORT, storage=STORAGE, accept_video=False, accept_frames=False,
-                 require_auth=None, allowed_hosts=None):
+                 require_auth=None, allowed_hosts=None, tls_cert=None, tls_key=None):
         host = host or os.environ.get("HELMET_HOST", "127.0.0.1")
         self.host = host
         self.storage = Path(storage)
@@ -130,8 +130,13 @@ class DashboardServer:
         self.socket.listen(128)
         self.port = self.socket.getsockname()[1]
         self.app = self._build_app()
+        tls = {}
+        cert, key = tls_cert or os.environ.get("HELMET_TLS_CERT"), tls_key or os.environ.get("HELMET_TLS_KEY")
+        if cert and key:
+            tls = {"ssl_certfile": str(cert), "ssl_keyfile": str(key)}
+        self.scheme = "https" if tls else "http"
         config = uvicorn.Config(HostOriginMiddleware(self.app, self), log_level="warning", access_log=False,
-                                lifespan="off", timeout_graceful_shutdown=1, proxy_headers=False, ws="none")
+                                lifespan="off", timeout_graceful_shutdown=1, proxy_headers=False, ws="none", **tls)
         self.uvicorn = uvicorn.Server(config)
         self.thread = threading.Thread(target=self._serve, daemon=True, name="helmet-http")
         self.maintenance = threading.Thread(target=self._maintain, daemon=True, name="helmet-retention")
@@ -143,7 +148,7 @@ class DashboardServer:
     @property
     def url(self):
         shown = "127.0.0.1" if self.host in {"0.0.0.0", "::"} else self.host
-        return f"http://{shown}:{self.port}"
+        return f"{self.scheme}://{shown}:{self.port}"
 
     def allowed_hosts(self):
         hosts = {f"127.0.0.1:{self.port}", f"localhost:{self.port}", f"[::1]:{self.port}"}
