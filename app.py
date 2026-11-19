@@ -471,10 +471,17 @@ def run_detector(dashboard, cameras=None, alerts=None):
         dashboard.update_status("Detector ready. Waiting for browser camera permission.")
         print("Detector ready. Allow camera access in the website to start live detection.")
         next_sync = 0
+        from cameras import CameraHealthMonitor
+        health = CameraHealthMonitor()
         while not dashboard.restart_detector.is_set():
             if cameras is not None and time.monotonic() >= next_sync:
                 cameras.sync()
-                dashboard.update_cameras(cameras.statuses())
+                statuses = cameras.statuses()
+                dashboard.update_cameras(statuses)
+                if alerts is not None and isinstance(statuses, dict):
+                    for key, text in health.update(statuses, cameras.names(), time.monotonic()):
+                        print(text)
+                        alerts.notify_health(key, text)
                 next_sync = time.monotonic() + 2
             if video_path is None:
                 requested_video = dashboard.next_video()
@@ -582,6 +589,7 @@ def main():
                 dashboard.update_status(f"Camera detector stopped: {exc}. Retrying in 5 seconds; "
                                         "saved-event review remains available.")
                 traceback.print_exc()
+                alerts.notify_health("detector", f"Detector stopped: {exc}. It restarts automatically in 5 seconds.")
                 dashboard.restart_detector.wait(5)
     except KeyboardInterrupt:
         print("Stopped.")

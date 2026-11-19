@@ -170,3 +170,35 @@ class CameraManager:
             reader.stop()
         self.readers.clear()
         self.signature = None
+
+    def names(self):
+        return {key: reader.camera["name"] for key, reader in self.readers.items()}
+
+
+class CameraHealthMonitor:
+    """Turn camera states into offline / back-online messages, ignoring short drops."""
+
+    def __init__(self, grace_seconds=60):
+        self.grace = grace_seconds
+        self.down_since = {}
+        self.reported = set()
+
+    def update(self, statuses, names, now):
+        messages = []
+        for key, status in statuses.items():
+            name = names.get(key, key)
+            if status.get("state") == "live":
+                self.down_since.pop(key, None)
+                if key in self.reported:
+                    self.reported.discard(key)
+                    messages.append((f"camera:{key}", f"Camera {name} is back online."))
+                continue
+            since = self.down_since.setdefault(key, now)
+            if key not in self.reported and now - since >= self.grace:
+                self.reported.add(key)
+                reason = status.get("error") or status.get("state") or "no frames"
+                messages.append((f"camera:{key}", f"Camera {name} is offline for {int(now - since)} s ({reason})."))
+        for key in set(self.down_since) - set(statuses):  # camera removed from settings
+            self.down_since.pop(key, None)
+            self.reported.discard(key)
+        return messages

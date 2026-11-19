@@ -30,6 +30,7 @@ DEFAULTS = {
     "smtp_password": "",
     "smtp_from": "",
     "email_to": "",
+    "health_alerts": True,
     "whatsapp_enabled": False,
     "twilio_account_sid": "",
     "twilio_auth_token": "",
@@ -39,6 +40,7 @@ DEFAULTS = {
 SECRET_FIELDS = ("webhook_token", "smtp_password", "twilio_auth_token")
 TWILIO_API = "https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json"
 PHONE_RE = re.compile(r"\+[1-9]\d{7,14}\Z")
+HEALTH_INTERVAL = 15 * 60  # at most one camera/detector problem alert per source every 15 minutes
 
 
 def load_settings(root):
@@ -128,7 +130,9 @@ def send_email(settings, event, text, attachment=None):
     message["Subject"] = f"Helmet alert: {event.get('category', 'event').replace('_', ' ')} at {event['timestamp']}"
     message["From"] = settings["smtp_from"]
     message["To"] = [address.strip() for address in settings["email_to"].split(",") if address.strip()]
-    message.set_content(text + "\n\nThis is an automated suggestion from a detection model, not proof of a violation.")
+    note = "" if event.get("category") == "system" else \
+        "\n\nThis is an automated suggestion from a detection model, not proof of a violation."
+    message.set_content(text + note)
     if attachment:
         message.add_attachment(attachment, maintype="image", subtype="jpeg", filename="person.jpg")
     port = int(settings["smtp_port"])
@@ -171,6 +175,7 @@ class AlertDispatcher:
         self.last_sent = None
         self.last_error = ""
         self.sent = 0
+        self.health_sent = {}
         self.thread = threading.Thread(target=self._run, daemon=True, name="helmet-alerts")
         self.thread.start()
 
@@ -211,9 +216,61 @@ class AlertDispatcher:
         self.sent += 1
         return "sent:" + ",".join(channels)
 
+    def notify_health(self, key, text):
+        try:
+            self.queue.put_nowait(("health", key, text))
+        except queue.Full:
+            logging.warning("Alert queue full; dropping health alert %s", key)
+
+    def deliver_health(self, key, text, force=False):
+        """System message (camera offline/online, detector stopped) on every configured channel."""
+        settings = load_settings(self.root)
+        if not force:
+            if not settings["enabled"] or not settings["health_alerts"]:
+                return "disabled"
+            last = self.health_sent.get(key)
+            if last is not None and self.clock() - last < HEALTH_INTERVAL and "back online" not in text:
+                return "rate_limited"
+        text = f"Helmet system alert: {text}"
+        channels = []
+        if settings["webhook_url"]:
+            headers = {"Content-Type": "application/json", "User-Agent": "helmet-alerts/1.0"}
+            if settings.get("webhook_token"):
+                headers["Authorization"] = f"Bearer {settings['webhook_token']}"
+            body = json.dumps({"text": text, "health": {"key": key}}).encode()
+            with urlopen(Request(settings["webhook_url"], data=body, headers=headers, method="POST"),
+                         timeout=10) as response:
+                if response.status >= 300:
+                    raise OSError(f"Webhook returned HTTP {response.status}")
+            channels.append("webhook")
+        if settings["email_enabled"]:
+            send_email(settings, {"category": "system", "timestamp": time.strftime("%Y-%m-%d %H:%M")}, text)
+            channels.append("email")
+        if settings["whatsapp_enabled"]:
+            send_whatsapp(settings, text)
+            channels.append("whatsapp")
+        if not channels:
+            raise ValueError("No alert channel is configured")
+        self.health_sent[key] = self.clock()
+        return "sent:" + ",".join(channels)
+
+    def _handle_health(self, key, text):
+        try:
+            result = self.deliver_health(key, text)
+            if result.startswith("sent"):
+                record_audit(self.root, "system", "health_alert_sent", key, {"text": text})
+        except Exception as exc:  # delivery problems must never stop detection
+            self.last_error = f"{type(exc).__name__}: {exc}"[:300]
+            logging.warning("Health alert delivery failed: %s", self.last_error)
+            record_audit(self.root, "system", "alert_failed", key, {"error": self.last_error})
+
     def _run(self):
         while True:
-            event, image_path = self.queue.get()
+            item = self.queue.get()
+            if item[0] == "health":
+                self._handle_health(item[1], item[2])
+                continue
+            event, image_path = item
             try:
                 result = self.deliver(event, image_path)
                 if result.startswith("sent"):

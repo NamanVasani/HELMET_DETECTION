@@ -109,6 +109,20 @@ class AlertTests(unittest.TestCase):
         self.assertIn("No helmet detected on Gate 1", form["Body"])
         self.assertEqual(RecordingHandler.received[1][1]["To"], "whatsapp:+919999999999")
 
+    def test_health_alerts_are_sent_rate_limited_and_can_be_switched_off(self):
+        alerts.save_settings(self.root, {"enabled": True, "webhook_url": self.url, "min_interval_seconds": 0})
+        clock = Mock(return_value=100.0)
+        dispatcher = alerts.AlertDispatcher(self.root, clock=clock)
+        self.assertEqual(dispatcher.deliver_health("camera:c1", "Camera Gate 1 is offline for 61 s (timeout)."),
+                         "sent:webhook")
+        self.assertIn("Helmet system alert: Camera Gate 1 is offline", RecordingHandler.received[0][1]["text"])
+        self.assertEqual(dispatcher.deliver_health("camera:c1", "Camera Gate 1 is offline again."), "rate_limited")
+        self.assertEqual(dispatcher.deliver_health("camera:c1", "Camera Gate 1 is back online."), "sent:webhook")
+        clock.return_value = 100.0 + alerts.HEALTH_INTERVAL
+        self.assertEqual(dispatcher.deliver_health("camera:c1", "Camera Gate 1 is offline again."), "sent:webhook")
+        alerts.save_settings(self.root, {"health_alerts": False})
+        self.assertEqual(dispatcher.deliver_health("detector", "Detector stopped."), "disabled")
+
     def test_email_requires_complete_settings_and_uses_starttls(self):
         with self.assertRaises(ValueError):
             alerts.save_settings(self.root, {"email_enabled": True, "smtp_host": "smtp.example.test"})
@@ -205,6 +219,24 @@ class CameraTests(unittest.TestCase):
             self.assertEqual(started, ["a", "a"])
             manager.stop_all()
             self.assertEqual(manager.readers, {})
+
+
+class CameraHealthTests(unittest.TestCase):
+    def test_offline_reported_once_after_grace_and_recovery_reported(self):
+        monitor = cameras.CameraHealthMonitor(grace_seconds=60)
+        names = {"c1": "Gate 1"}
+        down = {"c1": {"state": "reconnecting", "error": "Could not open stream"}}
+        self.assertEqual(monitor.update(down, names, 0), [])
+        self.assertEqual(monitor.update(down, names, 30), [], "short drops are ignored")
+        offline = monitor.update(down, names, 61)
+        self.assertEqual(len(offline), 1)
+        self.assertIn("Gate 1 is offline for 61 s (Could not open stream)", offline[0][1])
+        self.assertEqual(monitor.update(down, names, 120), [], "reported only once")
+        back = monitor.update({"c1": {"state": "live"}}, names, 125)
+        self.assertEqual(back, [("camera:c1", "Camera Gate 1 is back online.")])
+        self.assertEqual(monitor.update({"c1": {"state": "live"}}, names, 130), [])
+        self.assertEqual(monitor.update({"c1": {"state": "reconnecting"}}, names, 140), [])
+        self.assertEqual(monitor.update({"c1": {"state": "live"}}, names, 150), [], "unreported blip has no recovery")
 
 
 class MultiSourceDetectorTests(unittest.TestCase):
