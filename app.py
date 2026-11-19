@@ -573,12 +573,13 @@ def run_detector(dashboard, cameras=None, alerts=None):
 
 
 def main():
-    from alerts import AlertDispatcher
+    from alerts import AlertDispatcher, DailyReporter
     from cameras import CameraManager
 
     dashboard = DashboardServer().start()
     dashboard.detector_managed = True
     alerts = AlertDispatcher(dashboard.storage)
+    DailyReporter(dashboard.storage).start()
     cameras = CameraManager(dashboard.storage)
     dashboard.alerts = alerts
     print(f"Dashboard: {dashboard.url}")

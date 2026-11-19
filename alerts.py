@@ -1,6 +1,7 @@
 """Background alerts for new violation events: JSON webhook (Slack/Teams/WhatsApp gateways) and SMTP email."""
 
 import base64
+from datetime import datetime, timedelta
 from email.message import EmailMessage
 import json
 import logging
@@ -31,6 +32,8 @@ DEFAULTS = {
     "smtp_from": "",
     "email_to": "",
     "health_alerts": True,
+    "daily_report_enabled": False,
+    "daily_report_time": "08:00",
     "whatsapp_enabled": False,
     "twilio_account_sid": "",
     "twilio_auth_token": "",
@@ -86,6 +89,10 @@ def save_settings(root, incoming):
     for key in ("whatsapp_from", "whatsapp_to"):
         updated[key] = ",".join(number.strip().removeprefix("whatsapp:").replace(" ", "")
                                 for number in updated[key].split(",") if number.strip())
+    if not re.fullmatch(r"([01]\d|2[0-3]):[0-5]\d", updated["daily_report_time"]):
+        raise ValueError("Daily report time must be HH:MM (24-hour), e.g. 08:00")
+    if updated["daily_report_enabled"] and not (updated["smtp_host"] and updated["email_to"] and updated["smtp_from"]):
+        raise ValueError("The daily summary is emailed: fill in the SMTP host, from address and recipients first")
     if updated["whatsapp_enabled"]:
         numbers = [updated["whatsapp_from"]] + updated["whatsapp_to"].split(",")
         if not re.fullmatch(r"AC[0-9a-fA-F]{32}", updated["twilio_account_sid"]) or not updated["twilio_auth_token"]:
@@ -135,6 +142,10 @@ def send_email(settings, event, text, attachment=None):
     message.set_content(text + note)
     if attachment:
         message.add_attachment(attachment, maintype="image", subtype="jpeg", filename="person.jpg")
+    smtp_send(settings, message)
+
+
+def smtp_send(settings, message):
     port = int(settings["smtp_port"])
     context = ssl.create_default_context()
     if port == 465:
@@ -146,6 +157,60 @@ def send_email(settings, event, text, attachment=None):
         if settings.get("smtp_user"):
             server.login(settings["smtp_user"], settings["smtp_password"])
         server.send_message(message)
+
+
+class DailyReporter:
+    """Email yesterday's PDF report once a day at the configured time (catches up after a missed time)."""
+
+    def __init__(self, root, now=None):
+        self.root = root
+        self.now = now or datetime.now
+        self.thread = None
+
+    def start(self):
+        self.thread = threading.Thread(target=self._run, daemon=True, name="helmet-daily-report")
+        self.thread.start()
+        return self
+
+    def _run(self):
+        while True:
+            try:
+                self.tick()
+            except Exception:  # SMTP/report problems must never stop the service; retried next minute
+                logging.exception("Daily report failed")
+            time.sleep(60)
+
+    def tick(self):
+        settings = load_settings(self.root)
+        if not settings["daily_report_enabled"]:
+            return "disabled"
+        now = self.now()
+        hour, minute = (int(part) for part in settings["daily_report_time"].split(":"))
+        if (now.hour, now.minute) < (hour, minute):
+            return "not_yet"
+        today = now.date().isoformat()
+        if get_setting(self.root, "daily_report_last") == today:
+            return "already_sent"
+        day = (now.date() - timedelta(days=1)).isoformat()
+        from event_store import event_stats
+        from reports_pdf import build_report
+        totals = event_stats(self.root, day, day)["totals"]
+        pdf = build_report(self.root, day, day)
+        message = EmailMessage()
+        message["Subject"] = f"Helmet daily report {day}: {totals['no_helmet']} no-helmet, {totals['events']} events"
+        message["From"] = settings["smtp_from"]
+        message["To"] = [address.strip() for address in settings["email_to"].split(",") if address.strip()]
+        message.set_content(
+            f"Helmet summary for {day}\n\n"
+            f"Events: {totals['events']}\nNo helmet: {totals['no_helmet']}\nHelmet: {totals['helmet']}\n"
+            f"Confirmed: {totals['confirmed']}\nFalse positive: {totals['false_positive']}\n"
+            f"Still needs review: {totals['needs_review']}\n\nThe PDF report is attached.\n"
+            f"Open the dashboard: {settings['dashboard_url']}\n")
+        message.add_attachment(pdf, maintype="application", subtype="pdf", filename=f"helmet-report-{day}.pdf")
+        smtp_send(settings, message)
+        set_setting(self.root, "daily_report_last", today)
+        record_audit(self.root, "system", "daily_report_sent", day, {"events": totals["events"]})
+        return "sent"
 
 
 def send_whatsapp(settings, text):

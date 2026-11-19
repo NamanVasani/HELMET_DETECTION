@@ -123,6 +123,33 @@ class AlertTests(unittest.TestCase):
         alerts.save_settings(self.root, {"health_alerts": False})
         self.assertEqual(dispatcher.deliver_health("detector", "Detector stopped."), "disabled")
 
+    def test_daily_report_emails_yesterdays_pdf_once_per_day(self):
+        from datetime import datetime as real_datetime
+        with self.assertRaises(ValueError):
+            alerts.save_settings(self.root, {"daily_report_enabled": True})  # no email settings yet
+        with self.assertRaises(ValueError):
+            alerts.save_settings(self.root, {"daily_report_time": "25:00"})
+        alerts.save_settings(self.root, {"daily_report_enabled": True, "daily_report_time": "08:00",
+                                         "smtp_host": "smtp.example.test", "smtp_from": "helmet@example.test",
+                                         "email_to": "boss@example.test"})
+        clock = Mock(return_value=real_datetime(2026, 11, 20, 7, 59))
+        reporter = alerts.DailyReporter(self.root, now=clock)
+        with patch("alerts.smtplib.SMTP") as smtp:
+            self.assertEqual(reporter.tick(), "not_yet")
+            clock.return_value = real_datetime(2026, 11, 20, 8, 0)
+            self.assertEqual(reporter.tick(), "sent")
+            self.assertEqual(reporter.tick(), "already_sent")
+            clock.return_value = real_datetime(2026, 11, 21, 9, 30)
+            self.assertEqual(reporter.tick(), "sent", "catches up later in the day")
+        self.assertEqual(smtp.return_value.send_message.call_count, 2)
+        message = smtp.return_value.send_message.call_args_list[0][0][0]
+        self.assertIn("Helmet daily report 2026-11-19", message["Subject"])
+        attachments = [part for part in message.iter_attachments()]
+        self.assertEqual(attachments[0].get_filename(), "helmet-report-2026-11-19.pdf")
+        self.assertTrue(attachments[0].get_content().startswith(b"%PDF"))
+        alerts.save_settings(self.root, {"daily_report_enabled": False})
+        self.assertEqual(reporter.tick(), "disabled")
+
     def test_email_requires_complete_settings_and_uses_starttls(self):
         with self.assertRaises(ValueError):
             alerts.save_settings(self.root, {"email_enabled": True, "smtp_host": "smtp.example.test"})

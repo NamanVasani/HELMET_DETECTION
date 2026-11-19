@@ -737,6 +737,7 @@ async function saveAlerts(event) {
   const payload = {
     enabled: form.enabled.checked, email_enabled: form.email_enabled.checked, whatsapp_enabled: form.whatsapp_enabled.checked,
     health_alerts: form.health_alerts.checked,
+    daily_report_enabled: form.daily_report_enabled.checked, daily_report_time: form.daily_report_time.value || '08:00',
     categories: [form.cat_no_helmet.checked && 'no_helmet', form.cat_helmet.checked && 'helmet'].filter(Boolean),
     min_interval_seconds: Number(form.min_interval_seconds.value || 0), smtp_port: Number(form.smtp_port.value || 587),
   };
