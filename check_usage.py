@@ -38,8 +38,8 @@ def main():
     rows, failures = [], []
     with tempfile.TemporaryDirectory(prefix="helmet_usage_") as temp:
         root = Path(temp)
-        server = DashboardServer(port=0, storage=root / "events").start()
-        base = f"http://127.0.0.1:{server.server.server_address[1]}"
+        server = DashboardServer(port=0, storage=root / "events", require_auth=False).start()
+        base = f"http://127.0.0.1:{server.port}"
 
         def detect():
             try:

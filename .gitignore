@@ -14,22 +14,14 @@ __pycache__/
 /output/
 /storage
 
-# Invalid old inference placeholder
-/helmet.pt
-
-# Old experiments, backups, and local sample files not part of the documented app
-/TIMEPASS.ipynb
+# Archived experiments and local-only files
+/_archive/
 /HELMET!.pages
-/main.py.save
-/nano train.py
-/hi_show.py
-/test_cam.py
-/web.py
-/image.jpg
-/yolov8n.pt
+/yolov8*.pt
+/.venv-py39/
 
-# Curated copy for direct GitHub upload
-/HELMET_GITHUB_UPLOAD/
+# Trained checkpoint (6 MB, private; provision with `python manage.py prepare-model`)
+/best.pt
 
 # Rollback copy of private event data
 /storage.before-login-service/
