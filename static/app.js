@@ -4,6 +4,7 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const PAGE_SIZE = 60;
+const MAX_SEND_WIDTH = 1920;
 const STATUS_LABELS = {needs_review: 'Needs review', confirmed: 'Confirmed', false_positive: 'False positive'};
 const state = {
   user: null, perms: new Set(), tab: 'review', category: 'no_helmet', events: [], total: 0, signature: '',
@@ -236,7 +237,7 @@ function cardHtml(event, index) {
       ${can('review') ? `<label class="check"><input type="checkbox" class="pick" ${selected ? 'checked' : ''} aria-label="Select event"><b>${when}</b></label>` : `<b>${when}</b>`}
       <span class="badge ${esc(category)}">${label}</span>
     </div>
-    <p class="notice"><span class="badge ${esc(status)}">${esc(STATUS_LABELS[status] || status)}</span> ${sourceText(event)} · time is processing time${privacy}</p>
+    <p class="notice"><span class="badge ${esc(status)}">${esc(STATUS_LABELS[status] || status)}</span>${detection.zoomed ? ' <span class="badge zoomed" title="Caught by auto-zoom on a distant rider">🔍 Auto-zoom</span>' : ''} ${sourceText(event)} · time is processing time${privacy}</p>
     <div class="images">
       <figure><button type="button" class="zoom" data-src="${base}person.jpg" data-caption="${esc(label)} person crop"><img src="${base}person.jpg" alt="${esc(label)} person crop" loading="lazy"></button><figcaption>Person</figcaption></figure>
       <figure>${files.plate ? `<button type="button" class="zoom" data-src="${base}plate.jpg" data-caption="Suggested plate"><img src="${base}plate.jpg" alt="Suggested number plate" loading="lazy"></button>` : '<div class="noimg">No plate matched</div>'}
@@ -257,7 +258,7 @@ function quickCardHtml(event, index) {
   const time = new Date(event.timestamp);
   return `<article class="card quick-card" tabindex="0" data-key="${esc(eventKey(event))}" data-index="${index}">
     <div class="card-head"><b>${esc(index + 1)} of ${esc(state.events.length)}${state.total > state.events.length ? '+' : ''}</b>
-      <span class="badge ${esc(category)}">${label}</span></div>
+      <span>${detection.zoomed ? '<span class="badge zoomed">🔍 Auto-zoom</span> ' : ''}<span class="badge ${esc(category)}">${label}</span></span></div>
     <p class="notice">${esc(event.date)} ${isNaN(time) ? '' : esc(time.toLocaleTimeString())} · ${sourceText(event)} · score ${esc(Number(detection.confidence).toFixed(2))}</p>
     <div class="quick-images">
       <button type="button" class="zoom" data-src="${base}person.jpg" data-caption="${esc(label)} person"><img src="${base}person.jpg" alt="${esc(label)} person crop"></button>
@@ -532,12 +533,13 @@ async function sendCameraFrames(now) {
   if (now - state.lastFrameAt >= 120 && !state.sendingFrame && video.readyState >= 2) {
     state.lastFrameAt = now;
     state.sendingFrame = true;
-    const scale = Math.min(1, 1280 / video.videoWidth);
+    // Send up to 1080p so auto-zoom on distant riders has real detail to work with.
+    const scale = Math.min(1, MAX_SEND_WIDTH / video.videoWidth);
     canvas.width = Math.round(video.videoWidth * scale);
     canvas.height = Math.round(video.videoHeight * scale);
     canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
     try {
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.72));
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
       if (blob && state.cameraStream === stream) {
         const response = await fetch('/api/frame', {method: 'POST', headers: {'Content-Type': 'image/jpeg'}, body: blob,
           credentials: 'same-origin', signal: AbortSignal.timeout(10000)});
@@ -570,11 +572,13 @@ async function startCamera() {
       return;
     }
     setText('#camera-status', 'Requesting browser camera permission…');
-    state.cameraStream = await navigator.mediaDevices.getUserMedia({audio: false, video: {width: {ideal: 1280}, height: {ideal: 720}}});
+    state.cameraStream = await navigator.mediaDevices.getUserMedia({audio: false, video: {width: {ideal: 1920}, height: {ideal: 1080}}});
+    const settings = state.cameraStream.getVideoTracks?.()[0]?.getSettings?.() || {};
+    if (settings.width) state.cameraResolution = `${settings.width}×${settings.height}`;
     const video = $('#camera-source');
     video.srcObject = state.cameraStream;
     await video.play();
-    setText('#camera-status', 'Camera allowed. Starting live detection…');
+    setText('#camera-status', `Camera allowed${state.cameraResolution ? ` (${state.cameraResolution})` : ''}. Starting live detection…`);
     requestAnimationFrame(sendCameraFrames);
     syncStreams();
   } catch (error) {

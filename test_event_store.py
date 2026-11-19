@@ -238,6 +238,15 @@ class EventStoreTests(unittest.TestCase):
             self.assertEqual(violation["plate_text"], "GJ01AB1234")
             self.assertEqual(violation["privacy"], {"faces_blurred": 0, "plate_dropped": False})
 
+    def test_auto_zoom_catches_are_marked(self):
+        with tempfile.TemporaryDirectory() as temp:
+            head = {"class_name": "no-helmet", "confidence": 0.7, "track_id": 1, "box": [10, 10, 40, 40], "zoomed": True}
+            zoomed = save_event(np.zeros((80, 100, 3), dtype=np.uint8), head, [head],
+                                associate_objects(head, [head]), root=temp)
+            self.assertTrue(zoomed["event_detection"]["zoomed"])
+            normal = self._event(temp)
+            self.assertNotIn("zoomed", normal["event_detection"])
+
     def test_plate_normalisation_fixes_common_ocr_confusions(self):
         self.assertEqual(normalize_plate("GJO1AB1234"), ("GJ01AB1234", True))
         self.assertEqual(normalize_plate("6J01A8I234"), ("GJ01AB1234", True))

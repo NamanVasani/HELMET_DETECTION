@@ -342,7 +342,10 @@ def save_event(frame, event_detection, detections, association, ocr=read_plate_t
     def summary(item):
         if not item:
             return None
-        return {key: item.get(key) for key in ("class_name", "confidence", "track_id", "box")}
+        summary = {key: item.get(key) for key in ("class_name", "confidence", "track_id", "box")}
+        if item.get("zoomed"):
+            summary["zoomed"] = True  # caught by auto-zoom on a distant rider
+        return summary
 
     metadata = {
         "id": event_id,

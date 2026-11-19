@@ -92,7 +92,7 @@ async function testReviewRenderingAndFilters() {
   const events = [{date: '2026-10-20', id: 'event_1', timestamp: '2026-10-20T10:00:00Z', category: 'no_helmet', status: 'needs_review',
     event_detection: {confidence: 0.9}, source: {type: 'video', filename: '<junction>.mp4', frame: 24, position_seconds: 2.4}},
   {date: '2026-10-20', id: 'event_2', timestamp: '2026-10-20T10:01:00Z', category: 'no_helmet', status: 'needs_review',
-    event_detection: {confidence: 0.8}, files: {plate: 'plate.jpg'}, plate_text: 'GJ01AB1234', plate_format_valid: true}];
+    event_detection: {confidence: 0.8, zoomed: true}, files: {plate: 'plate.jpg'}, plate_text: 'GJ01AB1234', plate_format_valid: true}];
   const page = makePage({status: baseStatus, events});
   await settle();
   const {document, env} = page;
@@ -103,6 +103,9 @@ async function testReviewRenderingAndFilters() {
   assert.match(html, /Vehicle context not verified/);
   assert.match(html, /Source not recorded/);
   assert.match(html, /✓ format/);
+  const zoomBadges = document.querySelectorAll('#events .badge.zoomed');
+  assert.equal(zoomBadges.length, 1, 'only the event caught by auto-zoom gets the badge');
+  assert.match(zoomBadges[0].textContent, /Auto-zoom/);
   const first = env.requests.find(r => r.url.startsWith('/api/events'));
   assert.match(first.url, /category=no_helmet/, 'Violations are shown first');
   assert.match(first.url, /status=needs_review/, 'Unreviewed events are shown first');

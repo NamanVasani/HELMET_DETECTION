@@ -28,8 +28,8 @@ HEAD_ZOOM_FRACTION = 0.20
 RIDER_ZOOM_FRACTION = 0.45
 MAX_FOCUS_TARGETS = 3
 FACE_MISS_GRACE = 4
-CAMERA_WIDTH = 1280
-CAMERA_HEIGHT = 720
+CAMERA_WIDTH = 1920
+CAMERA_HEIGHT = 1080
 INFERENCE_SIZE = 800
 DETECTION_CONFIDENCE = 0.80
 ZOOM_CONFIDENCE = 0.50
@@ -444,6 +444,14 @@ class SourcePipeline:
             outline = np.array([[int(x * frame.shape[1]), int(y * frame.shape[0])] for x, y in zone], dtype=np.int32)
             cv2.polylines(annotated, [outline], True, (0, 220, 255), 2)
         preview = adaptive_zoom(annotated, detections, target)
+        if region:  # tell the viewer that the distant rider is being enlarged
+            label = f"Auto-zoom {region[2]:.1f}x on distant rider"
+            size = max(0.6, preview.shape[1] / 1500)  # readable at 720p and 1080p
+            thickness = max(2, round(size * 2))
+            (text_w, text_h), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, size, thickness)
+            pad = int(12 * size)
+            cv2.rectangle(preview, (0, 0), (text_w + 2 * pad, text_h + 2 * pad), (20, 20, 20), -1)
+            cv2.putText(preview, label, (pad, text_h + pad), cv2.FONT_HERSHEY_SIMPLEX, size, (191, 212, 45), thickness)
         ok, encoded = cv2.imencode(".jpg", preview, [cv2.IMWRITE_JPEG_QUALITY, 78])
         if ok:
             dashboard.update_frame(encoded.tobytes(), source=self.key)
