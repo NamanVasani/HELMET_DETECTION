@@ -1,0 +1,11 @@
+{
+  "model_sha256": "6b698def99f6513f283fcf2b35763c91e0807e5f70874a51dc18ccb6ec41a739",
+  "source": "validation maximum class F1 after excluding known overlaps",
+  "imgsz": 800,
+  "full_frame": {
+    "helmet": 0.5315,
+    "no-helmet": 0.3974
+  },
+  "zoom_crop": 0.5,
+  "zoom_limit": "Uncalibrated; needs labeled crop footage."
+}

@@ -61,6 +61,9 @@ def main():
     parser.add_argument("--model", type=Path, default=MODEL_PATH)
     parser.add_argument("--output", type=Path, default=Path(__file__).parent / "reports")
     parser.add_argument("--device", default="cpu")
+    parser.add_argument("--prefix", default=None,
+                        help="evaluate only images whose filename starts with this source prefix (e.g. ds1_, "
+                             "the only source that annotates rider and bike)")
     args = parser.parse_args()
     dataset = yaml.safe_load(args.data.read_text())
     if dataset["names"] != EXPECTED_CLASSES:
@@ -69,6 +72,11 @@ def main():
         dataset["path"] = str((args.data.parent / dataset.get("path", ".")).resolve())
     args.output.mkdir(parents=True, exist_ok=True)
     audit, eligible = split_audit(dataset)
+    if args.prefix:
+        eligible = {split: [p for p in paths if Path(p).name.startswith(args.prefix)]
+                    for split, paths in eligible.items()}
+        audit["prefix_filter"] = args.prefix
+        audit["eligible_after_prefix"] = {split: len(paths) for split, paths in eligible.items()}
     for split in ("val", "test"):
         if not eligible[split]:
             raise ValueError(f"No nonoverlapping {split} images remain")

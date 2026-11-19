@@ -21,6 +21,10 @@ MODEL_PATH = Path(os.environ.get("HELMET_MODEL", next(
 )))
 FACE_MODEL_PATH = PROJECT / "models/face_detection_yunet/face_detection_yunet_2023mar.onnx"
 MAX_DISPLAY_ZOOM = 4.0
+# Share of the frame height a zoom target fills. Calibrated 2026-11-19 (reports/zoom-calibration-2026-11-19.json):
+# heads at 65% were far larger than anything in training (0.30 correct); 20% gives 0.82, riders do best at 45%.
+HEAD_ZOOM_FRACTION = 0.20
+RIDER_ZOOM_FRACTION = 0.45
 MAX_FOCUS_TARGETS = 3
 FACE_MISS_GRACE = 4
 CAMERA_WIDTH = 1280
@@ -223,7 +227,8 @@ def zoom_region(frame, detections, target=None):
     box_height = y2 - y1
     if box_height <= 0:
         return frame, None
-    zoom = min(MAX_DISPLAY_ZOOM, max(1.0, 0.65 * height / max(box_height, 1)))
+    fraction = RIDER_ZOOM_FRACTION if target["class_name"] == "rider" else HEAD_ZOOM_FRACTION
+    zoom = min(MAX_DISPLAY_ZOOM, max(1.0, fraction * height / max(box_height, 1)))
     if zoom <= 1.05:
         return frame, None
 

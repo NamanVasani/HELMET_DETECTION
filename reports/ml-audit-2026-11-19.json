@@ -1,0 +1,349 @@
+{
+  "date": "2026-11-19",
+  "label_coverage_by_source": {
+    "train": {
+      "ds1": {
+        "images": 555,
+        "empty_label_images": 0,
+        "instances": {
+          "helmet": 947,
+          "no-helmet": 341,
+          "number-plate": 153,
+          "rider": 1219,
+          "bike": 997
+        },
+        "images_with": {
+          "helmet": 431,
+          "no-helmet": 210,
+          "number-plate": 97,
+          "rider": 555,
+          "bike": 551
+        }
+      },
+      "ds2": {
+        "images": 1070,
+        "empty_label_images": 8,
+        "instances": {
+          "helmet": 582,
+          "no-helmet": 573,
+          "number-plate": 580,
+          "rider": 0,
+          "bike": 0
+        },
+        "images_with": {
+          "helmet": 333,
+          "no-helmet": 250,
+          "number-plate": 550,
+          "rider": 0,
+          "bike": 0
+        }
+      },
+      "ds3": {
+        "images": 3648,
+        "empty_label_images": 13,
+        "instances": {
+          "helmet": 3729,
+          "no-helmet": 3771,
+          "number-plate": 0,
+          "rider": 0,
+          "bike": 0
+        },
+        "images_with": {
+          "helmet": 2258,
+          "no-helmet": 1852,
+          "number-plate": 0,
+          "rider": 0,
+          "bike": 0
+        }
+      }
+    },
+    "valid": {
+      "ds1": {
+        "images": 79,
+        "empty_label_images": 0,
+        "instances": {
+          "helmet": 151,
+          "no-helmet": 62,
+          "number-plate": 51,
+          "rider": 199,
+          "bike": 166
+        },
+        "images_with": {
+          "helmet": 59,
+          "no-helmet": 38,
+          "number-plate": 22,
+          "rider": 78,
+          "bike": 78
+        }
+      },
+      "ds2": {
+        "images": 309,
+        "empty_label_images": 0,
+        "instances": {
+          "helmet": 196,
+          "no-helmet": 163,
+          "number-plate": 171,
+          "rider": 0,
+          "bike": 0
+        },
+        "images_with": {
+          "helmet": 101,
+          "no-helmet": 64,
+          "number-plate": 159,
+          "rider": 0,
+          "bike": 0
+        }
+      },
+      "ds3": {
+        "images": 372,
+        "empty_label_images": 1,
+        "instances": {
+          "helmet": 338,
+          "no-helmet": 322,
+          "number-plate": 0,
+          "rider": 0,
+          "bike": 0
+        },
+        "images_with": {
+          "helmet": 215,
+          "no-helmet": 208,
+          "number-plate": 0,
+          "rider": 0,
+          "bike": 0
+        }
+      }
+    },
+    "test": {
+      "ds1": {
+        "images": 159,
+        "empty_label_images": 0,
+        "instances": {
+          "helmet": 452,
+          "no-helmet": 125,
+          "number-plate": 44,
+          "rider": 548,
+          "bike": 443
+        },
+        "images_with": {
+          "helmet": 124,
+          "no-helmet": 68,
+          "number-plate": 17,
+          "rider": 159,
+          "bike": 158
+        }
+      },
+      "ds2": {
+        "images": 154,
+        "empty_label_images": 1,
+        "instances": {
+          "helmet": 79,
+          "no-helmet": 73,
+          "number-plate": 85,
+          "rider": 0,
+          "bike": 0
+        },
+        "images_with": {
+          "helmet": 45,
+          "no-helmet": 38,
+          "number-plate": 78,
+          "rider": 0,
+          "bike": 0
+        }
+      },
+      "ds3": {
+        "images": 149,
+        "empty_label_images": 0,
+        "instances": {
+          "helmet": 171,
+          "no-helmet": 103,
+          "number-plate": 0,
+          "rider": 0,
+          "bike": 0
+        },
+        "images_with": {
+          "helmet": 110,
+          "no-helmet": 61,
+          "number-plate": 0,
+          "rider": 0,
+          "bike": 0
+        }
+      }
+    }
+  },
+  "finding": "Partial annotation. Only ds1 (555 of 5273 train images, 10.5%) labels rider and bike; ds2 (1070) never labels rider/bike and ds3 (3648) never labels rider, bike or number-plate. ds2/ds3 images visibly contain riders and motorcycles, so training treats them as background, which suppresses rider/bike recall. Test rider/bike recall is effectively measured only on ds1, and correct rider/bike predictions on ds2/ds3 test images count as false positives, so whole-split rider/bike precision is understated.",
+  "ds1_geometry": {
+    "heads_inside_rider_box": "1259/1288",
+    "plates_inside_bike_box": "151/153",
+    "rider_bike_iou_median": 0.337,
+    "meaning": "ds1 rider = whole person, bike = motorcycle; maps to COCO person-on-motorcycle / motorcycle"
+  },
+  "fix_applied": {
+    "method": "pseudo_label.py: COCO YOLOv8x teacher adds rider (person linked to a motorcycle at >=0.25) and bike (motorcycle) to ds2/ds3 train labels, and the v3 model adds plates to ds3 train; rules tuned against ds1 ground truth. Validation/test labels unchanged.",
+    "rules": {
+      "rider": {
+        "conf": 0.5,
+        "overlap": 0.2,
+        "precision": 0.8205,
+        "recall": 0.6038,
+        "f1": 0.6957
+      },
+      "bike": {
+        "conf": 0.7,
+        "overlap": 0.05,
+        "precision": 0.8306,
+        "recall": 0.4574,
+        "f1": 0.5899
+      }
+    },
+    "plate_rule": {
+      "conf": 0.5,
+      "precision": 0.9633,
+      "recall": 0.7517
+    },
+    "added_train_instances": {
+      "ds2": {
+        "rider": 969,
+        "bike": 805
+      },
+      "ds3": {
+        "rider": 5578,
+        "bike": 3734,
+        "number-plate": 3
+      }
+    },
+    "teacher_ceiling": "96.8% of ds1 riders have a teacher person box (IoU>=0.5); only 58.9% of ds1 bikes have any teacher motorcycle box"
+  },
+  "candidate": {
+    "path": "runs/detect/helmet_v4/weights/best.pt",
+    "sha256": "6b698def99f6513f283fcf2b35763c91e0807e5f70874a51dc18ccb6ec41a739",
+    "training": "fine-tuned from helmet_v3, yolov8n, 640px, batch 16, MPS, 12 epochs in the 1.4 h cap, lr0 0.01",
+    "thresholds": "reports/eval-v4-2026-11-19/thresholds.json"
+  },
+  "test_comparison": {
+    "all_sources": {
+      "v3": {
+        "mAP50-95": 0.4439,
+        "per_class": {
+          "helmet": {
+            "P": 0.837,
+            "R": 0.769,
+            "mAP50-95": 0.481
+          },
+          "no-helmet": {
+            "P": 0.674,
+            "R": 0.848,
+            "mAP50-95": 0.521
+          },
+          "number-plate": {
+            "P": 0.734,
+            "R": 0.797,
+            "mAP50-95": 0.5
+          },
+          "rider": {
+            "P": 0.754,
+            "R": 0.415,
+            "mAP50-95": 0.317
+          },
+          "bike": {
+            "P": 0.763,
+            "R": 0.461,
+            "mAP50-95": 0.401
+          }
+        }
+      },
+      "v4": {
+        "mAP50-95": 0.3947,
+        "per_class": {
+          "helmet": {
+            "P": 0.876,
+            "R": 0.721,
+            "mAP50-95": 0.469
+          },
+          "no-helmet": {
+            "P": 0.742,
+            "R": 0.792,
+            "mAP50-95": 0.497
+          },
+          "number-plate": {
+            "P": 0.854,
+            "R": 0.695,
+            "mAP50-95": 0.474
+          },
+          "rider": {
+            "P": 0.512,
+            "R": 0.637,
+            "mAP50-95": 0.256
+          },
+          "bike": {
+            "P": 0.505,
+            "R": 0.667,
+            "mAP50-95": 0.278
+          }
+        }
+      }
+    },
+    "ds1_only_fully_labelled_rider_bike": {
+      "v3": {
+        "mAP50-95": 0.3687,
+        "per_class": {
+          "helmet": {
+            "P": 0.849,
+            "R": 0.718,
+            "mAP50-95": 0.425
+          },
+          "no-helmet": {
+            "P": 0.474,
+            "R": 0.724,
+            "mAP50-95": 0.415
+          },
+          "number-plate": {
+            "P": 0.474,
+            "R": 0.535,
+            "mAP50-95": 0.212
+          },
+          "rider": {
+            "P": 0.899,
+            "R": 0.429,
+            "mAP50-95": 0.354
+          },
+          "bike": {
+            "P": 0.875,
+            "R": 0.472,
+            "mAP50-95": 0.437
+          }
+        }
+      },
+      "v4": {
+        "mAP50-95": 0.3783,
+        "per_class": {
+          "helmet": {
+            "P": 0.897,
+            "R": 0.666,
+            "mAP50-95": 0.407
+          },
+          "no-helmet": {
+            "P": 0.562,
+            "R": 0.621,
+            "mAP50-95": 0.377
+          },
+          "number-plate": {
+            "P": 0.573,
+            "R": 0.442,
+            "mAP50-95": 0.186
+          },
+          "rider": {
+            "P": 0.915,
+            "R": 0.653,
+            "mAP50-95": 0.421
+          },
+          "bike": {
+            "P": 0.903,
+            "R": 0.678,
+            "mAP50-95": 0.501
+          }
+        }
+      }
+    }
+  },
+  "decision": "Do not adopt helmet_v4. On ds1 rider recall 0.43->0.65 and bike 0.47->0.68 with higher precision, but full-test mAP50-95 falls for helmet (0.481->0.469), no-helmet (0.521->0.497) and number-plate (0.500->0.474). Likely cause: 12 epochs at lr0 0.01 re-optimizes an already converged model. Next run: same dataset, lr0 0.001, longer schedule (or yolov8s), then the same comparison."
+}

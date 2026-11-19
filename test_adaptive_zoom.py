@@ -192,5 +192,14 @@ class AdaptiveZoomTests(unittest.TestCase):
         self.assertEqual(visible_detections([zoomed]), [zoomed])
 
 
+    def test_zoom_uses_calibrated_target_size_per_class(self):
+        from app import zoom_region
+        frame = np.zeros((720, 1280, 3), dtype=np.uint8)
+        head = {"class_name": "helmet", "confidence": 0.9, "track_id": 1, "box": [600, 300, 700, 400]}
+        rider = {"class_name": "rider", "confidence": 0.9, "track_id": 2, "box": [500, 200, 700, 400]}
+        self.assertAlmostEqual(zoom_region(frame, [head], head)[1][2], 0.20 * 720 / 100)
+        self.assertAlmostEqual(zoom_region(frame, [rider], rider)[1][2], 0.45 * 720 / 200)
+
+
 if __name__ == "__main__":
     unittest.main()

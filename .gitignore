@@ -36,3 +36,9 @@ __pycache__/
 
 # Demo recordings contain dataset footage of real people; publish only after checking dataset licences
 /site/media/
+
+# Machine-specific evaluation scratch files
+/reports/eval-*/*-images.txt
+/reports/eval-*/evaluation-data.yaml
+/reports/eval-*/val/
+/reports/eval-*/test/

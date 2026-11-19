@@ -1,3 +1,7 @@
 # Dataset downloads use a separate Python 3.10+ environment.
 -r requirements.txt
 roboflow==1.7.1
+# Model export and speed benchmarks only (export_model.py, benchmark_speed.py)
+coremltools==9.0
+onnx==1.23.2
+onnxruntime==1.32.0

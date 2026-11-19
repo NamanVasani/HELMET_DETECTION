@@ -1,0 +1,3329 @@
+{
+  "evaluated_at": "2026-11-19T07:46:05.081621+00:00",
+  "model_sha256": "ad241f161cc7ac2d0f269939d37f7408a26fe529c2a005cfb47e244c25e77894",
+  "imgsz": 800,
+  "device": "mps",
+  "iou_nms": 0.4,
+  "dataset_audit": {
+    "images": {
+      "train": 5273,
+      "val": 760,
+      "test": 462
+    },
+    "eligible_images": {
+      "train": 5273,
+      "val": 496,
+      "test": 280
+    },
+    "excluded_overlaps": [
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets138_png.rf.26f8d5fc8cfceba51900d73171e1ff69.jpg",
+        "second_image": "ds1_BikesHelmets138_png.rf.e3bea28f8ca8feeccd626dfee6b3775f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets148_png.rf.cc644d808316fbbc345feeb150c86192.jpg",
+        "second_image": "ds1_BikesHelmets148_png.rf.ddc44a50180f918224795e1fd1ca0b84.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets166_png.rf.f1c4b77002f1eea30cfa34cabad92551.jpg",
+        "second_image": "ds1_BikesHelmets166_png.rf.cfe1c113f8f2a3f9161814cdd93c2970.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets214_png.rf.cdcc2bb962985d4b09e218ee9116d239.jpg",
+        "second_image": "ds1_BikesHelmets214_png.rf.88ff71e72062e3c6830bfd2c10fe1453.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets231_png.rf.80b817231e35955dfd21379882c2376d.jpg",
+        "second_image": "ds1_BikesHelmets231_png.rf.16a6bbdef2559d952ae0fe8a4b7f32b8.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets237_png.rf.70df2063a9aafdc32c3a8caae6b33ba5.jpg",
+        "second_image": "ds1_BikesHelmets237_png.rf.11cc020afcee7fdeb4fa99e0aab74893.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets251_png.rf.1e73f6ed0ee0a2b576d66ecb2505430f.jpg",
+        "second_image": "ds1_BikesHelmets251_png.rf.5eecd89f8f62d5960e88f67183fb7076.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets257_png.rf.a7418e53a01f87aeb8f31c84fe8216db.jpg",
+        "second_image": "ds1_BikesHelmets257_png.rf.75f29e6b6d7c71925b4fb49b70dbc315.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets269_png.rf.960485f5a04e79bd34ee874e8eb28751.jpg",
+        "second_image": "ds1_BikesHelmets269_png.rf.1dfa2c148c705794be290a31173369cc.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets27_png.rf.d533e90180d29b1424c0d6500c317a42.jpg",
+        "second_image": "ds1_BikesHelmets27_png.rf.9179b013d72cddfb39b8a3f59dae2750.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets286_png.rf.20eedb9de9505a79119d7826ca81e007.jpg",
+        "second_image": "ds1_BikesHelmets286_png.rf.3383f35900544009f3cb21b1bd4d928d.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets304_png.rf.c7c994ddccba45874afef9154e4f1ad3.jpg",
+        "second_image": "ds1_BikesHelmets304_png.rf.fa9211846a49b28a176c465ca06e88d7.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets315_png.rf.69c5bc0f954a3bb514ec609d90bd0506.jpg",
+        "second_image": "ds1_BikesHelmets315_png.rf.344515973aa54bf76d4d7325cf71fec0.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets376_png.rf.c3ba00fa08fd2db5502fbcf42ecb4838.jpg",
+        "second_image": "ds1_BikesHelmets376_png.rf.473114a4a8abd62d6d1a78a309d0a18c.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets396_png.rf.5b2fdcb980d230fa06dd65e8833d346b.jpg",
+        "second_image": "ds1_BikesHelmets396_png.rf.86a4e0986f7af097929c9899ee9a56fa.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets401_png.rf.782b9be71f8e7c703d9daf6df2c76966.jpg",
+        "second_image": "ds1_BikesHelmets401_png.rf.e9a151db6642764aa7eb831a3c1ad518.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets41_png.rf.938aa28680917fcf6fcf4a1edbb65136.jpg",
+        "second_image": "ds1_BikesHelmets41_png.rf.559c320dcdd5dd4b537d475b1169c74e.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets420_png.rf.94fcd9e391667f81bd86dd3916925c5b.jpg",
+        "second_image": "ds1_BikesHelmets420_png.rf.d3cd7a694f2b575a6f30187067d6049d.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets43_png.rf.b4c484f879d23835dddccc8f52042243.jpg",
+        "second_image": "ds1_BikesHelmets43_png.rf.4d08c35a6cbc26276b4025753fc829d6.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets43_png_jpg.rf.388d2cc33a5e402c73156bb201496b72.jpg",
+        "second_image": "ds1_BikesHelmets43_png_jpg.rf.b8b8a42d86b15a49ffa969de70e7a4b8.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets444_png.rf.784322b8f4fd8f94106aa4f4584922bf.jpg",
+        "second_image": "ds1_BikesHelmets444_png.rf.e7e1dc4f4005f5a6dd85ee8901893d31.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets471_png.rf.ce6f339465b72469fb67828ea8ed87ff.jpg",
+        "second_image": "ds1_BikesHelmets471_png.rf.58525a142169d9823604e35086bd3093.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets493_png.rf.836b0f21895cb8a9246f08446e4b5f24.jpg",
+        "second_image": "ds1_BikesHelmets493_png.rf.e6577bf3f7bbbab93cc46fc087cb27a8.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets536_png.rf.4b49a6061b2a685c08ffd497faadaf13.jpg",
+        "second_image": "ds1_BikesHelmets536_png.rf.e11956c916411e5a69b5cd1aa9bb7ff9.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets564_png.rf.0ecf23fe69efaf586cbc7dbba1e2220d.jpg",
+        "second_image": "ds1_BikesHelmets564_png.rf.a800091fed1bcc5556ae1ea0c92d759f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets577_png.rf.f751b9b86a7ebc5dcd78cf48728662f7.jpg",
+        "second_image": "ds1_BikesHelmets577_png.rf.7e5704ccdb4a6fd68e55bb708af6757e.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets582_png.rf.b349b605fc331861a05c038211e275fe.jpg",
+        "second_image": "ds1_BikesHelmets582_png.rf.5276360d1f337839838594a812a00a86.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets595_png.rf.77eead51cb26731da3d26b3aee0f759a.jpg",
+        "second_image": "ds1_BikesHelmets595_png.rf.76831c0dda8ce64028ebfb43cf0f20ac.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets601_png.rf.6b252080cee328185768fb06b514d360.jpg",
+        "second_image": "ds1_BikesHelmets601_png.rf.8a2c16b0f489caaf57c34c264efac6ad.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets621_png.rf.6d2667e83c6d26577b0e71701dd7610e.jpg",
+        "second_image": "ds1_BikesHelmets621_png.rf.2a5e3fd45565eaec547ae9fa9e55be76.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets670_png.rf.75fa97c9299067b3224ec08166995705.jpg",
+        "second_image": "ds1_BikesHelmets670_png.rf.f316a26b623c70c38540c3ecc9669871.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets690_png.rf.427c2476ad2eb517e0ee5ee926ae2048.jpg",
+        "second_image": "ds1_BikesHelmets690_png.rf.9011f7dfb02f348344e524857da4be4d.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets709_png.rf.c95dd023a3bb5c85343e94f91cb6cff2.jpg",
+        "second_image": "ds1_BikesHelmets709_png.rf.6f17fc4230dfb61fa073445a65611973.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets724_png.rf.2301f1709911524c482a86de79327b6d.jpg",
+        "second_image": "ds1_BikesHelmets724_png.rf.a199346ec6dd6aeff7452c6661b60df2.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets735_png.rf.dc8150f3dfb32b91922c69396d12b4bf.jpg",
+        "second_image": "ds1_BikesHelmets735_png.rf.02acbd47284fc1198564efd9b7e81a1f.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets328_png.rf.2c25a000d84fb8ca3caef3751af2bcde.jpg",
+        "second_image": "ds1_BikesHelmets743_png.rf.0ba89dae13e79abf30515b6b357b84e5.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets77_png.rf.1a249e4e8c42f16a0410cffbc3b2d7a4.jpg",
+        "second_image": "ds1_BikesHelmets77_png.rf.cd14a34393198100a19395e36e82fa1b.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets95_png.rf.30141ce0c0b130fab82df9d17d5d6caa.jpg",
+        "second_image": "ds1_BikesHelmets95_png.rf.98d1d6f8bfd7783058e8e4ce58a2847a.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_frame_9_1762_jpg.rf.5c73c39643e2ab84f3e94c53d1a94fdd.jpg",
+        "second_image": "ds1_frame_9_1762_jpg.rf.345f29cc49af3921d3a7401adf6b0241.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets105_png.rf.185fd715edfc04d2e70e803d65f5d132.jpg",
+        "second_image": "ds2_BikesHelmets105_png.rf.e6fe3f32b95aa75db2e1b337c68278d0.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets115_png.rf.058888457af2fd8cfec8c4433b9d1de8.jpg",
+        "second_image": "ds2_BikesHelmets115_png.rf.dc9f23e9aecf5f676ba5e36ea6407e14.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets126_png.rf.090f946e81e39b6cc27ee417316fdf24.jpg",
+        "second_image": "ds2_BikesHelmets126_png.rf.9412a0c25d8c48fbf692694a3c710d71.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets135_png.rf.345f50d5307dc480e265372840d6c162.jpg",
+        "second_image": "ds2_BikesHelmets135_png.rf.3e694d99a8bd7a8ed9527325bf0a0306.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets136_png.rf.c8e7294fcaf4f9b367563111d5eed5c5.jpg",
+        "second_image": "ds2_BikesHelmets136_png.rf.5faeb1be8fc08840a39bc31b44b6db03.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets158_png.rf.380bdac51b6016be1d3bed16277fcffb.jpg",
+        "second_image": "ds2_BikesHelmets158_png.rf.b71995f6ec67e8557e40da7773a97c8e.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets160_png.rf.42e306392bb9279ebec622bc793370bb.jpg",
+        "second_image": "ds2_BikesHelmets160_png.rf.c8025b71fb5a87909cc7ff939f61b05b.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets162_png.rf.3fc856781aa3445a9ff7e9e3d3eab6bd.jpg",
+        "second_image": "ds2_BikesHelmets162_png.rf.630b7b859a83afef1e9876d1dbc5f8bb.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets163_png.rf.76ef93a33dee4bc83324ee74db20c3fd.jpg",
+        "second_image": "ds2_BikesHelmets163_png.rf.9f4ff24d76525a528e1bc0504f5651f7.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets574_png.rf.e28b33d38c64c8aa3be7b83a4b6fee83.jpg",
+        "second_image": "ds2_BikesHelmets164_png.rf.3aa3f84dccd090df213b704904b31660.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets174_png.rf.8da159a5bb64b19ec9bf0043733a0073.jpg",
+        "second_image": "ds2_BikesHelmets174_png.rf.38511101cd1f04b53051d66a390b810c.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets176_png.rf.e5855e94593693e5607f71dc6773fba7.jpg",
+        "second_image": "ds2_BikesHelmets176_png.rf.dc418328ea0fbcbdfea3c5f8b5e691bb.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets179_png.rf.4be315f247599b6a70d22e2d78078822.jpg",
+        "second_image": "ds2_BikesHelmets179_png.rf.30629380c4f3ba4bd05dc49699e502dd.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets180_png.rf.32fe69970d15123210d889f977d0f9ac.jpg",
+        "second_image": "ds2_BikesHelmets180_png.rf.c52a95e780fcde7fb5be27e76a15e5fc.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets183_png.rf.5d07d8e43f72d5baa18495346eeca13d.jpg",
+        "second_image": "ds2_BikesHelmets183_png.rf.095bab17d0ce23fc32d894d04d63b256.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets18_png.rf.961bb105b4c4d002a6a29a717a653239.jpg",
+        "second_image": "ds2_BikesHelmets18_png.rf.4d7189b66f572b32d98ec163a4d0e1b9.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets202_png.rf.b07290147c9a02f86848081898b7c3ee.jpg",
+        "second_image": "ds2_BikesHelmets202_png.rf.243f745bc18bdb7f4e1312f2ff910726.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets207_png.rf.a893a87f706f14888032dc42cf019de7.jpg",
+        "second_image": "ds2_BikesHelmets207_png.rf.7855902b1f8d6aca32294fe7fa84d5ee.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets209_png.rf.454334b5b2fb378763abf458b20bf083.jpg",
+        "second_image": "ds2_BikesHelmets209_png.rf.9c6eb965f218badc418ab55669bd900c.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets213_png.rf.51b2c9588fbef69a78a0209baaebe21d.jpg",
+        "second_image": "ds2_BikesHelmets213_png.rf.50348dc807a5d27d78793136496b95f5.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets233_png.rf.219c9cbddbbccd68e9468df6ae33a327.jpg",
+        "second_image": "ds2_BikesHelmets233_png.rf.836255caead83eb609a5328dd6b7c1b3.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets23_png.rf.9eb09bfff336a9b27d7e4fab365c7d0c.jpg",
+        "second_image": "ds2_BikesHelmets23_png.rf.cfdd2747301e18713018d5896f2115cd.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets243_png.rf.0d2156a3aeef6aa160e008ec46846860.jpg",
+        "second_image": "ds2_BikesHelmets243_png.rf.7f7a2d9ed5d9cea1023a9e47c6cf1aa0.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets24_png.rf.e32f4b0168c24a121b97a565e7386521.jpg",
+        "second_image": "ds2_BikesHelmets24_png.rf.875dd9ab7a3a1d050e11e571fc0ad167.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets251_png.rf.5eecd89f8f62d5960e88f67183fb7076.jpg",
+        "second_image": "ds2_BikesHelmets251_png.rf.1bd344c877502b3b1aa84b2cea40aa7e.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets253_png.rf.b25b126d3c29f15741da0dfdc550b1d6.jpg",
+        "second_image": "ds2_BikesHelmets253_png.rf.c3654d3fd77d4402205e77c35976b451.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets261_png.rf.9a01142ad39256a1fc90b577b59cc089.jpg",
+        "second_image": "ds2_BikesHelmets261_png.rf.af17ec8ad6889512140a501af853ba16.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets26_png.rf.ecdef3ddec60664a9da2b8a5c2f293ec.jpg",
+        "second_image": "ds2_BikesHelmets26_png.rf.818eaa76ff02fee50b1ccfea08040ca0.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets293_png.rf.a4750fdcadfd3836ce3c9d7ab9f85392.jpg",
+        "second_image": "ds2_BikesHelmets293_png.rf.8009ab07f605e75d274eb002aa0862c3.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets29_png.rf.c26e6c5d6c0e76438eb655acfff0a990.jpg",
+        "second_image": "ds2_BikesHelmets29_png.rf.cdea2acc81fef84caef8e32d9c9c4093.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets311_png.rf.b2007e26da6d863996cff61f8fbb2b04.jpg",
+        "second_image": "ds2_BikesHelmets311_png.rf.845bf97032da6d5c2191aa96071221ea.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets314_png.rf.76cea77e7152fb4f6a7d7e0e1ce3e324.jpg",
+        "second_image": "ds2_BikesHelmets314_png.rf.4c547495db791ac0712f7c4e47a9177f.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets319_png.rf.f636e26644ed4ca482435d6b35f8520a.jpg",
+        "second_image": "ds2_BikesHelmets319_png.rf.13b3be1da772c94aa05abf9ca972c602.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets321_png.rf.5aeb32b927cd8e97418344a8dfdbb84f.jpg",
+        "second_image": "ds2_BikesHelmets321_png.rf.7dc6bc2224d917545e8998f8a054b8ac.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets337_png.rf.7fd5439074a48e9aee744987f710a24d.jpg",
+        "second_image": "ds2_BikesHelmets337_png.rf.e3c2346929be72194c3fbb78ad080682.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets346_png.rf.b393f4a0e4635784e75339ecfac4e8ca.jpg",
+        "second_image": "ds2_BikesHelmets346_png.rf.50136f00dc4547c4ea0752d0792b479f.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets364_png.rf.16c49a2862547bd78169d9dd3f31bd61.jpg",
+        "second_image": "ds2_BikesHelmets364_png.rf.391077f7ce0687838437da22df946d3f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets365_png.rf.136fa7fae46d0613fe0619ce0d662658.jpg",
+        "second_image": "ds2_BikesHelmets365_png.rf.7536840707a7b6816fff033bb0bb5d9f.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets37_png.rf.999323c1e013a49093dc296419e4176f.jpg",
+        "second_image": "ds2_BikesHelmets37_png.rf.c507bff3d45e6e42b7340178ceff6142.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets380_png.rf.2ef66bc8013fb67290059ca90235709c.jpg",
+        "second_image": "ds2_BikesHelmets380_png.rf.abb66106bd9d1fb6a0b83db80fd7eb47.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets385_png.rf.343bcc91c0b74dcd64340642a6c8de47.jpg",
+        "second_image": "ds2_BikesHelmets385_png.rf.5342f0a39e62234fd68eba47c49b7130.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets138_png.rf.e3bea28f8ca8feeccd626dfee6b3775f.jpg",
+        "second_image": "ds2_BikesHelmets38_png.rf.75b52b066f4a0fb25b5c0095af5b796f.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets430_png.rf.86e66f9235b83669ec5f69c8ecbc36bb.jpg",
+        "second_image": "ds2_BikesHelmets393_png.rf.4801888102daf9d83078e7be97b883fd.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets3_png.rf.1e4febb00efb97fb2f22d0828d8861fe.jpg",
+        "second_image": "ds2_BikesHelmets3_png.rf.80885d3d5024c5d675b14ffbe780c057.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets403_png.rf.5042d4c3488e653052455b4df1e5328b.jpg",
+        "second_image": "ds2_BikesHelmets403_png.rf.16e2389ad1702a7e51bdcf17c07a20ed.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets406_png.rf.afd2a16033939afec5a1dbd9f6a223c2.jpg",
+        "second_image": "ds2_BikesHelmets406_png.rf.a0a5728ac7d135ee6f29d36e9a3117c0.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets81_png.rf.2e816b1c1a9270530d0a74260867af18.jpg",
+        "second_image": "ds2_BikesHelmets40_png.rf.d9c4e2978905511c17689d1770050f95.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets412_png.rf.74c0ce5bfcec3b24d39e56ad81b65de7.jpg",
+        "second_image": "ds2_BikesHelmets412_png.rf.5792ddb3be7c2ddae6d71fcf4b0677fc.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets429_png.rf.ca973599de562b27ca1e38f9dedce34f.jpg",
+        "second_image": "ds2_BikesHelmets429_png.rf.f251331ac6d3e159cdd6f9e1866902b8.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets432_png.rf.4b619cf69a75acd53287072199762f78.jpg",
+        "second_image": "ds2_BikesHelmets432_png.rf.064e7b5a11d1e39e915ce53c94bc421e.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets443_png.rf.26e43874c482974e7d1fdab2d6d74142.jpg",
+        "second_image": "ds2_BikesHelmets443_png.rf.5b82e4a8ad54d8d78b24c5c667ee7a5d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets446_png.rf.8420aff5753a85783e953613b5c6ad52.jpg",
+        "second_image": "ds2_BikesHelmets446_png.rf.6fc9f03d6d42874ac950522edc17a35b.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets457_png.rf.bf677b5add994b0ea9faf81a25e2f65c.jpg",
+        "second_image": "ds2_BikesHelmets457_png.rf.7833f9d115235fcefc184dc899b8e9a4.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets260_png.rf.bceb8b31f2ad1f0cec2b152ba2c55b3b.jpg",
+        "second_image": "ds2_BikesHelmets45_png.rf.fdf1c8c9f8f560f276b53088eae8fe3a.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets464_png.rf.fadd965daf5e29fae35f701d91946e6b.jpg",
+        "second_image": "ds2_BikesHelmets464_png.rf.286c797066e25f34c624d783dee87de4.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets466_png.rf.83eb222f5c0d858ab587db9a0ce1ce65.jpg",
+        "second_image": "ds2_BikesHelmets466_png.rf.bcc6f93afaf5ebdc02ae3375167deff2.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets478_png.rf.c2c8628753cf189c0ae928eba2c56e09.jpg",
+        "second_image": "ds2_BikesHelmets478_png.rf.23085e94282cba1b96bd2c8e39ba0b36.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets483_png.rf.1058f877a68ca4c247b9c5a9fc3024fd.jpg",
+        "second_image": "ds2_BikesHelmets483_png.rf.cb3f4c9649284a44a52225a09e415e88.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets48_png.rf.989f6d10a155e4c0244b16118a191d3a.jpg",
+        "second_image": "ds2_BikesHelmets48_png.rf.9150b5606952863bcac35f9821a65888.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets515_png.rf.46fd85d2217a2ad24f098cbb84da4f86.jpg",
+        "second_image": "ds2_BikesHelmets515_png.rf.e76ec17195ea31394f4e5718ead3f54c.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets51_png.rf.5b2ff9760a3c412913e9706c4dc2348f.jpg",
+        "second_image": "ds2_BikesHelmets51_png.rf.1b050e81d4b64820164dfb74e13baabe.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets529_png.rf.599f0275be643fb5a0bf011e747a4248.jpg",
+        "second_image": "ds2_BikesHelmets529_png.rf.3d59de8f57eab6ca8917a7300d832f87.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets535_png.rf.090f083441a97472bc9aff5651406640.jpg",
+        "second_image": "ds2_BikesHelmets535_png.rf.ab51fb0ad42fe0c0ee461e6bff2c2996.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets549_png.rf.47f9bdb771962494c537409499343d8f.jpg",
+        "second_image": "ds2_BikesHelmets549_png.rf.906ba2bf096f39b757bad50d2b649356.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets555_png.rf.5773fca52e26c3418935d83fc5a1a2d2.jpg",
+        "second_image": "ds2_BikesHelmets555_png.rf.29d3ce5c4e1d0a006392f134495d1aa6.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets562_png.rf.080239af6668c426efce25c87404d715.jpg",
+        "second_image": "ds2_BikesHelmets562_png.rf.2a573ed1e46f3d85750be00b85cde7c3.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets569_png.rf.4a1e85bce73475f66ad9701546d3e913.jpg",
+        "second_image": "ds2_BikesHelmets569_png.rf.20ccd47825c0a3b69f24cd504690ae7a.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets572_png.rf.efcf2bc4b1133e5e95cf0baffd1a5ae3.jpg",
+        "second_image": "ds2_BikesHelmets572_png.rf.4d357e32eeef1d89532ebbea5c0d2523.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets573_png.rf.9847fc3ba2db162fac96d2ef82520f72.jpg",
+        "second_image": "ds2_BikesHelmets573_png.rf.01510483d1274d491d71f63fdeb2f64c.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets596_png.rf.11fb96416bb4609aa27cfb857680f2fa.jpg",
+        "second_image": "ds2_BikesHelmets596_png.rf.61da79d2ec750a9e18979a30ec477754.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets605_png.rf.0a208b4b28bf2284442ec89b57e9a332.jpg",
+        "second_image": "ds2_BikesHelmets605_png.rf.c907d265ac0ca713eae357d28401eb8c.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets618_png.rf.22a4b7e491cac7dbf34a93d7cce253a0.jpg",
+        "second_image": "ds2_BikesHelmets618_png.rf.c9ba3ad3e9ec90c9c51f5a7d0ebefbad.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets61_png.rf.c25152da31e649e8277cfd22e28257e1.jpg",
+        "second_image": "ds2_BikesHelmets61_png.rf.dfd124dafeaf5c79af0b8cf9265bfffe.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets620_png.rf.e9276359359d4b2e56bfafcbf30aa0d1.jpg",
+        "second_image": "ds2_BikesHelmets620_png.rf.ad88093a0673486ebc60822ba85eb5e9.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets624_png.rf.3620ee74c0eed59e6413fdab90853dec.jpg",
+        "second_image": "ds2_BikesHelmets624_png.rf.7099f7c429c8a7631934f8bc52fa3b47.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets637_png.rf.4a9fe9f4c594ee3b20a75978858bc788.jpg",
+        "second_image": "ds2_BikesHelmets637_png.rf.817c6e82dafe766261f0c6a922c3f8c6.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets639_png.rf.c3510c13e2bf02e6623beb34c604a4d3.jpg",
+        "second_image": "ds2_BikesHelmets639_png.rf.d1911ef0444c29698ffc6863b4e8fa0b.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets63_png.rf.303de0e38de8424ad4469760a9ae4c01.jpg",
+        "second_image": "ds2_BikesHelmets63_png.rf.aba1096904a618353cd3c17b0d2cdd47.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets641_png.rf.10461e4187d8c1197914c64c59daf77d.jpg",
+        "second_image": "ds2_BikesHelmets641_png.rf.6c4d4642e11eb6091380a550cb7e280c.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets647_png.rf.5b915731c4fb7b378e95c00a54178316.jpg",
+        "second_image": "ds2_BikesHelmets647_png.rf.9be5d488321ea723a527dfd3b07c7f6f.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets648_png.rf.584768fc99699e794bc330ebe0efb05d.jpg",
+        "second_image": "ds2_BikesHelmets648_png.rf.f9bc93bb2efb864b669bb9fd7a0d1f4f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets651_png.rf.362f3cdf03f021182bcf6ea7a8662795.jpg",
+        "second_image": "ds2_BikesHelmets651_png.rf.f9f12af290a6364dc2d23a7b412332e6.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets652_png.rf.55ef8dc1314b1182c7f6942f26a69fb5.jpg",
+        "second_image": "ds2_BikesHelmets652_png.rf.ce742223f962b1368c3066a9264668ae.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets662_png.rf.8d3157e4abc73b04472fe993b4eb4e4a.jpg",
+        "second_image": "ds2_BikesHelmets662_png.rf.4f94b71a628f9fde16398a9ec89f401d.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets670_png.rf.f316a26b623c70c38540c3ecc9669871.jpg",
+        "second_image": "ds2_BikesHelmets670_png.rf.17722fb9ef13fe2f046456b707dae383.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets676_png.rf.21e5bb692b1ef35bccfb817b24215856.jpg",
+        "second_image": "ds2_BikesHelmets676_png.rf.cbdb6f2e89c887dfa3fd1d0ec2667978.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets677_png.rf.346c8b58acf07a854dce121eca5b96ac.jpg",
+        "second_image": "ds2_BikesHelmets677_png.rf.4f8af6ab40a2a75389adf6391d8adda0.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets685_png.rf.79cf09e638af03e2f17e60a8b14fdca2.jpg",
+        "second_image": "ds2_BikesHelmets685_png.rf.acd091744070b4bfedcfa19230e24186.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets687_png.rf.ab12d04ebccf65a721b29255a9f8114c.jpg",
+        "second_image": "ds2_BikesHelmets687_png.rf.20fe47a481935f5f65b98a009bb11d8d.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets69_png.rf.d7d74c0eb66eed54265c21b2e8d6c530.jpg",
+        "second_image": "ds2_BikesHelmets69_png.rf.a8a2edd480a09d00e4a12681ef83f2ff.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets705_png.rf.46d818033d6359e0e7935f1a0fb47979.jpg",
+        "second_image": "ds2_BikesHelmets705_png.rf.fda429eea465dbe42c628c04ec950381.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets706_png.rf.f0c768fd60d29e0213afb4d0c72b9ff5.jpg",
+        "second_image": "ds2_BikesHelmets706_png.rf.bf5a55ffed641123c7ba4c10e6e68b35.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets715_png.rf.2ad5e5cc60d3e427bb9e0869600e85b4.jpg",
+        "second_image": "ds2_BikesHelmets715_png.rf.5079337645ccc7d85761c60e7cd2738e.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets724_png.rf.a199346ec6dd6aeff7452c6661b60df2.jpg",
+        "second_image": "ds2_BikesHelmets724_png.rf.edb1d12b9148617e613a01b2f72c89ed.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets734_png.rf.1b7754ba281d4088d7549631b69b6e12.jpg",
+        "second_image": "ds2_BikesHelmets734_png.rf.6d6f653ed07b24207d01b854b5302c94.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets73_png.rf.0aec3401287a3c1b5fb0e182f40e8127.jpg",
+        "second_image": "ds2_BikesHelmets73_png.rf.3207ebe616113f04e23e7a43c295f6cb.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets748_png.rf.d4ca3f00893241888a1d8d9dda93dc98.jpg",
+        "second_image": "ds2_BikesHelmets748_png.rf.b59800ca5aa4a9e7cf966f0acfad6ff0.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets752_png.rf.3bce7d1e76f5d78026238692569c96dc.jpg",
+        "second_image": "ds2_BikesHelmets752_png.rf.8775f95985a1f224476bbc2e5791c684.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds3_BikesHelmets79_png.rf.32f1e2230e2f61cd9b575ccf3bd7444a.jpg",
+        "second_image": "ds2_BikesHelmets79_png.rf.3cf81bce02e0cb9de7f951144dff95f9.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets91_png.rf.ff5de90725e4fa32105aa8af00699ad2.jpg",
+        "second_image": "ds2_BikesHelmets91_png.rf.7762d5ff49d625e86fdeb462b60fe776.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets95_png.rf.98d1d6f8bfd7783058e8e4ce58a2847a.jpg",
+        "second_image": "ds2_BikesHelmets95_png.rf.0951aad78c7539d9dba613ea20386c16.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_Cars118_png.rf.5f320a70630f8e03a4892d0c889d11e8.jpg",
+        "second_image": "ds2_Cars225_png.rf.f3128ddf291046fc64d1883e90584971.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets101_png.rf.86cb3a2b8e2d401e15a1e89cc535b5e8.jpg",
+        "second_image": "ds3_BikesHelmets101_png.rf.36b5d86fa2b3ea5913a19e699b71ac3d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets107_png.rf.0743cd35dddd2b1593bba2159533c41a.jpg",
+        "second_image": "ds3_BikesHelmets107_png.rf.448b828c69ebe2b5cdc94c1e78358e7d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets109_png.rf.f3bc215c535c7638278ecaad8460c05f.jpg",
+        "second_image": "ds3_BikesHelmets109_png.rf.ff3c3d211f27ab5d2057e8405da91cf6.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets10_png.rf.fb713174232acc65224df31a6f44327d.jpg",
+        "second_image": "ds3_BikesHelmets10_png.rf.6afbab4228577a71a2cf7fc75025d675.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets112_png.rf.651334caea7a38a849036ade63a58d4a.jpg",
+        "second_image": "ds3_BikesHelmets112_png.rf.47c43cd8d1353d156aeaffbc3697242d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets116_png.rf.c1e8a5c858c9f509f5db449f2e384be4.jpg",
+        "second_image": "ds3_BikesHelmets116_png.rf.55b959c6382a5b0cb6826c4755cd1f83.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets127_png.rf.f30fa57e3ff476a1c445393b6d977491.jpg",
+        "second_image": "ds3_BikesHelmets127_png.rf.a271348cedd2d770575ec8d40727bd32.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets12_png.rf.7cf4c1cae55ef78d3be0c48fb3015272.jpg",
+        "second_image": "ds3_BikesHelmets12_png.rf.4238385fbbab6b0a454456244e376444.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets134_png.rf.cb993c9053c8517a8a14beb8bf1992b5.jpg",
+        "second_image": "ds3_BikesHelmets134_png.rf.9355a2a89f319414ce393e6d57936cd0.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets139_png.rf.a7e831fa7b330372d7a5f06fc11eeb71.jpg",
+        "second_image": "ds3_BikesHelmets139_png.rf.4dfda4daff1a2d846ab776042d2a65b4.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets147_png.rf.ef775c5c35bd64a1d5c8f146708bf8d5.jpg",
+        "second_image": "ds3_BikesHelmets147_png.rf.54bcf7374423c890c3cd27805473b412.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets150_png.rf.28b8f96cdf67d9dc4132b541d2b2f3eb.jpg",
+        "second_image": "ds3_BikesHelmets150_png.rf.a094442a0650a49984d818f1d714d4b3.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets153_png.rf.72cf70543c02892923794f452e40abf9.jpg",
+        "second_image": "ds3_BikesHelmets153_png.rf.dfa88b5b3f09e29c5c79a530c1a4410d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets157_png.rf.3ff71f7c444d95c02b466be5b13395c1.jpg",
+        "second_image": "ds3_BikesHelmets157_png.rf.16ea8c1bcbc5d9728eb9b3dc4bad2d5f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets15_png.rf.6f98fdf87f4b05b4670d94d5a306fcf5.jpg",
+        "second_image": "ds3_BikesHelmets15_png.rf.cbb415d7fd1f854da1115b039f220cd5.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets160_png.rf.42e306392bb9279ebec622bc793370bb.jpg",
+        "second_image": "ds3_BikesHelmets160_png.rf.7867dc017fc343eae9f53d2810037f2f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets162_png.rf.3fc856781aa3445a9ff7e9e3d3eab6bd.jpg",
+        "second_image": "ds3_BikesHelmets162_png.rf.1d67d9a063be6d3cf35dfc124eb654c8.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets175_png.rf.3937036ab694eca2a0d2ae32c97161df.jpg",
+        "second_image": "ds3_BikesHelmets175_png.rf.cbda13995503addd33fc25b169faaf33.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets176_png.rf.e5855e94593693e5607f71dc6773fba7.jpg",
+        "second_image": "ds3_BikesHelmets176_png.rf.410a8778c9e810db3cbcb9d18349c712.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets17_png.rf.97c5a098d326f7ae2ee6e7ce6d79ee93.jpg",
+        "second_image": "ds3_BikesHelmets17_png.rf.65100400ee3381e012006266ea0297ef.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets180_png.rf.32fe69970d15123210d889f977d0f9ac.jpg",
+        "second_image": "ds3_BikesHelmets180_png.rf.21f94aeebc88629c889478daaab5bb63.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets181_png.rf.c6e7fb74a470860507c47bfea9728419.jpg",
+        "second_image": "ds3_BikesHelmets181_png.rf.bbc039c3d786340bf4a2ac2e0b77ff15.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets182_png.rf.7c32257502a872575dcf10a5bf30c6bf.jpg",
+        "second_image": "ds3_BikesHelmets182_png.rf.d8a1d84b52a951a01760da4d7facceba.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets191_png.rf.9d84282b92d10fd55633fa2449333c7f.jpg",
+        "second_image": "ds3_BikesHelmets191_png.rf.407a98b4f02cc2580c37b317fefdd1c4.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets194_png.rf.828f9d74a58312f08ead6ebd581991b2.jpg",
+        "second_image": "ds3_BikesHelmets194_png.rf.efe1ea07ed13af3dee3f6afe0388eb8d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets19_png.rf.c4266ea6feb64f15ec28d8e679648bbf.jpg",
+        "second_image": "ds3_BikesHelmets19_png.rf.cd99c50cd792bd51f07494bfea7b0952.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets210_png.rf.99a6b63344f66c370005d4445e4158c9.jpg",
+        "second_image": "ds3_BikesHelmets210_png.rf.2a906e989102e0e2c3569acaa698f397.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets211_png.rf.dfb1167be72807b16815bbc0078a95f8.jpg",
+        "second_image": "ds3_BikesHelmets211_png.rf.f4a825cc248aeec7ecbbef8d8a6578ec.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets213_png.rf.51b2c9588fbef69a78a0209baaebe21d.jpg",
+        "second_image": "ds3_BikesHelmets213_png.rf.43904e4934ce3904a5d43d3d9c956a15.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets215_png.rf.99bb15a6923ff13058e4c4f6fefb1064.jpg",
+        "second_image": "ds3_BikesHelmets215_png.rf.342c2981953e3cdcb423dca571db0b40.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets225_png.rf.d6df19234267401149c8b3d809bd71b5.jpg",
+        "second_image": "ds3_BikesHelmets225_png.rf.759bae80419bac33b2b534089b2251a8.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets226_png.rf.301a16bce1677d0b4e055b35acae75db.jpg",
+        "second_image": "ds3_BikesHelmets226_png.rf.514763f70b5e8968a52fee0af2c196b2.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets231_png.rf.80b817231e35955dfd21379882c2376d.jpg",
+        "second_image": "ds3_BikesHelmets231_png.rf.56bd02a0cfd5c8c2a90dd64849e95f78.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets234_png.rf.10ddc7fdf8219636bb55e596af1e44bc.jpg",
+        "second_image": "ds3_BikesHelmets234_png.rf.61d0e467dee827cd0bdf9ed8f6729f9a.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets245_png.rf.cea5ce9d6c45a7c595272b03903f934e.jpg",
+        "second_image": "ds3_BikesHelmets245_png.rf.b944c84f9623b817a0df84cf97278ee7.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets255_png.rf.6b68b4649331d686f920e7bbda98d9f2.jpg",
+        "second_image": "ds3_BikesHelmets255_png.rf.a436409b26a5106f3043454a4883d829.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets269_png.rf.960485f5a04e79bd34ee874e8eb28751.jpg",
+        "second_image": "ds3_BikesHelmets269_png.rf.97419a5f17f068172e9412ee9014b4ed.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets270_png.rf.096c1a45dfdaabb699fa76aef8ef3422.jpg",
+        "second_image": "ds3_BikesHelmets270_png.rf.c1e759884a1b962286adfc90093520c0.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets272_png.rf.1e33a8cdc79b94ffd0e018c586424f69.jpg",
+        "second_image": "ds3_BikesHelmets272_png.rf.55a364e1611ba948bd07132b5261e902.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets279_png.rf.32831f8b0f287e7f097ddd5b48bac930.jpg",
+        "second_image": "ds3_BikesHelmets279_png.rf.cc1248c739c85e5d54e5197914ff121a.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets27_png.rf.d533e90180d29b1424c0d6500c317a42.jpg",
+        "second_image": "ds3_BikesHelmets27_png.rf.373d8579c35f9f1d01f4c96f2961e516.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets282_png.rf.07790fdd7cffc519ce8debd0e7b57363.jpg",
+        "second_image": "ds3_BikesHelmets282_png.rf.5687e4bdfd150c42c4eb49b6f67a4d18.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets296_png.rf.62f3d015ff78c3dacd62f1f8b01734cf.jpg",
+        "second_image": "ds3_BikesHelmets296_png.rf.f945131172bfcac44c373801cf21a94a.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets299_png.rf.5140f38f11d7cb365d36959db658617c.jpg",
+        "second_image": "ds3_BikesHelmets299_png.rf.0f191e43624f7db04bf40f0790ab7143.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets301_png.rf.64a816c9c180ace1f50df0941fb124b4.jpg",
+        "second_image": "ds3_BikesHelmets301_png.rf.f70decd8df48c5374a83946c8794fb25.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets302_png.rf.5d9b3abb3700a8208cdedd005eb6472f.jpg",
+        "second_image": "ds3_BikesHelmets302_png.rf.94401e8a2a4cbf8bb2b10d220eb8f078.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets309_png.rf.fa14a8c041dacdeed84ba232af7994a5.jpg",
+        "second_image": "ds3_BikesHelmets309_png.rf.52392ce58ee1c482a667e4722bd58a1b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets312_png.rf.7b51e866ca4262b444b72fe653e87e7d.jpg",
+        "second_image": "ds3_BikesHelmets312_png.rf.a7a235f42ff46a3cae9ac1bc8c3a4472.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets324_png.rf.dd99a7e8ec6220f2b2c31e482a5987d7.jpg",
+        "second_image": "ds3_BikesHelmets324_png.rf.bbaf57a0303821a11f460036ac80dca0.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets330_png.rf.7a46126e11dca12069b876a68b8144d5.jpg",
+        "second_image": "ds3_BikesHelmets330_png.rf.8b9cd7bc5c8a912c12f27cb4fb0a548e.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets33_png.rf.5c50e974a0b8945485ffa39b83f050c8.jpg",
+        "second_image": "ds3_BikesHelmets33_png.rf.9568fb6bd070dedf6452b117efbd14db.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets351_png.rf.dc245e7f69b00a352026e94727835674.jpg",
+        "second_image": "ds3_BikesHelmets351_png.rf.ab7b76bc7910c4eef2a2ad9fa0905e75.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets369_png.rf.b1d743afe7e555155986a9ad3b06841a.jpg",
+        "second_image": "ds3_BikesHelmets369_png.rf.b58b5956309a57b5a06544c713d47ff6.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets374_png.rf.a438a1f7e8f036804c133851a23bdd7c.jpg",
+        "second_image": "ds3_BikesHelmets374_png.rf.fca096a3115b78dca67b4de4e682d087.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets376_png.rf.c3ba00fa08fd2db5502fbcf42ecb4838.jpg",
+        "second_image": "ds3_BikesHelmets376_png.rf.da41132ceb43e328b61e617847ff9c43.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets380_png.rf.2ef66bc8013fb67290059ca90235709c.jpg",
+        "second_image": "ds3_BikesHelmets380_png.rf.67a8ea2da2e88cf1bd15f957e5907924.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets381_png.rf.5e3da90fa5acf21684200d6d80e1e365.jpg",
+        "second_image": "ds3_BikesHelmets381_png.rf.b1f3d059b63c1461a089bb95449a003a.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets389_png.rf.103fcd1c802a30c0ce98c76902e2c6db.jpg",
+        "second_image": "ds3_BikesHelmets389_png.rf.7cf5fdd11605d78e058aef27cb43f28f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets390_png.rf.7799ad0ccf15931823ff3b1725cb783d.jpg",
+        "second_image": "ds3_BikesHelmets390_png.rf.82ad380f2f6825a42f41187b2d473b0f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets391_png.rf.29fb161004af04604b15fd7aca599792.jpg",
+        "second_image": "ds3_BikesHelmets391_png.rf.f49f847e78a848fc853cc15cedd1d78a.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets393_png.rf.4801888102daf9d83078e7be97b883fd.jpg",
+        "second_image": "ds3_BikesHelmets393_png.rf.3188753644edcac96bba700d91ba62c1.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets395_png.rf.dbf59086ad2db8112f90e187d72704ce.jpg",
+        "second_image": "ds3_BikesHelmets395_png.rf.68e2afb994337ae138b383293955d63e.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets396_png.rf.5b2fdcb980d230fa06dd65e8833d346b.jpg",
+        "second_image": "ds3_BikesHelmets396_png.rf.1be3264fe0d60d73688c07d444cdded8.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets39_png.rf.c1fa33dae18333ed24af18da7c2ccffa.jpg",
+        "second_image": "ds3_BikesHelmets39_png.rf.2bd52d662d6b0ade06f1134372abedef.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets408_png.rf.54a80ac25cb5880e7791935f0de67aef.jpg",
+        "second_image": "ds3_BikesHelmets408_png.rf.ae7f69e26ce72098645c07b60717a4d5.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets41_png.rf.938aa28680917fcf6fcf4a1edbb65136.jpg",
+        "second_image": "ds3_BikesHelmets41_png.rf.5cb85a809a3cf3665cde14325543fcda.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets428_png.rf.2488c122180c7ac3a61571fc3c86b701.jpg",
+        "second_image": "ds3_BikesHelmets428_png.rf.a17c6e9f617e61b5d69efbee97cc552d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets429_png.rf.ca973599de562b27ca1e38f9dedce34f.jpg",
+        "second_image": "ds3_BikesHelmets429_png.rf.4f3075b2f5974f2d58dcb81286643a62.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets434_png.rf.f41e043b55f6b641d1413b7c56baa4d3.jpg",
+        "second_image": "ds3_BikesHelmets434_png.rf.f4302bddd3c5251104ddefff9dc25bac.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets435_png.rf.617f14825b88d3bb35c6ccc76e5d869a.jpg",
+        "second_image": "ds3_BikesHelmets435_png.rf.9155624e5afd35d71ca48a1f2f09a41c.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets441_png.rf.bed446721d86e7c4d3f0ccc6e78277ad.jpg",
+        "second_image": "ds3_BikesHelmets441_png.rf.be5948a4455d7f224ac01290ec5186c0.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets44_png.rf.6941d004f89b6799c1d9301b0d551649.jpg",
+        "second_image": "ds3_BikesHelmets44_png.rf.68fbad4625a4e1cd4772f7f9e05990fb.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets450_png.rf.8a88c81e3f3ba5dde4a2e1311255ebb1.jpg",
+        "second_image": "ds3_BikesHelmets450_png.rf.3a1f68cbd7fb23323ea68430dbe76867.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets452_png.rf.a6c4117093871b4f58fc07d27b1f0a1d.jpg",
+        "second_image": "ds3_BikesHelmets452_png.rf.60e4ad93d97e5cbe11b4e2d28fa5d310.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets460_png.rf.b5640725137e34444ec62e80b1870b33.jpg",
+        "second_image": "ds3_BikesHelmets460_png.rf.30f5f1799724b42f5940c26c1ef14459.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets461_png.rf.854849a7e3f8992d68d652a18c58e4f4.jpg",
+        "second_image": "ds3_BikesHelmets461_png.rf.107a9eb3cdf62198c018d0a2b3b7ce7e.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets473_png.rf.75f16e63717f53a156c730aa76379951.jpg",
+        "second_image": "ds3_BikesHelmets473_png.rf.069fed7361483d68b14e1eebdeea1833.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets492_png.rf.9021a3abbbcaa5dd0d3e32391f2360d5.jpg",
+        "second_image": "ds3_BikesHelmets492_png.rf.bd6cd9e74b6bd0d7e6c972a3f913034b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets4_png.rf.be2a79f9fcaae3298662a8ecf874e61c.jpg",
+        "second_image": "ds3_BikesHelmets4_png.rf.a65bbeb3d9a28a95f5b05b13ca2fa13d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets502_png.rf.d48b90821da28c239bceecd513b107d2.jpg",
+        "second_image": "ds3_BikesHelmets502_png.rf.e3321ebb59883b18e7563b07fb0bd795.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets510_png.rf.9addff8a25056cd023d7e851e238e132.jpg",
+        "second_image": "ds3_BikesHelmets510_png.rf.b794e19bf08a9f99dcf4afef8446066d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets515_png.rf.46fd85d2217a2ad24f098cbb84da4f86.jpg",
+        "second_image": "ds3_BikesHelmets515_png.rf.12d81042b179f26bb0c246f6e3c6616e.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets519_png.rf.0727691c5ab34c3ed7abc442dc2bf556.jpg",
+        "second_image": "ds3_BikesHelmets519_png.rf.e7bf9d5e507775fa93d3d4401fb0e359.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets523_png.rf.45682b6aab094a6f5a1137086148f0b1.jpg",
+        "second_image": "ds3_BikesHelmets523_png.rf.37073c9c5a78ae9c0c33ac8d63ccbbc6.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets530_png.rf.b01ac5cfd3844d6a8ad060e1f58aff26.jpg",
+        "second_image": "ds3_BikesHelmets530_png.rf.497cec9ce6d6b1d2d4008c65e6c8e9fa.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets532_png.rf.d325602462b80583c467f2f0741b2a4b.jpg",
+        "second_image": "ds3_BikesHelmets532_png.rf.b82c96053929b7ef601ffec6c607e228.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets533_png.rf.69952b59967e8b34741dd24e9285297b.jpg",
+        "second_image": "ds3_BikesHelmets533_png.rf.8f340f1458b66c1fa6af6b6e517b6d2f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets549_png.rf.47f9bdb771962494c537409499343d8f.jpg",
+        "second_image": "ds3_BikesHelmets549_png.rf.45ac1149f61a8c4d88d2ab6840dbcc85.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets554_png.rf.56763ec22e4ecb4e7ada8a39ff9d0f5f.jpg",
+        "second_image": "ds3_BikesHelmets554_png.rf.90548293b5bd242eb95bd2db9049d737.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets55_png.rf.f798dd6a7fffc259998e51b33a41ff9b.jpg",
+        "second_image": "ds3_BikesHelmets55_png.rf.047f29daa866bf082976a8467dbf7528.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets584_png.rf.b60d4794f21d349da32be2e2fa9660d8.jpg",
+        "second_image": "ds3_BikesHelmets584_png.rf.88b5ac0616f0dc7b35e450b69a727113.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets593_png.rf.94403a1e2f9a53351fb06b4d081869fa.jpg",
+        "second_image": "ds3_BikesHelmets593_png.rf.277b0406459c15befb618dd59cbc361b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets594_png.rf.29af80248803af4bcf5f13937c563c41.jpg",
+        "second_image": "ds3_BikesHelmets594_png.rf.5cfab46236254eb8f4a94aa54d9aa939.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets601_png.rf.6b252080cee328185768fb06b514d360.jpg",
+        "second_image": "ds3_BikesHelmets601_png.rf.c5a6c0fe92e01e68d227d5596e3943ae.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets613_png.rf.325e6577f537d2231e43f3bc4ea328c8.jpg",
+        "second_image": "ds3_BikesHelmets613_png.rf.2bc7c3e1265f0a757620dacef9081f36.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets619_png.rf.d0abef22af62a7b2e728b3146744b832.jpg",
+        "second_image": "ds3_BikesHelmets619_png.rf.a13f4372b4e19805a771325ccb377cea.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets624_png.rf.3620ee74c0eed59e6413fdab90853dec.jpg",
+        "second_image": "ds3_BikesHelmets624_png.rf.467aab895c580e80a9328b7f439be771.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets626_png.rf.0153a5aec3c4d15c301aa6e9cf93d666.jpg",
+        "second_image": "ds3_BikesHelmets626_png.rf.994e9775af227aae0c52a8c5c485a202.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets629_png.rf.e3170d53e07b7f93e25c7dd9e3a00dcd.jpg",
+        "second_image": "ds3_BikesHelmets629_png.rf.040219396b9c697fd5f454b5cdb49f5b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets632_png.rf.ad2fbf374cb0f8f11dc27fc03f610361.jpg",
+        "second_image": "ds3_BikesHelmets632_png.rf.ca6e4b013d4947e445cecd8180642d98.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets635_png.rf.51d2d70ccc61861e9a64eb5d9877a6d4.jpg",
+        "second_image": "ds3_BikesHelmets635_png.rf.8c08f19d7bffbda188783450a220993b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets660_png.rf.d6d8ef5ef5aa62f95b8bcee4faf8dcf2.jpg",
+        "second_image": "ds3_BikesHelmets660_png.rf.db87974a5b709f6a423758c367a33889.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets671_png.rf.949006b410feb0ef0c1ba4a1a7daefc3.jpg",
+        "second_image": "ds3_BikesHelmets671_png.rf.6fc5796f05b7b8b871e046a616a97502.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets684_png.rf.6af21c007b19ba1ceb41d4a75ee2cb4a.jpg",
+        "second_image": "ds3_BikesHelmets684_png.rf.c5e07566f020e467be29603cd11a109f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets686_png.rf.d9058d1cf0c3e6070f0800f18f9f5e4d.jpg",
+        "second_image": "ds3_BikesHelmets686_png.rf.20ad2320998a4b28e6d5e0fdefdc362d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets688_png.rf.f02d04bd6f93571521175923a54645a7.jpg",
+        "second_image": "ds3_BikesHelmets688_png.rf.384d195e8b0af46ffb60821670ae8163.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets69_png.rf.d7d74c0eb66eed54265c21b2e8d6c530.jpg",
+        "second_image": "ds3_BikesHelmets69_png.rf.fca78aebbb6b6012fae647ca13128322.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets711_png.rf.847945a9b57a186ea737f8e60aed3835.jpg",
+        "second_image": "ds3_BikesHelmets711_png.rf.b44e798a2050c76c68e9e25f45d77f5a.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets714_png.rf.0789b726870661e0125e20b5c8eb1746.jpg",
+        "second_image": "ds3_BikesHelmets714_png.rf.255d577eab50adac7121e0450c776083.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets719_png.rf.d7f4939d5ddb7ceca94bf067f221c32f.jpg",
+        "second_image": "ds3_BikesHelmets719_png.rf.7a4955c6b606c9e11260a8fb89fbd56a.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets721_png.rf.416b820758bfca9ae1293cfa8cb1e0b5.jpg",
+        "second_image": "ds3_BikesHelmets721_png.rf.062eebf2af125781264e8e5cd11fa725.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets723_png.rf.264c2cbd8309a9cd4a721b08b18fffed.jpg",
+        "second_image": "ds3_BikesHelmets723_png.rf.35b12f46ce4ad1e4897a25f0a5bca446.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets729_png.rf.d230a4ed11a7239e004c0cd85487a388.jpg",
+        "second_image": "ds3_BikesHelmets729_png.rf.e59442193714b68c5c3cf11a162a944b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets731_png.rf.55fd2de3c8455b422ffa0da97c3538f4.jpg",
+        "second_image": "ds3_BikesHelmets731_png.rf.ebda50557fc8ec16787a5a1c8a8e63aa.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets733_png.rf.44854352eb252ef260db614784271872.jpg",
+        "second_image": "ds3_BikesHelmets733_png.rf.e8b278d5ff9dacda6414ce3a471e3c4d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds2_BikesHelmets737_png.rf.b5b57f491cd2c5dfed74c471103bed9d.jpg",
+        "second_image": "ds3_BikesHelmets737_png.rf.1b5a4d33afb9d71a8c99ba854042c2f4.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets76_png.rf.43b749b1f94bd937fcd14ff63490cd81.jpg",
+        "second_image": "ds3_BikesHelmets76_png.rf.a428fbc14bc68e2d66ded9c40e6ea0c0.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets80_png.rf.4693dbc9a94690a0a8cb3914d1a285fd.jpg",
+        "second_image": "ds3_BikesHelmets80_png.rf.215040e3215df6372be7e4a06feaca2a.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets90_png.rf.1e156f0fb5dbb0977085b55dcc786cb5.jpg",
+        "second_image": "ds3_BikesHelmets90_png.rf.ea870eedd8e1bc4e33f69fd707ca52b7.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets92_png.rf.54bbc82d9dc212aaafb80eea99af8faa.jpg",
+        "second_image": "ds3_BikesHelmets92_png.rf.710f71a200b482469dce9ea5f6f1d663.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "val",
+        "first_image": "ds1_BikesHelmets93_png.rf.ebd84a603882e457d4edfa503e95aff5.jpg",
+        "second_image": "ds3_BikesHelmets93_png.rf.26cc4a86ae830638dc3e06eaa967b136.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_download-1-_jpg.rf.535c3f4b20a0d002a4876661db8f9d18.jpg",
+        "second_image": "ds3_download-1-_jpg.rf.daea7dc2a86a21c2f908f341a0f548c8.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "val",
+        "first_image": "ds2_download_jpg.rf.55a63db51d4d9d041b7ca858b64e9580.jpg",
+        "second_image": "ds3_download_jpg.rf.5fa1b19cd9bdac20c5b7ecf5c4fab28f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_43_jpg.rf.51c16c85dec5a45f5066d8adc8c3903b.jpg",
+        "second_image": "ds1_43_jpg.rf.dc13f8d3e650b2801dbe0192198e348b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_48_jpg.rf.52da8d50a801284f04d0e8301aacf498.jpg",
+        "second_image": "ds1_48_jpg.rf.436e01de5d5c481fef0048b55302c30c.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_48_jpg.rf.52da8d50a801284f04d0e8301aacf498.jpg",
+        "second_image": "ds1_48_jpg.rf.7fa6ac0cd4b537a45b74081c9ac167f0.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_49_jpg.rf.50f93b41b3c8a41f0dfab2ab7157eb63.jpg",
+        "second_image": "ds1_49_jpg.rf.fd011c9e125f2ea0ffeed076d79e7be8.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_58_jpg.rf.63669725005b0a6764afc5bff339196b.jpg",
+        "second_image": "ds1_58_jpg.rf.6e0d174315a47f94b8a258146d648194.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets120_png.rf.16c0895efa488203096c85c9dafe8d52.jpg",
+        "second_image": "ds1_BikesHelmets120_png.rf.c8cfd5d9e0bb0fdca06fec2aace0d745.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets22_png.rf.628cba69ef5317431ed779911b7fbf9c.jpg",
+        "second_image": "ds1_BikesHelmets125_png.rf.b2394355411f7a3ff62a8976b1759470.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets170_png.rf.0e824f50fc35ade01c19c13e3a7c9b27.jpg",
+        "second_image": "ds1_BikesHelmets170_png.rf.42b0f43f7e8c93691c94bef9f7119771.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets182_png.rf.7c32257502a872575dcf10a5bf30c6bf.jpg",
+        "second_image": "ds1_BikesHelmets182_png.rf.2a757d70a14e79fec95aabb1e6f95721.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets19_png.rf.c4266ea6feb64f15ec28d8e679648bbf.jpg",
+        "second_image": "ds1_BikesHelmets19_png.rf.cd0b0684c7d08011dd1eab518f780de1.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets210_png.rf.99a6b63344f66c370005d4445e4158c9.jpg",
+        "second_image": "ds1_BikesHelmets210_png.rf.d68ca6d13bd99537c3f6e135ed58fc06.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets217_png.rf.530fd896a6ae602306090b23853c2e6b.jpg",
+        "second_image": "ds1_BikesHelmets217_png.rf.1df6d0826cf1a7127a788fe10c5fd24a.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets233_png.rf.836255caead83eb609a5328dd6b7c1b3.jpg",
+        "second_image": "ds1_BikesHelmets233_png.rf.e12a7656cf47a975800d8c611022a98b.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets234_png.rf.10ddc7fdf8219636bb55e596af1e44bc.jpg",
+        "second_image": "ds1_BikesHelmets234_png.rf.2d932df845c6ca76f070a9dda08e4ab3.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets235_png.rf.ee8e3bcd0b8918b1ecb88727c1f3891f.jpg",
+        "second_image": "ds1_BikesHelmets235_png.rf.b76de18fc0897ece000670b1ea156c52.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets29_png.rf.cdea2acc81fef84caef8e32d9c9c4093.jpg",
+        "second_image": "ds1_BikesHelmets29_png.rf.54781a5beb5b9623f5e945f64d7d0426.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets330_png.rf.7a46126e11dca12069b876a68b8144d5.jpg",
+        "second_image": "ds1_BikesHelmets330_png.rf.2aca07cef29b28a95ec5729ed13453e8.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets205_png.rf.2e8a6d5177595fc4cd7bfa039e4ea104.jpg",
+        "second_image": "ds1_BikesHelmets348_png.rf.c821a84d8605e15bcf6377cac7ac7ca2.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets349_png.rf.5b19dc7c6109e817b781f5b43558e1e6.jpg",
+        "second_image": "ds1_BikesHelmets349_png.rf.ac679874cd12d00dfeb5adc02902ff64.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets364_png.rf.391077f7ce0687838437da22df946d3f.jpg",
+        "second_image": "ds1_BikesHelmets364_png.rf.e5037f3af9b9854c792f7a0925845707.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets36_png.rf.e905ede5b5cbbb13f00bfc451d3e33b8.jpg",
+        "second_image": "ds1_BikesHelmets36_png.rf.172d9ac5e1d2d60f5509ec7ebefb9b43.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets382_png.rf.9e33d76d79bcd8fe4c8bf06ae717c72a.jpg",
+        "second_image": "ds1_BikesHelmets382_png.rf.6f2951d366b69866c5b38983c1fc28c2.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets387_png.rf.29273406f2431d8d3b8835ba47ed2cdc.jpg",
+        "second_image": "ds1_BikesHelmets387_png.rf.6066ab8e277b25942b73801d5850cb1c.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets404_png.rf.c45fefcc6ddbe11f8a1946cef7f60bab.jpg",
+        "second_image": "ds1_BikesHelmets404_png.rf.01daabf950b61b8bd137528886f12a29.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets199_png.rf.59da999e39239945fdd452ee3b08965a.jpg",
+        "second_image": "ds1_BikesHelmets413_png.rf.a204c0d7cfa4854d2b181bcd281ff78f.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets375_png.rf.678728ae5b4494b133cf2f0d08a7f1de.jpg",
+        "second_image": "ds1_BikesHelmets422_png.rf.56584c8698d157e1235e941e5e81d323.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets435_png.rf.617f14825b88d3bb35c6ccc76e5d869a.jpg",
+        "second_image": "ds1_BikesHelmets435_png.rf.19aa0d19462f4faaf825cd42d1e1169a.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets441_png.rf.bed446721d86e7c4d3f0ccc6e78277ad.jpg",
+        "second_image": "ds1_BikesHelmets441_png.rf.3f11b64a6e6a4c662d63b2dd02dd48e7.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets46_png.rf.795ccdd84a1b9171eb5df8c5f7d71c5e.jpg",
+        "second_image": "ds1_BikesHelmets46_png.rf.07d986b433e3f1de6a23b3a3670decf5.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets479_png.rf.106f8849ea996a5cf2cc549706bf2abd.jpg",
+        "second_image": "ds1_BikesHelmets479_png.rf.effaf3ccb045e9a16c853c866e4dd1ba.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets487_png.rf.9346cb06e5a8e0d3bbabbce0962bf0f8.jpg",
+        "second_image": "ds1_BikesHelmets487_png.rf.490cf475c300a54bd5d8d622e21028c6.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets491_png.rf.78b6dd0f08211f66c8c5aa2e0b209f95.jpg",
+        "second_image": "ds1_BikesHelmets491_png.rf.b60d93a0e89af2f974a91e85db098249.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets501_png.rf.529eac61388a3bf024d8dde1a31ee0aa.jpg",
+        "second_image": "ds1_BikesHelmets501_png.rf.c1f91e59ac39ca5a8c3a72930c26d97d.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets507_png.rf.1caebfd9dab570fcedaab5543e6d7e9d.jpg",
+        "second_image": "ds1_BikesHelmets507_png.rf.8d09d2d4f3a5fd42ca64cdf17fb95d8d.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets508_png.rf.04a75dc4bfa3c73b4524892027de6f65.jpg",
+        "second_image": "ds1_BikesHelmets508_png.rf.20f1295d0398cbc0f18ad4a6a35395cb.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets512_png.rf.c0e3c98021138b1342f6770c1b456c98.jpg",
+        "second_image": "ds1_BikesHelmets512_png.rf.1743d86632660bc3d83232f9b4e6dea7.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets527_png.rf.9a0af1a1308e0e4f2fe91dc2b9efe68b.jpg",
+        "second_image": "ds1_BikesHelmets527_png.rf.4fefcfe3ab4680727236f2053b833ece.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets535_png.rf.ab51fb0ad42fe0c0ee461e6bff2c2996.jpg",
+        "second_image": "ds1_BikesHelmets535_png.rf.dcd1cec2205f504ad537ec0bf5a1560a.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets542_png.rf.6140b61887ba0e6ea3240060a6ec2dbe.jpg",
+        "second_image": "ds1_BikesHelmets542_png.rf.ac8af453462feefc0f457f339f064408.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets550_png.rf.716c1a0e090cebfa6d59209ec38321d8.jpg",
+        "second_image": "ds1_BikesHelmets550_png.rf.5010396cc4d0c211d128691b16154481.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets551_png.rf.72f90fb0097e2c6fd66c9da8ec7a9b31.jpg",
+        "second_image": "ds1_BikesHelmets551_png.rf.188760cb9a985c04bde3958be7c905ee.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets560_png.rf.2319c0afc91fea63336403ee1589becd.jpg",
+        "second_image": "ds1_BikesHelmets560_png.rf.1b0e8a115b5c40e653238b71781ab7e0.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets566_png.rf.5cb5b9b784f3c2ec2eb42c2742a19b05.jpg",
+        "second_image": "ds1_BikesHelmets566_png.rf.3c9b65a8576df6ca147428a5b435044c.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets569_png.rf.20ccd47825c0a3b69f24cd504690ae7a.jpg",
+        "second_image": "ds1_BikesHelmets569_png.rf.18203d6a654e3bb59ddb15d16b7af9c9.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets9_png.rf.66d6a01effb248386c94e7fe804c5176.jpg",
+        "second_image": "ds1_BikesHelmets578_png.rf.2a885e0b15ac5e12551152d331e7ac75.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets597_png.rf.08a9160d9e6337a991990d6222efa207.jpg",
+        "second_image": "ds1_BikesHelmets597_png.rf.eb0e8f29c443f69363cf160b0ce3ea9b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets600_png.rf.99e452e2287a03e1d6b2d3b194cd1bb5.jpg",
+        "second_image": "ds1_BikesHelmets600_png.rf.8c1ae77a62ffb5dedf1384098b49645b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets602_png.rf.6cbfd173b1b259e7281768fe66180817.jpg",
+        "second_image": "ds1_BikesHelmets602_png.rf.96b0870624ee17b3c4a6a492c3e7cbc1.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets617_png.rf.018503c86a56c59fc69c9ea24715f7ed.jpg",
+        "second_image": "ds1_BikesHelmets617_png.rf.bc87dc24ce59265b7880eb46b70623c0.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets630_png.rf.c0621fe815b87d545b3f133a2b11fce1.jpg",
+        "second_image": "ds1_BikesHelmets630_png.rf.9de7e07d564234395429eeeb118cbfd8.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets632_png.rf.ad2fbf374cb0f8f11dc27fc03f610361.jpg",
+        "second_image": "ds1_BikesHelmets632_png.rf.34bd1380bed1e4fe8558426d93834565.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets638_png.rf.7705b47bcb876bd059b297907dc76c17.jpg",
+        "second_image": "ds1_BikesHelmets638_png.rf.88aad0ea29d1dd071948a011a780ff1c.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets646_png.rf.4267031f9e9573d82d64feef44821f53.jpg",
+        "second_image": "ds1_BikesHelmets646_png.rf.547e6277b6020a96b4a0b3a96281336a.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets653_png.rf.cd49aea7b4d845139065d6701e5f9046.jpg",
+        "second_image": "ds1_BikesHelmets653_png.rf.4f630075e851a4fe070433a97dea27c3.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets659_png.rf.1b062ba364a5b10a9e892ecad62e78a2.jpg",
+        "second_image": "ds1_BikesHelmets659_png.rf.cd99105fe1c7120c0acd974dbc74dd69.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets660_png.rf.d6d8ef5ef5aa62f95b8bcee4faf8dcf2.jpg",
+        "second_image": "ds1_BikesHelmets660_png.rf.13e4e09af1c3595af1dd85f94c2c7899.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets678_png.rf.9bc424a1ffae38568d4b8cf8694e43c8.jpg",
+        "second_image": "ds1_BikesHelmets678_png.rf.3f9116314b7ff172c5f89abba5a0af22.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets689_png.rf.509c419952f93bb0926d628ab544c2e2.jpg",
+        "second_image": "ds1_BikesHelmets689_png.rf.4bf655b9bf2df1b41065d6d9dbc1b005.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets64_png.rf.f46085724f67594767a2f488a9cafd1d.jpg",
+        "second_image": "ds1_BikesHelmets697_png.rf.de01be3be8fde355cab3c493d39f891d.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets707_png.rf.8582899985eaa5b3795ae4bce3052ca0.jpg",
+        "second_image": "ds1_BikesHelmets707_png.rf.f67e541e562ccb1d43782a015c361c8b.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets737_png.rf.b5b57f491cd2c5dfed74c471103bed9d.jpg",
+        "second_image": "ds1_BikesHelmets737_png.rf.0901085881e9104134403eea8ed87565.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets741_png.rf.b5d004b5a5bbdcb6e1bbdb18ef9e6464.jpg",
+        "second_image": "ds1_BikesHelmets741_png.rf.a4c2803012fd2d3c865456a0a06876e6.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets753_png.rf.12a9d89ae9490f81f4c166c37afdcb35.jpg",
+        "second_image": "ds1_BikesHelmets753_png.rf.da4baf80524aef628cb499971547bb54.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "test",
+        "second_split": "test",
+        "first_image": "ds1_testing_images_117_jpg.rf.257c4f9652f3f14a485cbdf453f8f654.jpg",
+        "second_image": "ds1_testing_images_117_jpg.rf.f10f918e8309be6c294a28982b07d5bd.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "test",
+        "second_split": "test",
+        "first_image": "ds1_testing_images_77_jpg.rf.2a7f00ce38eaf55b729b6adc03ad0431.jpg",
+        "second_image": "ds1_testing_images_77_jpg.rf.808727e8009cb2921d846218f8a2353c.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets10_png.rf.fb713174232acc65224df31a6f44327d.jpg",
+        "second_image": "ds2_BikesHelmets10_png.rf.8ce96100e4bd6bce01b80788d192aac2.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets112_png.rf.651334caea7a38a849036ade63a58d4a.jpg",
+        "second_image": "ds2_BikesHelmets112_png.rf.386f98c041a51f0534a513d856a1da6c.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets142_png.rf.36716e7335373855942898e6d5128d79.jpg",
+        "second_image": "ds2_BikesHelmets142_png.rf.d542945cce82aef4b55de68c3ab4a322.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets145_png.rf.3554d452c0c73e650591c56978dbff20.jpg",
+        "second_image": "ds2_BikesHelmets145_png.rf.2d0e3158cb179e2e2de96bc37750b340.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets161_png.rf.21b52b4ebb977596edce4eee23879bcf.jpg",
+        "second_image": "ds2_BikesHelmets161_png.rf.1b78db539d02899bbfcadb41e5e80fa1.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets172_png.rf.1c4f422f9f6e600c7ad61e38b4ec3c01.jpg",
+        "second_image": "ds2_BikesHelmets172_png.rf.ce9bf169ccf7f58ba5eddede6640463b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets184_png.rf.3fa48066520a86ba7e841fa1e6dc1a1b.jpg",
+        "second_image": "ds2_BikesHelmets184_png.rf.b11327b10a7436a2e80d9d5f188240ce.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets185_png.rf.011bb22ee9a363e4ce1a0734391a45a0.jpg",
+        "second_image": "ds2_BikesHelmets185_png.rf.a7a5353fd9b019fc18fe99031faeb5da.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets192_png.rf.aec911cefab79449d1de12ddeb9229f5.jpg",
+        "second_image": "ds2_BikesHelmets192_png.rf.502c2ca93c3997d40a78fc1d6ebf2d49.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets1_png.rf.59d367d3a600c013980ec7c3b6820b65.jpg",
+        "second_image": "ds2_BikesHelmets1_png.rf.4392a72f15f096af0f077faac9a4384c.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets236_png.rf.c5b8cba476d1ab991df2728ad361ce2e.jpg",
+        "second_image": "ds2_BikesHelmets236_png.rf.0856c9d66961039673a0cc04d610e345.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets242_png.rf.5d0cc5dd11e6faf9a2427e9e7cfdc9c0.jpg",
+        "second_image": "ds2_BikesHelmets242_png.rf.a555499542aa778fe94515ec62c275ec.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets246_png.rf.b40fd15c7143368ce05ad9e246f1a90d.jpg",
+        "second_image": "ds2_BikesHelmets246_png.rf.1792ff08c9461e2603e45f995ed56ffb.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets247_png.rf.4cc4d58c2962803cf4a71ba79716538c.jpg",
+        "second_image": "ds2_BikesHelmets247_png.rf.abfc8e3bfa181f570d240aa38da75f79.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets249_png.rf.9b7cfaaa9ef1cd9facfde369dc79059d.jpg",
+        "second_image": "ds2_BikesHelmets249_png.rf.df1f2eff46a440d0cbe2d1ae3acc9e6b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets262_png.rf.9fdec5b1876795d13c1f74e0163faea8.jpg",
+        "second_image": "ds2_BikesHelmets262_png.rf.45bd61f047299da13365f8909251c7e8.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets274_png.rf.53286f93aa5182a9c94d77a93be1fac1.jpg",
+        "second_image": "ds2_BikesHelmets274_png.rf.7ec9157c7653d650317e7d27d35578fd.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets28_png.rf.9f1ca4794f91a3f9f618a986c7112ac3.jpg",
+        "second_image": "ds2_BikesHelmets28_png.rf.715cae251a7179a64a538ea489115b4c.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets290_png.rf.049cf78ae63a89bf121f20d9c9838b6c.jpg",
+        "second_image": "ds2_BikesHelmets290_png.rf.0c44e6e9dfe7d2a60be4728467c4d6dd.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets326_png.rf.c3f556c074fa25d1a108ef8288ac24b3.jpg",
+        "second_image": "ds2_BikesHelmets326_png.rf.0a85ce02f7f9ba1f7fbf02f3fc5de15c.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets347_png.rf.3d6c7059ed70db10511153e572c60f02.jpg",
+        "second_image": "ds2_BikesHelmets347_png.rf.8870ffe9c29fc2fbb10654798d362f62.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets356_png.rf.54b177671082a35f34d2bbab0f4586a5.jpg",
+        "second_image": "ds2_BikesHelmets356_png.rf.266a18bd73691469e0b1afa2f6132134.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets357_png.rf.5877dc7b98ca26dcf2bd3822be40ab15.jpg",
+        "second_image": "ds2_BikesHelmets357_png.rf.1a8c126fe15101647e03887ba49de824.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets366_png.rf.bf9345f59cedfabc2ef3ba4285d9c7d7.jpg",
+        "second_image": "ds2_BikesHelmets366_png.rf.ae42cdc32479ea66c38e6dde225f6979.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets368_png.rf.e5a10fe56c5b8144dc0f572c5cc9b431.jpg",
+        "second_image": "ds2_BikesHelmets368_png.rf.051f10000d334e55a90b7ded903f5736.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets528_png.rf.15832162d96dbb44bd4e5d8476f2e1f4.jpg",
+        "second_image": "ds2_BikesHelmets371_png.rf.c4ef05efdfb0777efc39b0a592e9d9bd.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets372_png.rf.899123e89f6d15459ed3d218b02d6731.jpg",
+        "second_image": "ds2_BikesHelmets372_png.rf.11e0a6c1ef1b02f4aee328a2adbdf2cb.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets424_png.rf.54b48dff11639d11e3aced4929906df4.jpg",
+        "second_image": "ds2_BikesHelmets424_png.rf.f55dcc2204003bbb0152ac8be79df2a7.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets431_png.rf.54017b1998d141143e65be433592b867.jpg",
+        "second_image": "ds2_BikesHelmets431_png.rf.20da1c4dd0c0f66455d4fe71af8a1467.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets433_png.rf.217145ee03f93a2c2b78f43a1139b34c.jpg",
+        "second_image": "ds2_BikesHelmets433_png.rf.280f3e525d53b8fab21cf532131f5d82.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets452_png.rf.a6c4117093871b4f58fc07d27b1f0a1d.jpg",
+        "second_image": "ds2_BikesHelmets452_png.rf.37e8e79c1af19ec59e7ef98cafc9cb1d.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets462_png.rf.3d52415de06ebcd520062baca57ba056.jpg",
+        "second_image": "ds2_BikesHelmets462_png.rf.ea78e5a9778270381ff518f2ef62c529.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets488_png.rf.4a84bca7b2c91e1a12b49ccc4931ebfd.jpg",
+        "second_image": "ds2_BikesHelmets488_png.rf.07d9d2b354dcae576e68c7d67367e532.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets497_png.rf.9828ceb9a7b8693507ee181bf3fc8a7d.jpg",
+        "second_image": "ds2_BikesHelmets497_png.rf.b9df15a7b3c07f7c503157a298d006e1.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets4_png.rf.be2a79f9fcaae3298662a8ecf874e61c.jpg",
+        "second_image": "ds2_BikesHelmets4_png.rf.592f365838f0a6f8906ead1e99ed3204.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets513_png.rf.f3ee7de1d236d88424698f29bcd68a1f.jpg",
+        "second_image": "ds2_BikesHelmets513_png.rf.521a60a69a6861f15e2aefe4d03ddd26.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets716_png.rf.3cf1188245ff5e14f3bf7250f726642c.jpg",
+        "second_image": "ds2_BikesHelmets524_png.rf.1cb499a8bcf59e95712648dc4cf5f8f5.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets540_png.rf.1b7988f5f04b87ce943dcfd48de2b925.jpg",
+        "second_image": "ds2_BikesHelmets540_png.rf.4e7866b0179810c693ce651c3783b09b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets547_png.rf.0da8b65d969522efb8713d7dc4dbc736.jpg",
+        "second_image": "ds2_BikesHelmets547_png.rf.cd41539bf1962eb3d32a2623ff993d6a.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets548_png.rf.4432ff800a2b8d1b9980b5fa1c3c2f6e.jpg",
+        "second_image": "ds2_BikesHelmets548_png.rf.0306073183001b42cc5dc604019451a5.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "test",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets559_png.rf.00e97013542e548309c2f512e41f63b9.jpg",
+        "second_image": "ds2_BikesHelmets559_png.rf.5ad74723f58f4f846386c2b11a8d26a8.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets564_png.rf.a800091fed1bcc5556ae1ea0c92d759f.jpg",
+        "second_image": "ds2_BikesHelmets564_png.rf.b4f4edc7d24d727387cab1bd38fb0df4.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets587_png.rf.01da31bf501802da7b6d63b286d72b73.jpg",
+        "second_image": "ds2_BikesHelmets587_png.rf.6ac254510568ef6df1508fb5cf9ae335.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets591_png.rf.25286f03bd4696c53cd90eda07045843.jpg",
+        "second_image": "ds2_BikesHelmets591_png.rf.fc6198b39a29f6d8efb8403e34b63e4b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "test",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets597_png.rf.eb0e8f29c443f69363cf160b0ce3ea9b.jpg",
+        "second_image": "ds2_BikesHelmets597_png.rf.6a651ff9978a410753b95881234696d1.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "test",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets600_png.rf.8c1ae77a62ffb5dedf1384098b49645b.jpg",
+        "second_image": "ds2_BikesHelmets600_png.rf.6b4c9fa2f9d65d7cba2a97b29db407fa.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets616_png.rf.3e8dfbc1252cc53b11e7f396d4386f8d.jpg",
+        "second_image": "ds2_BikesHelmets616_png.rf.955e676b5a26ab7232bea90580415ab9.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets619_png.rf.d0abef22af62a7b2e728b3146744b832.jpg",
+        "second_image": "ds2_BikesHelmets619_png.rf.0bff5f1db126f57ef4ef423deeb26417.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets631_png.rf.15ffea74468e33cb2719a45373e45c51.jpg",
+        "second_image": "ds2_BikesHelmets631_png.rf.7a419ab8ca294051a583883c6a9e7539.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets649_png.rf.9181c19336f07e7a6f5a51a568d71b07.jpg",
+        "second_image": "ds2_BikesHelmets649_png.rf.0c70e8868bf2e7effc7f31af9d90a501.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets656_png.rf.444046c4c599eb9273128e166526d0b4.jpg",
+        "second_image": "ds2_BikesHelmets656_png.rf.5625b40ca0de6b08a04e9654fdb23c8c.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets679_png.rf.6029b62188bd543aff30dd6616f75317.jpg",
+        "second_image": "ds2_BikesHelmets679_png.rf.6afe6ce0eed714c2cef3d94d09a0af07.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "test",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets689_png.rf.4bf655b9bf2df1b41065d6d9dbc1b005.jpg",
+        "second_image": "ds2_BikesHelmets689_png.rf.1c8396588acb48dd99fdd0f4baff2a72.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets68_png.rf.1cf25b1856a8d8023a42316ad07add5c.jpg",
+        "second_image": "ds2_BikesHelmets68_png.rf.cdc0cafdc3dce3910e35c97ba2e1eda8.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets74_png.rf.998a91ba0a697972a764bf62ec20c91c.jpg",
+        "second_image": "ds2_BikesHelmets74_png.rf.c28497c881e8c2d05b55883e00800dbd.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets76_png.rf.43b749b1f94bd937fcd14ff63490cd81.jpg",
+        "second_image": "ds2_BikesHelmets76_png.rf.1381334b328a9b150ed9b8905e4d5427.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds3_BikesHelmets85_png.rf.1679c4383bd4e1e22c2e729643554e85.jpg",
+        "second_image": "ds2_BikesHelmets85_png.rf.e7f00d719d549719bfbdb12d6b373433.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "test",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets753_png.rf.da4baf80524aef628cb499971547bb54.jpg",
+        "second_image": "ds2_BikesHelmets88_png.rf.a2142a33c7718b2f2a9c270a21f92a4b.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets93_png.rf.ebd84a603882e457d4edfa503e95aff5.jpg",
+        "second_image": "ds2_BikesHelmets93_png.rf.85f7f905777bd960c1ee991d9733c211.jpg",
+        "reason": "identical bytes"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets102_png.rf.4da59f44b4d36f8bca665fc7f23effd1.jpg",
+        "second_image": "ds3_BikesHelmets102_png.rf.b771e83db4052e5e48900f1d9f4ee68e.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "test",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets110_png.rf.c7d37c4d6ee5dbe08908d9e4e9d0fbc4.jpg",
+        "second_image": "ds3_BikesHelmets110_png.rf.108cd2cfde7b038eea459b97539f7922.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets113_png.rf.96787b0a0562e2f5b1dbc05de54a64e8.jpg",
+        "second_image": "ds3_BikesHelmets113_png.rf.ce74cc3e9c8d03be417b6cd16444261e.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets143_png.rf.a3d300b23d6e0e1873f6badf0e33541d.jpg",
+        "second_image": "ds3_BikesHelmets143_png.rf.caf0aacf12adfbfa16b20b8c3563a803.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets158_png.rf.380bdac51b6016be1d3bed16277fcffb.jpg",
+        "second_image": "ds3_BikesHelmets158_png.rf.71cdb3536b840ccc2f0e44d1e5ce36e3.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets183_png.rf.5d07d8e43f72d5baa18495346eeca13d.jpg",
+        "second_image": "ds3_BikesHelmets183_png.rf.1f9ebed2be11011e589ec58d1def89c1.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets188_png.rf.6f31f4c0452f9655e15b6ed3ef147b49.jpg",
+        "second_image": "ds3_BikesHelmets188_png.rf.5cb2244a739e758ea7be65c953983719.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets18_png.rf.961bb105b4c4d002a6a29a717a653239.jpg",
+        "second_image": "ds3_BikesHelmets18_png.rf.39b09ebd4ed07f24e16c28d648c0c0bd.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets202_png.rf.b07290147c9a02f86848081898b7c3ee.jpg",
+        "second_image": "ds3_BikesHelmets202_png.rf.384e5abdec8235eefa443e02538b49c5.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets214_png.rf.cdcc2bb962985d4b09e218ee9116d239.jpg",
+        "second_image": "ds3_BikesHelmets214_png.rf.1d87985c9f70bdff315954906fd27b10.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets21_png.rf.46de0a2be9bc7b84c9e30fc253dafa98.jpg",
+        "second_image": "ds3_BikesHelmets21_png.rf.ad8fa30dc49193ca3d21a6d66bda52e3.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets221_png.rf.0f17fc50999cbbae5e89c327992eb27d.jpg",
+        "second_image": "ds3_BikesHelmets221_png.rf.e1a4110c1e5428c3b88da7d43bcbc6d7.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets222_png.rf.7628eb2d1fd4ab7410e3e000f1c25ef1.jpg",
+        "second_image": "ds3_BikesHelmets222_png.rf.0ba4101460e78d78b57cb2494d8264b0.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets23_png.rf.9eb09bfff336a9b27d7e4fab365c7d0c.jpg",
+        "second_image": "ds3_BikesHelmets23_png.rf.ae6429da1b83b05cc669ecab2e611cbd.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets25_png.rf.5aa51f719dfb1a21cce34fd9192dc6d5.jpg",
+        "second_image": "ds3_BikesHelmets25_png.rf.48e814a829c17ed0ed2fabe6348227f8.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets26_png.rf.ecdef3ddec60664a9da2b8a5c2f293ec.jpg",
+        "second_image": "ds3_BikesHelmets26_png.rf.76e4507b29e48ac1884bb3805b5afcb6.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets278_png.rf.c9e5b6f7cc4c6c54fb350c779a405783.jpg",
+        "second_image": "ds3_BikesHelmets278_png.rf.48ab39123c6c19236835b38da4bb4c71.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets300_png.rf.7a643a80bb37d6b44b709a23e9746f50.jpg",
+        "second_image": "ds3_BikesHelmets300_png.rf.1b29b939bacbd4ec2bc896ac3d310936.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets306_png.rf.50a2697a72d95b3981d2bd8e9c971ce9.jpg",
+        "second_image": "ds3_BikesHelmets306_png.rf.d5ce0f26360e58dbd163c6a7d59b37d8.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets30_png.rf.c4cb46805724bd0fc7456ca34c7ba4e0.jpg",
+        "second_image": "ds3_BikesHelmets30_png.rf.d7b5ff447118e97fbb2f4f01ab442108.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets320_png.rf.e0520115d2100b93a56003b8800b5978.jpg",
+        "second_image": "ds3_BikesHelmets320_png.rf.d83404c137c6569d109f42b13b2240d4.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets329_png.rf.7690db4a6012f0f3456578feaacd1f72.jpg",
+        "second_image": "ds3_BikesHelmets329_png.rf.344fe5b695d8fd9f5638085d5e98c3d4.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets32_png.rf.5fe4bb47a18855c341fdb2469f42d1c2.jpg",
+        "second_image": "ds3_BikesHelmets32_png.rf.b5d7364d90df0243d9a96ed2e6030026.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets349_png.rf.5b19dc7c6109e817b781f5b43558e1e6.jpg",
+        "second_image": "ds3_BikesHelmets349_png.rf.28e5f4354bf5793fa4e004650884955c.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets354_png.rf.51007e00b759437d54060dcf02ae1504.jpg",
+        "second_image": "ds3_BikesHelmets354_png.rf.0cd512180453bd0c9cf83810ac8f21e6.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "test",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets360_png.rf.3805ecb5a0d9455eff070d3f02685aa3.jpg",
+        "second_image": "ds3_BikesHelmets360_png.rf.87ecf05011f6e9a7af1dc89924d75173.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets366_png.rf.bf9345f59cedfabc2ef3ba4285d9c7d7.jpg",
+        "second_image": "ds3_BikesHelmets366_png.rf.750d66a7f29842ccf10a46e0e4ca9575.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets367_png.rf.43c4b2332c57aebbba18ed5281434076.jpg",
+        "second_image": "ds3_BikesHelmets367_png.rf.28ba774989591d521958acedb1b16f60.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets405_png.rf.86dd7168a67a611536a80991feac0f87.jpg",
+        "second_image": "ds3_BikesHelmets405_png.rf.d9a225599e8d3e605f22ce9f3c4aebe8.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets417_png.rf.8aa04ba86cf47c6921c5351e241b99f6.jpg",
+        "second_image": "ds3_BikesHelmets417_png.rf.b51c46e604279acfde2ee971b7739ef2.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets425_png.rf.35ef11bddd732689eefc24c337361b75.jpg",
+        "second_image": "ds3_BikesHelmets425_png.rf.fa3787994b86131edecb1298002e5d05.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets432_png.rf.4b619cf69a75acd53287072199762f78.jpg",
+        "second_image": "ds3_BikesHelmets432_png.rf.575327f2d7d702a8a09fcaecd843cb25.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets438_png.rf.4afce65612319e32a262245b280c8480.jpg",
+        "second_image": "ds3_BikesHelmets438_png.rf.d0ea27cf8e4ee5095cfb6ec41f7ec8f4.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets446_png.rf.8420aff5753a85783e953613b5c6ad52.jpg",
+        "second_image": "ds3_BikesHelmets446_png.rf.1dc30fe7d9690524fe33ffc1ee665fac.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets449_png.rf.316c3ed883e32ac9a7602453f9fcee49.jpg",
+        "second_image": "ds3_BikesHelmets449_png.rf.183125c7fb376ba3ee639f3728cd7cb8.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets469_png.rf.b501322734baddd2c17e7b5dade58673.jpg",
+        "second_image": "ds3_BikesHelmets469_png.rf.8e071aca06543aca0df24debb0b121eb.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets46_png.rf.795ccdd84a1b9171eb5df8c5f7d71c5e.jpg",
+        "second_image": "ds3_BikesHelmets46_png.rf.dadd6e511eac06877421dd220224bb11.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets471_png.rf.ce6f339465b72469fb67828ea8ed87ff.jpg",
+        "second_image": "ds3_BikesHelmets471_png.rf.fa48458179c7be084b1ed04dea6ca9cc.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets490_png.rf.47ba80f6f1f4a06a355ef8dcbf80e268.jpg",
+        "second_image": "ds3_BikesHelmets490_png.rf.6df553855641298a866a49d282d474a0.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets501_png.rf.529eac61388a3bf024d8dde1a31ee0aa.jpg",
+        "second_image": "ds3_BikesHelmets501_png.rf.7c620adfc46bd53f70bea0d3b8fddd12.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets513_png.rf.f3ee7de1d236d88424698f29bcd68a1f.jpg",
+        "second_image": "ds3_BikesHelmets513_png.rf.322995ce40008891414ad36bebcde655.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "test",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets559_png.rf.00e97013542e548309c2f512e41f63b9.jpg",
+        "second_image": "ds3_BikesHelmets559_png.rf.80301487197c7f94dce0f59d3a66adb0.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets565_png.rf.b8599d458a9c180b2dc332afeac28cac.jpg",
+        "second_image": "ds3_BikesHelmets565_png.rf.ad3e363617b5ef9a3220e179013f6859.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets627_png.rf.efbf982c375daa21356eed1b482b8184.jpg",
+        "second_image": "ds3_BikesHelmets627_png.rf.6539f7fef275e3ff925c2ed068cb410b.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets62_png.rf.7551b10b4977406034d7ead249eeec64.jpg",
+        "second_image": "ds3_BikesHelmets62_png.rf.ed4fd7462aad6e56a4e470bd32a0458d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets639_png.rf.c3510c13e2bf02e6623beb34c604a4d3.jpg",
+        "second_image": "ds3_BikesHelmets639_png.rf.74a5043fa73cbe03c4db679bb6ea1468.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets655_png.rf.43042f7f7aa24df358999cfbaccbbca9.jpg",
+        "second_image": "ds3_BikesHelmets655_png.rf.2f9b11b7b7eb8f5dc831c2859bd5bdd4.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets672_png.rf.960c6936268bec9ecc5404fb3bdd68cf.jpg",
+        "second_image": "ds3_BikesHelmets672_png.rf.78263b403c67678329a192ed0c599f97.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets680_png.rf.5af7fe3efe9c0d92fc857d586f01ca56.jpg",
+        "second_image": "ds3_BikesHelmets680_png.rf.a5f67428d2584966fcff164627fd57dc.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets685_png.rf.79cf09e638af03e2f17e60a8b14fdca2.jpg",
+        "second_image": "ds3_BikesHelmets685_png.rf.c197351bb7ac7de5d6642e9c15eb0b0d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets690_png.rf.427c2476ad2eb517e0ee5ee926ae2048.jpg",
+        "second_image": "ds3_BikesHelmets690_png.rf.82cdd08be3388e9ac5b4d508f4036c1d.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets705_png.rf.46d818033d6359e0e7935f1a0fb47979.jpg",
+        "second_image": "ds3_BikesHelmets705_png.rf.42c96afd48eb5e992cde1c2a5895bb45.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets712_png.rf.193e2ce0074312021e5b25239de450ef.jpg",
+        "second_image": "ds3_BikesHelmets712_png.rf.9e036594eb22763608fb4adb5f104d6f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds1_BikesHelmets720_png.rf.08a54c34a8abcc7d9003b1bb9168437d.jpg",
+        "second_image": "ds3_BikesHelmets720_png.rf.c461e462353d012dac9497eef360da94.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets745_png.rf.df0d1d06583c6e9911cdf3c0a5957195.jpg",
+        "second_image": "ds3_BikesHelmets745_png.rf.1f0ced87320266d23821c1e40275f79f.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "val",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets746_png.rf.0fea5cdb7e7179b0c6c200d875858392.jpg",
+        "second_image": "ds3_BikesHelmets746_png.rf.2c1f249429743284635e7469d5917206.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets77_png.rf.1a249e4e8c42f16a0410cffbc3b2d7a4.jpg",
+        "second_image": "ds3_BikesHelmets77_png.rf.8afa9339250c50a5e66817990cefd561.jpg",
+        "reason": "shared source filename"
+      },
+      {
+        "first_split": "train",
+        "second_split": "test",
+        "first_image": "ds2_BikesHelmets83_png.rf.fa01660446dd7ccd33bd75072a172352.jpg",
+        "second_image": "ds3_BikesHelmets83_png.rf.7f371ba07f6fedae81fa33ccd51d892e.jpg",
+        "reason": "shared source filename"
+      }
+    ],
+    "limit": "Byte hashes and source names cannot exclude all augmented duplicates or prove scene independence.",
+    "prefix_filter": "ds1_",
+    "eligible_after_prefix": {
+      "train": 555,
+      "val": 40,
+      "test": 94
+    }
+  },
+  "splits": {
+    "val": {
+      "per_class": [
+        {
+          "Class": "helmet",
+          "Images": 34,
+          "Instances": 111,
+          "Box-P": 0.79869,
+          "Box-R": 0.93694,
+          "Box-F1": 0.86231,
+          "mAP50": 0.93133,
+          "mAP75": 0.63796,
+          "mAP50-95": 0.56038
+        },
+        {
+          "Class": "no-helmet",
+          "Images": 21,
+          "Instances": 34,
+          "Box-P": 0.76214,
+          "Box-R": 0.64706,
+          "Box-F1": 0.6999,
+          "mAP50": 0.77589,
+          "mAP75": 0.43831,
+          "mAP50-95": 0.44584
+        },
+        {
+          "Class": "number-plate",
+          "Images": 20,
+          "Instances": 48,
+          "Box-P": 0.66567,
+          "Box-R": 0.70833,
+          "Box-F1": 0.68634,
+          "mAP50": 0.69492,
+          "mAP75": 0.28559,
+          "mAP50-95": 0.32577
+        },
+        {
+          "Class": "rider",
+          "Images": 39,
+          "Instances": 130,
+          "Box-P": 0.8584,
+          "Box-R": 0.84615,
+          "Box-F1": 0.85224,
+          "mAP50": 0.90131,
+          "mAP75": 0.64594,
+          "mAP50-95": 0.58996
+        },
+        {
+          "Class": "bike",
+          "Images": 39,
+          "Instances": 112,
+          "Box-P": 0.80791,
+          "Box-R": 0.90179,
+          "Box-F1": 0.85227,
+          "mAP50": 0.91556,
+          "mAP75": 0.82033,
+          "mAP50-95": 0.67305
+        }
+      ],
+      "metrics": {
+        "metrics/precision(B)": 0.7785621562763235,
+        "metrics/recall(B)": 0.8080537308478485,
+        "metrics/mAP50(B)": 0.8438019402064493,
+        "metrics/mAP50-95(B)": 0.5189996175974727,
+        "fitness": 0.5189996175974727
+      },
+      "speed_ms_per_image": {
+        "preprocess": 1.0053020751001895,
+        "inference": 51.10066664997248,
+        "loss": 0.000578124991079676,
+        "postprocess": 49.025488600000244
+      },
+      "interpolated_at_validation_thresholds": {
+        "helmet": {
+          "threshold": 0.5005,
+          "precision": 0.9062124599125995,
+          "recall": 0.8738738738738738
+        },
+        "no-helmet": {
+          "threshold": 0.0991,
+          "precision": 0.7283693371591122,
+          "recall": 0.7941163482486482
+        }
+      }
+    },
+    "test": {
+      "per_class": [
+        {
+          "Class": "helmet",
+          "Images": 83,
+          "Instances": 380,
+          "Box-P": 0.84858,
+          "Box-R": 0.71842,
+          "Box-F1": 0.77809,
+          "mAP50": 0.80789,
+          "mAP75": 0.40222,
+          "mAP50-95": 0.42507
+        },
+        {
+          "Class": "no-helmet",
+          "Images": 33,
+          "Instances": 58,
+          "Box-P": 0.47443,
+          "Box-R": 0.72414,
+          "Box-F1": 0.57327,
+          "mAP50": 0.68139,
+          "mAP75": 0.48254,
+          "mAP50-95": 0.41505
+        },
+        {
+          "Class": "number-plate",
+          "Images": 16,
+          "Instances": 43,
+          "Box-P": 0.47389,
+          "Box-R": 0.53488,
+          "Box-F1": 0.50254,
+          "mAP50": 0.47197,
+          "mAP75": 0.12117,
+          "mAP50-95": 0.21181
+        },
+        {
+          "Class": "rider",
+          "Images": 94,
+          "Instances": 413,
+          "Box-P": 0.89909,
+          "Box-R": 0.42857,
+          "Box-F1": 0.58046,
+          "mAP50": 0.666,
+          "mAP75": 0.32488,
+          "mAP50-95": 0.35434
+        },
+        {
+          "Class": "bike",
+          "Images": 93,
+          "Instances": 342,
+          "Box-P": 0.87534,
+          "Box-R": 0.47225,
+          "Box-F1": 0.61351,
+          "mAP50": 0.68761,
+          "mAP75": 0.49962,
+          "mAP50-95": 0.43744
+        }
+      ],
+      "metrics": {
+        "metrics/precision(B)": 0.7142665251321149,
+        "metrics/recall(B)": 0.5756528483758336,
+        "metrics/mAP50(B)": 0.6629738447834059,
+        "metrics/mAP50-95(B)": 0.36874146998655577,
+        "fitness": 0.36874146998655577
+      },
+      "speed_ms_per_image": {
+        "preprocess": 0.6183062765906452,
+        "inference": 12.764201680859495,
+        "loss": 0.00024779777224002243,
+        "postprocess": 31.15828812762165
+      },
+      "interpolated_at_validation_thresholds": {
+        "helmet": {
+          "threshold": 0.5005,
+          "precision": 0.9618764441884903,
+          "recall": 0.5311701103397488
+        },
+        "no-helmet": {
+          "threshold": 0.0991,
+          "precision": 0.4540419484682478,
+          "recall": 0.7413793103448276
+        }
+      }
+    }
+  },
+  "limitations": [
+    "These source dataset splits are not new independent road footage.",
+    "Mixed annotations and augmented scene leakage can affect results.",
+    "Full-frame metrics do not validate zoom-crop thresholds or temporal event accuracy."
+  ],
+  "full_frame_thresholds": {
+    "helmet": 0.5005,
+    "no-helmet": 0.0991
+  }
+}
