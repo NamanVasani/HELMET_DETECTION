@@ -166,6 +166,17 @@ python manage.py prepare-model
   mAP50–95 0.444**. At the frozen validation thresholds helmet precision is 0.94 / recall 0.62 and no-helmet precision
   0.82 / recall 0.77. Rider (recall 0.42) and bike (recall 0.46) are the weak classes, which is why many events have no
   plate match. See `reports/evaluation.json` and `reports/ml-audit-2026-11-19.json`.
+- Why rider/bike are weak: of the three merged datasets only one (555 of 5,273 training images) labels riders and bikes,
+  so the model learned unlabelled riders as background. `pseudo_label.py` fills those labels; a 12-epoch fine-tune on
+  that data (`runs/detect/helmet_v4`) lifted rider recall to 0.64 and bike recall to 0.67 but lowered helmet,
+  no-helmet and plate mAP50-95 slightly, so it was **not adopted**. A longer run at a lower learning rate is the next
+  step (`train.py --data runs/datasets/merged_v4/data.yaml --model runs/detect/helmet_v3/weights/best.pt`).
+- Zoom: enlarged inference sizes heads to 20% and riders to 45% of the frame height (was 65% for every target). On
+  upscaled test crops at the unchanged 0.50 threshold, no-helmet recall rises from 0.28 to 0.70 and precision from
+  0.63 to 0.78 (`reports/zoom-calibration-2026-11-19.json`). Measured on dataset crops, not live footage.
+- Speed: the model itself runs at 22–31 tracked frames/s on an M4 (`reports/speed-2026-11-19.json`); the app's 4–7
+  frames/s is set by face detection, the second zoom pass, JPEG work and the browser's frame rate. CoreML and ONNX
+  exports were not faster, so the `.pt` runtime stays.
 - These numbers come from the source datasets, **not** from independent road footage. Night, rain, glare, motion blur
   and camera angles you deploy with must be checked on your own labelled clips before relying on the system.
 - Plate text uses Tesseract and is often wrong on small, angled or dirty plates. Treat it as a hint and correct it.
@@ -205,7 +216,7 @@ CI runs the same lint and tests on every push (`.github/workflows/ci.yml`).
 | `auth.py`, `alerts.py`, `cameras.py`, `reports_pdf.py` | accounts, notifications, RTSP readers, PDF reports |
 | `static/` | dashboard UI (no inline script; works under strict CSP) |
 | `manage.py`, `install_service.py` | admin CLI and Mac login service installer |
-| `evaluate_model.py`, `train.py`, `calibrate_zoom.py`, `benchmark_speed.py` | model evaluation, training, calibration, speed |
+| `evaluate_model.py`, `train.py`, `ml_audit.py`, `pseudo_label.py`, `calibrate_zoom.py`, `export_model.py`, `benchmark_speed.py` | evaluation, training, label audit/fill, zoom calibration, export, speed |
 
 ## Configuration reference
 
