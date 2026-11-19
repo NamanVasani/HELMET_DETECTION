@@ -679,17 +679,19 @@ function fillAlerts(settings) {
   form.elements.cat_helmet.checked = (settings.categories || []).includes('helmet');
   form.elements.webhook_token.placeholder = settings.webhook_token_set ? 'saved — leave blank to keep' : 'optional';
   form.elements.smtp_password.placeholder = settings.smtp_password_set ? 'saved — leave blank to keep' : 'optional';
+  form.elements.twilio_auth_token.placeholder = settings.twilio_auth_token_set ? 'saved — leave blank to keep' : 'required for WhatsApp';
 }
 
 async function saveAlerts(event) {
   event.preventDefault();
   const form = $('#alerts-form').elements;
   const payload = {
-    enabled: form.enabled.checked, email_enabled: form.email_enabled.checked,
+    enabled: form.enabled.checked, email_enabled: form.email_enabled.checked, whatsapp_enabled: form.whatsapp_enabled.checked,
     categories: [form.cat_no_helmet.checked && 'no_helmet', form.cat_helmet.checked && 'helmet'].filter(Boolean),
     min_interval_seconds: Number(form.min_interval_seconds.value || 0), smtp_port: Number(form.smtp_port.value || 587),
   };
-  for (const key of ['dashboard_url', 'webhook_url', 'webhook_token', 'smtp_host', 'smtp_user', 'smtp_password', 'smtp_from', 'email_to']) {
+  for (const key of ['dashboard_url', 'webhook_url', 'webhook_token', 'smtp_host', 'smtp_user', 'smtp_password', 'smtp_from', 'email_to',
+    'twilio_account_sid', 'twilio_auth_token', 'whatsapp_from', 'whatsapp_to']) {
     payload[key] = form[key].value.trim();
   }
   try {

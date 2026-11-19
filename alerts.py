@@ -1,15 +1,17 @@
 """Background alerts for new violation events: JSON webhook (Slack/Teams/WhatsApp gateways) and SMTP email."""
 
+import base64
 from email.message import EmailMessage
 import json
 import logging
 from pathlib import Path
 import queue
+import re
 import smtplib
 import ssl
 import threading
 import time
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
 
 from event_store import get_setting, record_audit, set_setting
@@ -28,8 +30,15 @@ DEFAULTS = {
     "smtp_password": "",
     "smtp_from": "",
     "email_to": "",
+    "whatsapp_enabled": False,
+    "twilio_account_sid": "",
+    "twilio_auth_token": "",
+    "whatsapp_from": "",
+    "whatsapp_to": "",
 }
-SECRET_FIELDS = ("webhook_token", "smtp_password")
+SECRET_FIELDS = ("webhook_token", "smtp_password", "twilio_auth_token")
+TWILIO_API = "https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json"
+PHONE_RE = re.compile(r"\+[1-9]\d{7,14}\Z")
 
 
 def load_settings(root):
@@ -72,6 +81,15 @@ def save_settings(root, incoming):
             raise ValueError(f"{key.replace('_', ' ').capitalize()} must start with http:// or https://")
     if updated["email_enabled"] and not (updated["smtp_host"] and updated["email_to"] and updated["smtp_from"]):
         raise ValueError("Email alerts need an SMTP host, a from address, and at least one recipient")
+    for key in ("whatsapp_from", "whatsapp_to"):
+        updated[key] = ",".join(number.strip().removeprefix("whatsapp:").replace(" ", "")
+                                for number in updated[key].split(",") if number.strip())
+    if updated["whatsapp_enabled"]:
+        numbers = [updated["whatsapp_from"]] + updated["whatsapp_to"].split(",")
+        if not re.fullmatch(r"AC[0-9a-fA-F]{32}", updated["twilio_account_sid"]) or not updated["twilio_auth_token"]:
+            raise ValueError("WhatsApp alerts need your Twilio Account SID (starts with AC) and Auth Token")
+        if not updated["whatsapp_to"] or not all(PHONE_RE.fullmatch(number) for number in numbers):
+            raise ValueError("WhatsApp numbers must be in international format, e.g. +919876543210")
     for name in SECRET_FIELDS:
         if incoming.get(name + "_clear"):
             updated[name] = ""
@@ -126,6 +144,23 @@ def send_email(settings, event, text, attachment=None):
         server.send_message(message)
 
 
+def send_whatsapp(settings, text):
+    """Send the alert text to each WhatsApp number via Twilio's Messages API.
+
+    No photo: Twilio can only attach media from a public URL, and the dashboard is private.
+    """
+    url = TWILIO_API.format(sid=settings["twilio_account_sid"])
+    token = base64.b64encode(f"{settings['twilio_account_sid']}:{settings['twilio_auth_token']}".encode()).decode()
+    headers = {"Authorization": f"Basic {token}", "Content-Type": "application/x-www-form-urlencoded",
+               "User-Agent": "helmet-alerts/1.0"}
+    for number in filter(None, settings["whatsapp_to"].split(",")):
+        body = urlencode({"From": f"whatsapp:{settings['whatsapp_from']}", "To": f"whatsapp:{number}",
+                          "Body": text[:1500]}).encode()
+        with urlopen(Request(url, data=body, headers=headers, method="POST"), timeout=15) as response:
+            if response.status >= 300:
+                raise OSError(f"Twilio returned HTTP {response.status}")
+
+
 class AlertDispatcher:
     """Queue events and deliver alerts on a background thread, never blocking detection."""
 
@@ -167,6 +202,9 @@ class AlertDispatcher:
                     attachment = None
             send_email(settings, event, text, attachment)
             channels.append("email")
+        if settings["whatsapp_enabled"]:
+            send_whatsapp(settings, text)
+            channels.append("whatsapp")
         if not channels:
             raise ValueError("No alert channel is configured")
         self.last_sent = self.clock()

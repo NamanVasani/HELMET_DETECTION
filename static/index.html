@@ -177,6 +177,15 @@
         <label>From <input type="email" name="smtp_from"></label>
         <label>To (comma separated) <input name="email_to"></label>
       </div>
+      <h3>WhatsApp (via Twilio)</h3>
+      <label class="check"><input type="checkbox" name="whatsapp_enabled"> Send WhatsApp messages</label>
+      <div class="two">
+        <label>Twilio Account SID <input name="twilio_account_sid" placeholder="AC…" autocomplete="off"></label>
+        <label>Twilio Auth Token <input type="password" name="twilio_auth_token" autocomplete="off" placeholder="optional"></label>
+        <label>From (Twilio WhatsApp number) <input name="whatsapp_from" placeholder="+14155238886"></label>
+        <label>To (comma separated) <input name="whatsapp_to" placeholder="+919876543210"></label>
+      </div>
+      <p class="notice">Text and a link to the event are sent. Photos are not attached because the dashboard is private (Twilio can only attach public images); email alerts include the photo.</p>
       <div class="row"><button type="submit" class="primary">Save alerts</button><button type="button" id="alert-test">Send test alert</button></div>
       <p id="alerts-msg" class="notice" role="status"></p>
     </form>

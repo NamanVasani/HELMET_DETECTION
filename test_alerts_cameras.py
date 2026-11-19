@@ -19,7 +19,12 @@ class RecordingHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         body = self.rfile.read(int(self.headers["Content-Length"]))
-        RecordingHandler.received.append((self.headers.get("Authorization"), json.loads(body)))
+        if self.headers.get("Content-Type", "").startswith("application/x-www-form-urlencoded"):
+            from urllib.parse import parse_qs
+            parsed = {key: values[0] for key, values in parse_qs(body.decode()).items()}
+            RecordingHandler.received.append((self.headers.get("Authorization"), dict(parsed, path=self.path)))
+        else:
+            RecordingHandler.received.append((self.headers.get("Authorization"), json.loads(body)))
         self.send_response(200)
         self.end_headers()
 
@@ -74,6 +79,35 @@ class AlertTests(unittest.TestCase):
         self.assertTrue(dispatcher.last_error)
         from event_store import list_audit
         self.assertTrue(any(entry["action"] == "alert_failed" for entry in list_audit(self.root)))
+
+    def test_whatsapp_via_twilio_sends_to_each_number(self):
+        import base64
+        sid = "AC" + "0" * 32
+        with self.assertRaises(ValueError):
+            alerts.save_settings(self.root, {"whatsapp_enabled": True, "twilio_account_sid": "bad",
+                                             "twilio_auth_token": "t", "whatsapp_from": "+14155238886",
+                                             "whatsapp_to": "+919876543210"})
+        with self.assertRaises(ValueError):
+            alerts.save_settings(self.root, {"whatsapp_enabled": True, "twilio_account_sid": sid,
+                                             "twilio_auth_token": "t", "whatsapp_from": "+14155238886",
+                                             "whatsapp_to": "98765 43210"})
+        saved = alerts.save_settings(self.root, {
+            "enabled": True, "whatsapp_enabled": True, "twilio_account_sid": sid, "twilio_auth_token": "tok",
+            "whatsapp_from": "whatsapp:+14155238886", "whatsapp_to": "+91 98765 43210, +919999999999"})
+        self.assertEqual(saved["whatsapp_from"], "+14155238886")
+        self.assertEqual(saved["whatsapp_to"], "+919876543210,+919999999999")
+        self.assertEqual(alerts.public_settings(saved)["twilio_auth_token"], "")
+        with patch("alerts.TWILIO_API", self.url.replace("/hook", "/{sid}/Messages.json")):
+            result = alerts.AlertDispatcher(self.root).deliver(sample_event())
+        self.assertEqual(result, "sent:whatsapp")
+        self.assertEqual(len(RecordingHandler.received), 2)
+        auth, form = RecordingHandler.received[0]
+        self.assertEqual(auth, "Basic " + base64.b64encode(f"{sid}:tok".encode()).decode())
+        self.assertEqual(form["path"], f"/{sid}/Messages.json")
+        self.assertEqual(form["From"], "whatsapp:+14155238886")
+        self.assertEqual(form["To"], "whatsapp:+919876543210")
+        self.assertIn("No helmet detected on Gate 1", form["Body"])
+        self.assertEqual(RecordingHandler.received[1][1]["To"], "whatsapp:+919999999999")
 
     def test_email_requires_complete_settings_and_uses_starttls(self):
         with self.assertRaises(ValueError):
