@@ -20,6 +20,12 @@ PAGE = (STATIC / "index.html").read_text() + (STATIC / "app.js").read_text()
 
 
 class DashboardTests(unittest.TestCase):
+    def setUp(self):
+        # app.main() starts background schedulers; tests must never write backups next to real data.
+        patcher = patch("backup.BACKUP_ENABLED", False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_retention_runs_while_server_stays_open_and_retries_failures(self):
         with tempfile.TemporaryDirectory() as temp:
             server = DashboardServer(port=0, storage=Path(temp), require_auth=False)

@@ -580,9 +580,11 @@ def main():
     dashboard.detector_managed = True
     alerts = AlertDispatcher(dashboard.storage)
     DailyReporter(dashboard.storage).start()
-    from backup import BACKUP_ENABLED, BackupScheduler
-    if BACKUP_ENABLED:
-        BackupScheduler(dashboard.storage).start()
+    import backup
+    if backup.BACKUP_ENABLED:
+        # Back up the storage this server actually uses, into a folder beside it (never a global default).
+        destination = Path(os.environ.get("HELMET_BACKUP_DIR") or Path(dashboard.storage).resolve().parent / "backups")
+        backup.BackupScheduler(dashboard.storage, destination).start()
     cameras = CameraManager(dashboard.storage)
     dashboard.alerts = alerts
     print(f"Dashboard: {dashboard.url}")
