@@ -47,6 +47,9 @@ section{padding:96px 0}
 .links{display:flex;gap:24px;margin-left:auto;font-size:15px}
 .links a{text-decoration:none;color:var(--muted);font-weight:550}.links a:hover{color:var(--ink)}
 .nav .btn{padding:9px 16px}
+.nav .signin{margin-left:-14px}
+.demo{width:100%;display:block;border-radius:18px;border:1px solid var(--line);box-shadow:var(--shadow);background:#05070d}
+.demo-note{font-size:13px;color:var(--muted);margin-top:12px}
 
 /* hero */
 .hero{padding:72px 0 88px;background:radial-gradient(900px 500px at 85% 10%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 70%),
@@ -148,13 +151,14 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   .tour.flip>:first-child{order:0}
   .mock{transform:none}
   .steps,.features,.deploy{grid-template-columns:1fr 1fr}
-  .links{display:none}.nav .btn{margin-left:auto}
+  .links{display:none}.nav .signin{margin-left:auto}.nav .wrap{gap:10px}
 }
 @media (max-width:600px){
   section{padding:68px 0}.wrap{padding:0 18px}
   .steps,.features,.deploy,.priv{grid-template-columns:1fr}
   .mock{grid-template-columns:64px 1fr;min-height:0}.tiles{grid-template-columns:1fr 1fr}.cards{grid-template-columns:1fr 1fr}.cards .mcard:nth-child(3){display:none}
   .pilot{padding:26px}.lead{font-size:17px}
+  .nav .btn{white-space:nowrap}.nav .btn.primary{display:none}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}
 </style>
@@ -182,6 +186,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   <div class="wrap">
     <a class="brand" href="#top"><img src="../static/icon.svg" alt="">Helmet</a>
     <div class="links"><a href="#how">How it works</a><a href="#features">Features</a><a href="#privacy">Privacy</a><a href="#faq">FAQ</a></div>
+    <!-- Opens the dashboard on this computer; a customer's install has its own address. -->
+    <a class="btn ghost signin" href="http://127.0.0.1:8003" title="Open the Helmet dashboard on this computer">Sign in</a>
     <a class="btn primary" href="#contact">Request a pilot</a>
   </div>
 </nav>
@@ -219,6 +225,15 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     </div>
   </div>
 </header>
+
+<section id="demo" class="alt">
+  <div class="wrap center">
+    <h2>See it in action</h2>
+    <p class="sub">A short walkthrough: real detections from a recorded clip, quick review with keyboard shortcuts, bulk confirmation, analytics and adding a CCTV camera.</p>
+    <video class="demo" controls preload="metadata" playsinline poster="media/helmet-demo-poster.jpg" src="media/helmet-demo.webm"></video>
+    <p class="demo-note">Riders shown come from a public test dataset.</p>
+  </div>
+</section>
 
 <section id="how">
   <div class="wrap center">
