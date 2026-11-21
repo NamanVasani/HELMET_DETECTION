@@ -102,6 +102,7 @@ class DashboardServer:
         self.frame_lock = threading.Lock()
         self.frames = {}
         self.metrics = {}
+        self.detections = {}
         self.camera_status = {}
         self.status = ("Waiting for browser camera permission." if accept_frames
                        else "Saved-event review only. Camera detector is not running.")
@@ -242,6 +243,10 @@ class DashboardServer:
     def update_metrics(self, source, values):
         with self.frame_lock:
             self.metrics[source] = values
+
+    def update_detections(self, source, payload):
+        with self.frame_lock:
+            self.detections[source] = payload
 
     def update_cameras(self, statuses):
         with self.frame_lock:
@@ -595,7 +600,10 @@ class DashboardServer:
             if len(body) != length or not body.startswith(b"\xff\xd8"):
                 return JSONResponse({"error": "Invalid JPEG frame"}, status_code=400)
             owner.update_input_frame(body)
-            return JSONResponse({"accepted": True}, status_code=202)
+            with owner.frame_lock:
+                latest = owner.detections.get("browser")
+            # Return the latest result so the phone can draw boxes over its own live camera (no picture round trip).
+            return JSONResponse({"accepted": True, "detections": latest}, status_code=202)
 
         @app.post("/api/video")
         async def video(request: Request):

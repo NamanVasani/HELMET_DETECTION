@@ -46,12 +46,14 @@ function makePage({session, status, events = [], role = 'admin'}) {
     }
     return {ok: code < 400, status: code, json: async () => body};
   };
-  window.navigator.mediaDevices = {async getUserMedia() {
+  window.navigator.mediaDevices = {async getUserMedia(constraints) {
     env.cameraRequests++;
+    env.lastConstraints = constraints;
     if (env.denied) throw Object.assign(new Error('denied'), {name: 'NotAllowedError'});
     return stream;
   }};
   window.HTMLMediaElement.prototype.play = async function play() {};
+  window.HTMLCanvasElement.prototype.getContext = () => null;  // jsdom has no canvas; drawing is skipped
   window.requestAnimationFrame = () => env.framesScheduled++;
   window.setInterval = () => 0;
   window.confirm = () => true;
@@ -186,8 +188,20 @@ async function testCameraAndVideo() {
   await Promise.all([run('startCamera()'), run('startCamera()')]);
   assert.equal(env.cameraRequests, 2, 'Retry should make one request after the denied request');
   assert.equal(env.framesScheduled, 1);
+  assert.equal(env.lastConstraints.video.facingMode.ideal, 'user', 'computers start on the front webcam');
+  assert.equal(document.querySelector('#cam-wrap').hidden, false, 'own camera is shown locally while running');
+  // Detection results drawn over the local video: badge notes, and stale results are hidden.
+  run(`drawOverlay({at: Date.now() / 1000, width: 960, height: 540, too_close: true, zoom: 2.4, saved: 1,
+    boxes: [{label: 'no-helmet', box: [10, 10, 60, 60], confidence: 0.81}]})`);
+  assert.match(document.querySelector('#cam-badge').textContent, /Too close.*Auto-zoom 2\.4×.*Saved/);
+  run(`drawOverlay({at: 1, width: 960, height: 540, boxes: []})`);
+  assert.equal(document.querySelector('#cam-badge').hidden, true, 'old results are not shown');
+  await run('switchCamera()');
+  assert.equal(env.lastConstraints.video.facingMode.ideal, 'environment', 'switch goes to the back camera');
+  assert.match(document.querySelector('#camera-status').textContent, /Back camera/);
   run('stopCamera()');
-  assert.equal(env.stopped, 1);
+  assert.equal(env.stopped, 2);
+  assert.equal(document.querySelector('#cam-wrap').hidden, true);
 
   const file = {name: 'sample.mp4', size: 1000, type: 'video/mp4'};
   Object.defineProperty(document.querySelector('#video-file'), 'files', {value: [file]});

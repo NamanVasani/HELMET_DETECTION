@@ -4,7 +4,12 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const PAGE_SIZE = 60;
-const MAX_SEND_WIDTH = 1920;
+// Phones send smaller, lighter frames over Wi-Fi (about 5-10x less data); computers keep 1080p for auto-zoom detail.
+const IS_PHONE = Boolean(window.matchMedia?.('(pointer: coarse)').matches) &&
+  Math.min(window.screen?.width || 0, window.screen?.height || 0) < 900;
+const MAX_SEND_WIDTH = IS_PHONE ? 960 : 1920;
+const SEND_QUALITY = IS_PHONE ? 0.65 : 0.8;
+const BOX_COLORS = {helmet: '#2dd4bf', 'no-helmet': '#fb7185', rider: '#38bdf8', bike: '#c084fc', 'number-plate': '#fbbf24'};
 const STATUS_LABELS = {needs_review: 'Needs review', confirmed: 'Confirmed', false_positive: 'False positive'};
 const state = {
   user: null, perms: new Set(), tab: 'review', category: 'no_helmet', events: [], total: 0, signature: '',
@@ -516,7 +521,54 @@ function stopCamera(message = '') {
   state.cameraStream = null;
   const video = $('#camera-source');
   if (video) video.srcObject = null;
+  drawOverlay(null);
   if (message) setText('#camera-status', message);
+  syncStreams();
+}
+
+async function switchCamera() {
+  state.facing = (state.facing || (IS_PHONE ? 'environment' : 'user')) === 'environment' ? 'user' : 'environment';
+  const running = Boolean(state.cameraStream);
+  stopCamera(`Switching to the ${state.facing === 'environment' ? 'back' : 'front'} camera…`);
+  if (running) await startCamera();
+}
+
+/* Draw the server's latest detection boxes over the phone's own live video (no picture round trip). */
+function drawOverlay(result) {
+  const canvas = $('#camera-overlay'), video = $('#camera-source'), badge = $('#cam-badge');
+  if (!canvas || !badge) return;
+  const fresh = result && Date.now() / 1000 - (result.at || 0) < 3;
+  const notes = !fresh ? [] : [result.too_close && 'Too close — move back (2–15 m)',
+    result.zoom && `Auto-zoom ${result.zoom}×`, result.saved && 'Saved ✓'].filter(Boolean);
+  badge.textContent = notes.join(' · ');
+  badge.hidden = notes.length === 0;
+  const context = canvas.getContext?.('2d');
+  if (!context) return;
+  // Cover exactly the visible picture inside the <video> box (object-fit: contain may letterbox it).
+  const boxWidth = video.clientWidth, boxHeight = video.clientHeight;
+  const sourceWidth = video.videoWidth || result?.width || boxWidth, sourceHeight = video.videoHeight || result?.height || boxHeight;
+  const fit = sourceWidth && sourceHeight ? Math.min(boxWidth / sourceWidth, boxHeight / sourceHeight) : 1;
+  canvas.width = Math.round(sourceWidth * fit) || canvas.width;
+  canvas.height = Math.round(sourceHeight * fit) || canvas.height;
+  canvas.style.left = `${video.offsetLeft + (boxWidth - canvas.width) / 2}px`;
+  canvas.style.top = `${video.offsetTop + (boxHeight - canvas.height) / 2}px`;
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  if (!fresh || !result.width) return;
+  const scaleX = canvas.width / result.width, scaleY = canvas.height / result.height;
+  context.lineWidth = 3;
+  context.font = '600 13px system-ui, sans-serif';
+  for (const item of result.boxes || []) {
+    const [x1, y1, x2, y2] = item.box;
+    const color = BOX_COLORS[item.label] || '#e2e8f0';
+    context.strokeStyle = color;
+    context.strokeRect(x1 * scaleX, y1 * scaleY, (x2 - x1) * scaleX, (y2 - y1) * scaleY);
+    const text = `${item.label}${item.confidence == null ? '' : ' ' + item.confidence.toFixed(2)}`;
+    const width = context.measureText(text).width + 10;
+    context.fillStyle = color;
+    context.fillRect(x1 * scaleX, Math.max(0, y1 * scaleY - 20), width, 20);
+    context.fillStyle = '#0b1120';
+    context.fillText(text, x1 * scaleX + 5, Math.max(14, y1 * scaleY - 6));
+  }
 }
 
 async function restartDetector() {
@@ -539,11 +591,14 @@ async function sendCameraFrames(now) {
     canvas.height = Math.round(video.videoHeight * scale);
     canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
     try {
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', SEND_QUALITY));
       if (blob && state.cameraStream === stream) {
         const response = await fetch('/api/frame', {method: 'POST', headers: {'Content-Type': 'image/jpeg'}, body: blob,
           credentials: 'same-origin', signal: AbortSignal.timeout(10000)});
         if (!response.ok) throw new Error('Camera frame rejected');
+        let reply = {};
+        try { reply = await response.json(); } catch { reply = {}; }
+        if (state.cameraStream === stream) drawOverlay(reply.detections);
       }
     } catch {
       if (state.cameraStream === stream) stopCamera('Camera detector unavailable. Retry the camera when the detector is ready.');
@@ -572,13 +627,18 @@ async function startCamera() {
       return;
     }
     setText('#camera-status', 'Requesting browser camera permission…');
-    state.cameraStream = await navigator.mediaDevices.getUserMedia({audio: false, video: {width: {ideal: 1920}, height: {ideal: 1080}}});
+    state.facing = state.facing || (IS_PHONE ? 'environment' : 'user');  // phones start on the back camera
+    state.cameraStream = await navigator.mediaDevices.getUserMedia({audio: false, video: {
+      facingMode: {ideal: state.facing},
+      width: {ideal: IS_PHONE ? 1280 : 1920}, height: {ideal: IS_PHONE ? 720 : 1080},
+    }});
     const settings = state.cameraStream.getVideoTracks?.()[0]?.getSettings?.() || {};
     if (settings.width) state.cameraResolution = `${settings.width}×${settings.height}`;
     const video = $('#camera-source');
     video.srcObject = state.cameraStream;
     await video.play();
-    setText('#camera-status', `Camera allowed${state.cameraResolution ? ` (${state.cameraResolution})` : ''}. Starting live detection…`);
+    const which = state.facing === 'environment' ? 'Back camera' : 'Front camera';
+    setText('#camera-status', `${which}${state.cameraResolution ? ` (${state.cameraResolution})` : ''}. Starting live detection…`);
     requestAnimationFrame(sendCameraFrames);
     syncStreams();
   } catch (error) {
@@ -595,11 +655,13 @@ async function startCamera() {
 function syncStreams() {
   const live = state.tab === 'live' && state.status?.camera_enabled;
   const image = $('#live-stream');
-  const wantLive = live && (state.status.sources || []).includes('live');
+  const ownCamera = Boolean(state.cameraStream);  // show this device's camera locally; boxes come back as JSON
+  $('#cam-wrap').hidden = !ownCamera;
+  const wantLive = live && !ownCamera && (state.status.sources || []).includes('live');
   if (wantLive && !image.getAttribute('src')) image.src = '/stream?source=live';
   if (!wantLive && image.getAttribute('src')) image.removeAttribute('src');
   image.hidden = !wantLive;
-  $('#live-empty').hidden = wantLive;
+  $('#live-empty').hidden = wantLive || ownCamera;
   $$('#camera-streams img[data-source]').forEach(img => {
     if (live && !img.getAttribute('src')) img.src = '/stream?source=' + encodeURIComponent(img.dataset.source);
     if (!live && img.getAttribute('src')) img.removeAttribute('src');
@@ -993,6 +1055,7 @@ function bindOnce() {
   });
   $('#camera-start').addEventListener('click', startCamera);
   $('#camera-stop').addEventListener('click', () => stopCamera('Camera stopped.'));
+  $('#camera-switch').addEventListener('click', switchCamera);
   $('#detector-restart').addEventListener('click', restartDetector);
   $('#analyze-video').addEventListener('click', analyzeVideo);
   $('#cancel-video').addEventListener('click', cancelVideo);
