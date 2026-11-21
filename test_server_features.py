@@ -227,6 +227,23 @@ class ServerConfigTests(unittest.TestCase):
             finally:
                 server.close()
 
+    def test_frame_upload_returns_latest_detection_boxes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            server = DashboardServer(port=0, storage=Path(temp), require_auth=False, accept_frames=True).start()
+            try:
+                base = f"http://127.0.0.1:{server.port}"
+                frame = Request(base + "/api/frame", data=b"\xff\xd8jpeg", headers={"Content-Type": "image/jpeg"})
+                with build_opener().open(frame) as response:
+                    self.assertIsNone(json.load(response)["detections"], "nothing processed yet")
+                server.update_detections("browser", {"width": 960, "height": 540, "boxes": [
+                    {"label": "no-helmet", "box": [1, 2, 3, 4], "confidence": 0.8}], "too_close": False})
+                with build_opener().open(frame) as response:
+                    reply = json.load(response)
+                self.assertEqual(reply["detections"]["boxes"][0]["label"], "no-helmet")
+                self.assertEqual(reply["detections"]["width"], 960)
+            finally:
+                server.close()
+
     def test_extra_allowed_host(self):
         with tempfile.TemporaryDirectory() as temp:
             server = DashboardServer(port=0, storage=Path(temp), require_auth=False,

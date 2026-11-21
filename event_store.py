@@ -188,7 +188,13 @@ def associate_objects(no_helmet, detections):
               and max(rider["box"][0], item["box"][0]) < min(rider["box"][2], item["box"][2])
               and max(rider["box"][1], item["box"][1]) < min(rider["box"][3], item["box"][3])]
     bike = nearby[0] if len(nearby) == 1 else None
-    contained_plates = [item for item in plates if bike and _inside(_center(item), bike)]
+    if bike:
+        contained_plates = [item for item in plates if _inside(_center(item), bike)]
+    else:
+        # The bike box is often missed; a plate just below/inside the rider box still belongs to that rider.
+        x1, y1, x2, y2 = rider["box"]
+        below = {"box": [x1, y1, x2, y2 + 0.25 * (y2 - y1)]}
+        contained_plates = [item for item in plates if _inside(_center(item), below)]
     plate = contained_plates[0] if len(contained_plates) == 1 else None
     return {"rider": rider, "bike": bike, "plate": plate}
 

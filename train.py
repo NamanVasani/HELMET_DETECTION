@@ -26,6 +26,8 @@ def main():
     parser.add_argument("--imgsz", type=int, default=640)
     parser.add_argument("--batch", type=int, default=8)
     parser.add_argument("--patience", type=int, default=15)
+    parser.add_argument("--lr0", type=float, default=None,
+                        help="initial learning rate; use ~0.001 when fine-tuning an already trained model")
     args = parser.parse_args()
 
     source = (project / args.data) if not args.data.is_absolute() else args.data
@@ -40,6 +42,8 @@ def main():
                    device="mps" if torch.backends.mps.is_available() else "cpu", workers=4, exist_ok=False)
     if args.hours:
         options["time"] = args.hours
+    if args.lr0:
+        options.update(lr0=args.lr0, warmup_epochs=0.5)  # gentle fine-tune: keep what the model already knows
     YOLO(args.model).train(**options)
     print("Training done!")
 

@@ -141,6 +141,30 @@ class AdaptiveZoomTests(unittest.TestCase):
         detections = read_detections(result, model)
         self.assertEqual([item["track_id"] for item in detections], [11, 12])
 
+    def test_keeps_less_certain_plates_and_bikes_but_not_heads(self):
+        class Scalar:
+            def __init__(self, value):
+                self.value = value
+
+            def item(self):
+                return self.value
+
+        class Coordinates:
+            def cpu(self):
+                return self
+
+            def tolist(self):
+                return [10, 20, 90, 40]
+
+        class Box:
+            def __init__(self, cls, conf):
+                self.conf, self.cls, self.xyxy, self.id = [Scalar(conf)], [Scalar(cls)], [Coordinates()], None
+
+        model = type("Model", (), {"names": {0: "helmet", 2: "number-plate", 4: "bike"}})()
+        result = type("Result", (), {"boxes": [Box(2, 0.4), Box(4, 0.4), Box(0, 0.4), Box(2, 0.2)]})()
+        names = [item["class_name"] for item in read_detections(result, model)]
+        self.assertEqual(names, ["number-plate", "bike"])
+
     def test_saves_confident_home_test_prediction_without_rider_match_once(self):
         detection = {"class_name": "helmet", "confidence": 0.56, "zoomed": True,
                      "track_id": 7, "box": [110, 90, 150, 130]}

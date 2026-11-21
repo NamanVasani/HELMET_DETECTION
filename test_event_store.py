@@ -93,6 +93,14 @@ class EventStoreTests(unittest.TestCase):
         self.assertIsNone(association["bike"])
         self.assertIsNone(association["plate"])
 
+    def test_plate_links_to_rider_when_bike_box_is_missed(self):
+        head = {"class_name": "no-helmet", "box": [40, 20, 60, 40]}
+        rider = {"class_name": "rider", "box": [10, 10, 100, 200]}
+        long_plate = {"class_name": "number-plate", "box": [30, 190, 90, 205]}
+        far_plate = {"class_name": "number-plate", "box": [400, 190, 460, 205]}
+        self.assertIs(associate_objects(head, [head, rider, long_plate])["plate"], long_plate)
+        self.assertIs(associate_objects(head, [head, rider, long_plate, far_plate])["plate"], long_plate)
+
     def test_imports_legacy_json_events_into_sqlite(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
