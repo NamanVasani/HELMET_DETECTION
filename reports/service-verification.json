@@ -1,0 +1,19 @@
+{
+  "service": "passed",
+  "before_pid": 30164,
+  "after_pid": 32262,
+  "restart_seconds_to_detector_ready": 1.061,
+  "port": 8003,
+  "data_integrity": "ok",
+  "baseline_events_preserved": 59,
+  "current_events": 59,
+  "evidence_files_preserved_in_both_locations": 177,
+  "physical_browser_camera": "passed",
+  "preview_dimensions": [
+    1280,
+    720
+  ],
+  "camera_stopped_after_check": true,
+  "browser_review_controls": "visibly present in Safari",
+  "limitations": "Process restart tested; full physical reboot/login and independent annotated road footage not tested."
+}

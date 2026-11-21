@@ -1,0 +1,15 @@
+{
+  "service": "updated and ready",
+  "port": 8003,
+  "code_files": [
+    "hi.py",
+    "dashboard.py",
+    "event_store.py"
+  ],
+  "preserved_events": 63,
+  "preserved_evidence_files": 189,
+  "data_integrity": "ok",
+  "evidence_hashes": "unchanged",
+  "status": "Detector ready. Waiting for browser camera permission.",
+  "limitations": "Idle service activation only; physical reboot and independent road accuracy are not tested."
+}

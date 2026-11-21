@@ -1,0 +1,16 @@
+*
+!app.py
+!dashboard.py
+!event_store.py
+!auth.py
+!alerts.py
+!cameras.py
+!reports_pdf.py
+!manage.py
+!model-manifest.json
+!thresholds.json
+!best.pt
+!requirements.txt
+!static/
+!models/
+!backup.py

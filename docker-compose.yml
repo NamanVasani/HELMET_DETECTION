@@ -1,0 +1,21 @@
+# Server / edge deployment. CCTV cameras are added in the dashboard (Settings → CCTV cameras).
+services:
+  helmet:
+    build: .
+    image: helmet:latest
+    restart: unless-stopped
+    ports:
+      - "8003:8003"
+    volumes:
+      - helmet-data:/data
+    environment:
+      # First admin (only used while no users exist). Change the password after first sign-in.
+      HELMET_ADMIN_USER: ${HELMET_ADMIN_USER:-admin}
+      HELMET_ADMIN_PASSWORD: ${HELMET_ADMIN_PASSWORD:?Set HELMET_ADMIN_PASSWORD in .env}
+      # Extra names/IPs browsers use to reach this server, e.g. "helmet.local,192.168.1.50".
+      HELMET_ALLOWED_HOSTS: ${HELMET_ALLOWED_HOSTS:-}
+      HELMET_RETENTION_DAYS: ${HELMET_RETENTION_DAYS:-30}
+      HELMET_KEEP_CONFIRMED: ${HELMET_KEEP_CONFIRMED:-1}
+      HELMET_PRIVACY: ${HELMET_PRIVACY:-1}
+volumes:
+  helmet-data:

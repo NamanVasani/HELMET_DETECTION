@@ -1,0 +1,11 @@
+{
+  "name": "helmet-dashboard-tests",
+  "private": true,
+  "description": "Browser-side tests for the Helmet dashboard (static/app.js).",
+  "scripts": {
+    "test": "node test_camera_page.js"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  }
+}

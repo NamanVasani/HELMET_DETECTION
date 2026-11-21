@@ -1,0 +1,223 @@
+{
+  "evaluated_at": "2026-11-19T07:48:28.400987+00:00",
+  "model_sha256": "ad241f161cc7ac2d0f269939d37f7408a26fe529c2a005cfb47e244c25e77894",
+  "imgsz": 800,
+  "method": "Calibrate the zoom-crop helmet/no-helmet score threshold on labelled validation crops.\n\nEach labelled head box in the overlap-filtered validation split becomes a zoom target. The crop\ngeometry copies hi.zoom_region (target box, zoom = min(4, 0.65 * H / box_height), crop resized\nback to the frame size). The model's best on-target helmet/no-helmet prediction is the decision.\nThe threshold is chosen by macro F1 on validation, then frozen and reported on test.\n\nFinding (2026-11-19): hi.zoom_region sizes every target to 65% of the frame height. For a head/face\ntarget that makes the head far larger than anything in training and on-target accuracy collapses\n(0.30 correct at 65% vs 0.82 at 20%). Calibration therefore uses a target fraction per target type\n(--head-fraction, --rider-fraction) and records it as \"zoom_geometry\" in the candidate calibration; hi.py\nmust use the same geometry for the threshold to be valid.",
+  "targets": {
+    "val": 594,
+    "test": 563
+  },
+  "selection": "max validation macro F1 among thresholds with validation precision >= 0.8 for both helmet and no-helmet",
+  "chosen_zoom_crop_threshold": 0.02,
+  "val_sweep": {
+    "0.02": 0.9142,
+    "0.03": 0.9131,
+    "0.04": 0.9094,
+    "0.05": 0.9074,
+    "0.06": 0.9064,
+    "0.07": 0.9054,
+    "0.08": 0.907,
+    "0.09": 0.905,
+    "0.1": 0.9012,
+    "0.11": 0.9003,
+    "0.12": 0.8964,
+    "0.13": 0.8954,
+    "0.14": 0.8954,
+    "0.15": 0.8944,
+    "0.16": 0.8922,
+    "0.17": 0.8929,
+    "0.18": 0.8929,
+    "0.19": 0.888,
+    "0.2": 0.8867,
+    "0.21": 0.8867,
+    "0.22": 0.8857,
+    "0.23": 0.8865,
+    "0.24": 0.8881,
+    "0.25": 0.8861,
+    "0.26": 0.8869,
+    "0.27": 0.8859,
+    "0.28": 0.8859,
+    "0.29": 0.8846,
+    "0.3": 0.8846,
+    "0.31": 0.8862,
+    "0.32": 0.8862,
+    "0.33": 0.8832,
+    "0.34": 0.8821,
+    "0.35": 0.8804,
+    "0.36": 0.8783,
+    "0.37": 0.8752,
+    "0.38": 0.8731,
+    "0.39": 0.8729,
+    "0.4": 0.8686,
+    "0.41": 0.8674,
+    "0.42": 0.8664,
+    "0.43": 0.8672,
+    "0.44": 0.868,
+    "0.45": 0.867,
+    "0.46": 0.8627,
+    "0.47": 0.8635,
+    "0.48": 0.8635,
+    "0.49": 0.8551,
+    "0.5": 0.8518,
+    "0.51": 0.8462,
+    "0.52": 0.8437,
+    "0.53": 0.8416,
+    "0.54": 0.8404,
+    "0.55": 0.8348,
+    "0.56": 0.8314,
+    "0.57": 0.8298,
+    "0.58": 0.8276,
+    "0.59": 0.8234,
+    "0.6": 0.8154,
+    "0.61": 0.8079,
+    "0.62": 0.8044,
+    "0.63": 0.7862,
+    "0.64": 0.7733,
+    "0.65": 0.7706,
+    "0.66": 0.7662,
+    "0.67": 0.7585,
+    "0.68": 0.7468,
+    "0.69": 0.7355,
+    "0.7": 0.7274,
+    "0.71": 0.7096,
+    "0.72": 0.6859,
+    "0.73": 0.6737,
+    "0.74": 0.6479,
+    "0.75": 0.6312,
+    "0.76": 0.6028,
+    "0.77": 0.5626,
+    "0.78": 0.5426,
+    "0.79": 0.5078,
+    "0.8": 0.4634,
+    "0.81": 0.422,
+    "0.82": 0.3662,
+    "0.83": 0.308,
+    "0.84": 0.248,
+    "0.85": 0.1892,
+    "0.86": 0.1488,
+    "0.87": 0.0893,
+    "0.88": 0.0449,
+    "0.89": 0.0164,
+    "0.9": 0.0033,
+    "0.91": 0.0033,
+    "0.92": 0.0,
+    "0.93": 0.0,
+    "0.94": 0.0,
+    "0.95": 0.0
+  },
+  "unconstrained_val_best": 0.02,
+  "per_class_best_threshold_on_val": {
+    "helmet": 0.02,
+    "no-helmet": 0.02
+  },
+  "val_at_chosen": {
+    "helmet": {
+      "precision": 0.9343,
+      "recall": 0.903,
+      "f1": 0.9184,
+      "targets": 299
+    },
+    "no-helmet": {
+      "precision": 0.9293,
+      "recall": 0.8915,
+      "f1": 0.91,
+      "targets": 295
+    },
+    "macro_f1": 0.9142
+  },
+  "test_at_chosen": {
+    "helmet": {
+      "precision": 0.9863,
+      "recall": 0.6538,
+      "f1": 0.7864,
+      "targets": 442
+    },
+    "no-helmet": {
+      "precision": 0.5833,
+      "recall": 0.8678,
+      "f1": 0.6977,
+      "targets": 121
+    },
+    "macro_f1": 0.742
+  },
+  "zoom_geometry": {
+    "head_fraction": 0.2,
+    "rider_fraction": 0.45
+  },
+  "val_at_previous_0.50": {
+    "helmet": {
+      "precision": 0.959,
+      "recall": 0.7826,
+      "f1": 0.8619,
+      "targets": 299
+    },
+    "no-helmet": {
+      "precision": 0.9776,
+      "recall": 0.739,
+      "f1": 0.8417,
+      "targets": 295
+    },
+    "macro_f1": 0.8518
+  },
+  "test_at_previous_0.50": {
+    "helmet": {
+      "precision": 0.9894,
+      "recall": 0.4208,
+      "f1": 0.5905,
+      "targets": 442
+    },
+    "no-helmet": {
+      "precision": 0.7798,
+      "recall": 0.7025,
+      "f1": 0.7391,
+      "targets": 121
+    },
+    "macro_f1": 0.6648
+  },
+  "current_hi_geometry_0.65": {
+    "best_val_threshold": 0.56,
+    "test_at_best": {
+      "helmet": {
+        "precision": 0.9913,
+        "recall": 0.2385,
+        "f1": 0.3845,
+        "targets": 478
+      },
+      "no-helmet": {
+        "precision": 0.7021,
+        "recall": 0.2391,
+        "f1": 0.3568,
+        "targets": 138
+      },
+      "macro_f1": 0.3707
+    },
+    "test_at_0.50": {
+      "helmet": {
+        "precision": 0.9839,
+        "recall": 0.2552,
+        "f1": 0.4053,
+        "targets": 478
+      },
+      "no-helmet": {
+        "precision": 0.629,
+        "recall": 0.2826,
+        "f1": 0.39,
+        "targets": 138
+      },
+      "macro_f1": 0.3976
+    }
+  },
+  "limitations": [
+    "Crops are upscaled source-dataset images, not live camera crops.",
+    "Face-target zoom (YuNet) is approximated by the head or containing rider box.",
+    "Only the best on-target prediction is scored; off-target zoom detections are ignored, as hi.py discards zoom detections that do not belong to the focus."
+  ],
+  "recommendation": {
+    "zoom_crop": 0.5,
+    "zoom_geometry": {
+      "head_fraction": 0.2,
+      "rider_fraction": 0.45
+    },
+    "reason": "Validation precision never falls below 0.93, so it cannot discriminate; the selected 0.02 floor gives test no-helmet precision 0.58. Keep 0.50 and change only the zoom geometry."
+  }
+}

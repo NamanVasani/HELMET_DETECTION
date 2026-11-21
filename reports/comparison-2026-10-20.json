@@ -1,0 +1,50 @@
+{
+  "source_image": "ds1_test34_mov-0029_jpg.rf.c8834d54da21ad1d45fd2d057c94c3c5.jpg",
+  "before": [
+    {
+      "scenario": "multiple_people",
+      "frames": 24,
+      "elapsed_seconds": 6.312,
+      "processed_fps": 3.8,
+      "saved_events": 5
+    },
+    {
+      "scenario": "synthetic_low_light",
+      "frames": 24,
+      "elapsed_seconds": 6.271,
+      "processed_fps": 3.83,
+      "saved_events": 5
+    },
+    {
+      "scenario": "synthetic_distance",
+      "frames": 24,
+      "elapsed_seconds": 6.05,
+      "processed_fps": 3.97,
+      "saved_events": 7
+    }
+  ],
+  "after": [
+    {
+      "scenario": "multiple_people",
+      "frames": 24,
+      "elapsed_seconds": 4.769,
+      "processed_fps": 5.03,
+      "saved_events": 13
+    },
+    {
+      "scenario": "synthetic_low_light",
+      "frames": 24,
+      "elapsed_seconds": 4.314,
+      "processed_fps": 5.56,
+      "saved_events": 8
+    },
+    {
+      "scenario": "synthetic_distance",
+      "frames": 24,
+      "elapsed_seconds": 3.594,
+      "processed_fps": 6.68,
+      "saved_events": 5
+    }
+  ],
+  "limitations": "Repeated dataset image with synthetic light/distance transforms. Event counts are not accuracy measurements; more captures can include mistakes. Independent road footage, OCR and identity accuracy remain unverified."
+}

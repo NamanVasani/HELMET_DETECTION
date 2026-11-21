@@ -1,0 +1,15 @@
+{
+  "model_sha256": "ad241f161cc7ac2d0f269939d37f7408a26fe529c2a005cfb47e244c25e77894",
+  "source": "validation maximum class F1 after excluding known overlaps",
+  "imgsz": 800,
+  "full_frame": {
+    "helmet": 0.4995,
+    "no-helmet": 0.3714
+  },
+  "zoom_crop": 0.5,
+  "zoom_limit": "Pending recalibration with zoom_geometry; 0.50 retained. See reports/zoom-calibration-2026-11-19.json.",
+  "zoom_geometry": {
+    "head_fraction": 0.2,
+    "rider_fraction": 0.45
+  }
+}

@@ -1,0 +1,47 @@
+# Local Python environment and generated files
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.DS_Store
+.idea/
+
+# Downloaded training data and generated experiments
+/Helmet-Detection_YOLOv8-3/
+/Helmet-and-no-helmet-rider-detection-6/
+/merged_dataset/
+/runs/
+/output/
+/storage
+
+# Archived experiments and local-only files
+/_archive/
+/HELMET!.pages
+/yolov8*.pt
+/.venv-py39/
+
+# Personal interview notes (kept local)
+/HELMET_Project_Guide.md
+
+# Rollback copy of private event data
+/storage.before-login-service/
+# Evaluation scratch paths and image lists are machine-specific
+/reports/val/
+/reports/test/
+/reports/*-images.txt
+/reports/evaluation-data.yaml
+
+# JavaScript test dependencies
+/node_modules/
+
+# Demo recordings contain dataset footage of real people; publish only after checking dataset licences
+/site/media/
+
+# Machine-specific evaluation scratch files
+/reports/eval-*/*-images.txt
+/reports/eval-*/evaluation-data.yaml
+/reports/eval-*/val/
+/reports/eval-*/test/
+
+# Local backups contain personal data
+/backups/

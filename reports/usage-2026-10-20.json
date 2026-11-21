@@ -1,0 +1,30 @@
+{
+  "source_image": "ds1_test34_mov-0029_jpg.rf.c8834d54da21ad1d45fd2d057c94c3c5.jpg",
+  "labeled_heads": 24,
+  "scenarios": [
+    {
+      "scenario": "multiple_people",
+      "frames": 24,
+      "elapsed_seconds": 4.769,
+      "processed_fps": 5.03,
+      "saved_events": 13
+    },
+    {
+      "scenario": "synthetic_low_light",
+      "frames": 24,
+      "elapsed_seconds": 4.314,
+      "processed_fps": 5.56,
+      "saved_events": 8
+    },
+    {
+      "scenario": "synthetic_distance",
+      "frames": 24,
+      "elapsed_seconds": 3.594,
+      "processed_fps": 6.68,
+      "saved_events": 5
+    }
+  ],
+  "browser_jpeg_endpoint": "passed",
+  "mjpeg_preview": "passed",
+  "limit": "Repeated dataset images and synthetic perturbations; not independent footage or a physical camera test."
+}

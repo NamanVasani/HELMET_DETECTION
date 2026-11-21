@@ -1,0 +1,102 @@
+{
+  "measured_at": "2026-11-19T07:49:10.595390+00:00",
+  "machine": "macOS-27.2-arm64-arm-64bit",
+  "processor": "arm",
+  "frames": 60,
+  "frame_size": [
+    1280,
+    720
+  ],
+  "imgsz": 800,
+  "results": {
+    "pt-cpu": {
+      "predict_median_ms": 26.16,
+      "predict_fps": 38.22,
+      "track_median_ms": 44.82,
+      "track_fps": 22.31,
+      "track_works": true,
+      "names": [
+        "helmet",
+        "no-helmet",
+        "number-plate",
+        "rider",
+        "bike"
+      ],
+      "agreement_vs_pt_cpu": {
+        "reference_boxes": 417,
+        "matched": 417,
+        "match_rate": 1.0,
+        "unmatched_candidate_boxes": 0,
+        "median_abs_score_diff": 0.0
+      },
+      "model": "runs/detect/helmet_v3/weights/best.pt"
+    },
+    "pt-mps": {
+      "predict_median_ms": 38.98,
+      "predict_fps": 25.65,
+      "track_median_ms": 32.05,
+      "track_fps": 31.2,
+      "track_works": true,
+      "names": [
+        "helmet",
+        "no-helmet",
+        "number-plate",
+        "rider",
+        "bike"
+      ],
+      "agreement_vs_pt_cpu": {
+        "reference_boxes": 417,
+        "matched": 417,
+        "match_rate": 1.0,
+        "unmatched_candidate_boxes": 0,
+        "median_abs_score_diff": 0.0
+      },
+      "model": "runs/detect/helmet_v3/weights/best.pt"
+    },
+    "coreml": {
+      "predict_median_ms": 33.22,
+      "predict_fps": 30.1,
+      "track_median_ms": 45.47,
+      "track_fps": 21.99,
+      "track_works": true,
+      "names": [
+        "helmet",
+        "no-helmet",
+        "number-plate",
+        "rider",
+        "bike"
+      ],
+      "agreement_vs_pt_cpu": {
+        "reference_boxes": 417,
+        "matched": 410,
+        "match_rate": 0.9832,
+        "unmatched_candidate_boxes": 8,
+        "median_abs_score_diff": 0.0034
+      },
+      "model": "runs/export/helmet_v3/model.mlpackage"
+    },
+    "onnx-cpu": {
+      "predict_median_ms": 29.15,
+      "predict_fps": 34.3,
+      "track_median_ms": 48.89,
+      "track_fps": 20.45,
+      "track_works": true,
+      "names": [
+        "helmet",
+        "no-helmet",
+        "number-plate",
+        "rider",
+        "bike"
+      ],
+      "agreement_vs_pt_cpu": {
+        "reference_boxes": 417,
+        "matched": 410,
+        "match_rate": 0.9832,
+        "unmatched_candidate_boxes": 8,
+        "median_abs_score_diff": 0.0034
+      },
+      "model": "runs/export/helmet_v3/model.onnx"
+    }
+  },
+  "note": "Model-only latency (predict/track). The live app also runs YuNet, optional zoom inference, drawing and JPEG encoding, so end-to-end FPS is lower."
+}
