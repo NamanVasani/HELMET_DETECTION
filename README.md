@@ -202,9 +202,19 @@ survive a disk failure. Settings → Privacy shows the last backup.
 ### Improving the model with your reviews
 
 `python manage.py training-export --out reviewed_dataset` turns *confirmed* events into labelled examples and
-*false positives* into hard negatives (YOLO format with `data.yaml`). Add them to the **training** split only, retrain
-with `train.py`, then re-run `evaluate_model.py` — thresholds are re-bound to the new checkpoint's hash and the app
-refuses mismatched calibration.
+*false positives* into hard negatives (YOLO format with `data.yaml`).
+
+`python retrain.py` does the whole loop in one command and **never replaces `best.pt` by itself**:
+
+```bash
+.venv/bin/python retrain.py --dry-run     # show the plan
+.venv/bin/python retrain.py --hours 2     # export reviews, fine-tune (lr0 0.001), evaluate, compare
+```
+
+It refuses to train with fewer than 100 reviewed events (`--force` overrides), adds reviewed events to the **training**
+split only, fine-tunes from the current model with a low learning rate, evaluates both models on the same
+human-labelled test split, and recommends the new model only if **no class gets worse** and the average improves.
+Results are in `runs/retrain/<timestamp>/comparison.json`; adopting is a deliberate, manual step it prints for you.
 
 ### Training and evaluation
 
@@ -218,7 +228,7 @@ validation only and reports frozen-threshold test results. Never commit API keys
 VIRTUAL_ENV=.venv uv pip install -r requirements-dev.txt && npm install
 .venv/bin/ruff check .
 .venv/bin/python -B -m unittest test_adaptive_zoom test_capture_state test_evaluation test_service test_event_store \
-    test_dashboard test_server_features test_manage test_alerts_cameras test_backup
+    test_dashboard test_server_features test_manage test_alerts_cameras test_backup test_retrain
 node test_camera_page.js          # dashboard in jsdom: login, review, keyboard, bulk, camera, video, roles, chart
 .venv/bin/python check_usage.py   # real-model replay through upload, detection, storage and preview
 ```

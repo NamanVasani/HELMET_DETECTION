@@ -132,15 +132,24 @@
   <div class="live-grid">
     <div class="panel">
       <div class="panel-head"><h2>Browser camera</h2></div>
-      <div class="viewer"><img id="live-stream" alt="Live camera detections" hidden><p id="live-empty" class="muted"><svg class="ic big"><use href="#i-live"/></svg><br>The preview appears here once the camera is running.</p></div>
+      <div class="viewer">
+        <img id="live-stream" alt="Live camera detections" hidden>
+        <div id="cam-wrap" class="cam-wrap" hidden>
+          <video id="camera-source" autoplay muted playsinline></video>
+          <canvas id="camera-overlay" aria-hidden="true"></canvas>
+          <span id="cam-badge" class="cam-badge" hidden></span>
+        </div>
+        <p id="live-empty" class="muted"><svg class="ic big"><use href="#i-live"/></svg><br>The preview appears here once the camera is running.</p>
+      </div>
       <div id="camera-status" class="notice" role="status">Checking camera detector…</div>
       <div class="row" data-perm="camera">
         <button type="button" id="camera-start" class="primary"><svg class="ic"><use href="#i-play"/></svg>Start camera</button>
+        <button type="button" id="camera-switch">Switch camera</button>
         <button type="button" id="camera-stop">Stop camera</button>
         <button type="button" id="detector-restart">Restart detector</button>
       </div>
-      <p class="notice">Frames go only to this Helmet server. A capture needs three agreeing processed frames.</p>
-      <video id="camera-source" autoplay muted playsinline hidden></video><canvas id="camera-frame" hidden></canvas>
+      <p class="notice">Frames go only to this Helmet server. A capture needs three agreeing processed frames. For riders, use the back camera from 2–15 m.</p>
+      <canvas id="camera-frame" hidden></canvas>
     </div>
     <div class="stack">
       <div class="panel">
