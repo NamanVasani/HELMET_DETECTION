@@ -324,6 +324,33 @@ class CameraHealthTests(unittest.TestCase):
 
 
 class MultiSourceDetectorTests(unittest.TestCase):
+    def test_slow_ptz_camera_never_stalls_detection(self):
+        import threading
+        import app
+        rider = {"class_name": "rider", "confidence": 0.9, "track_id": 3, "box": [100, 100, 140, 200], "zoomed": False}
+        model = Mock(names=dict(enumerate(app.EXPECTED_CLASSES)), predictor=None)
+        model.track.return_value = [None]
+        dashboard = Mock(storage=Path("."), url="http://test")
+        pipeline = app.SourcePipeline("camera:c1", model, Mock(), {"helmet": 0.8, "no-helmet": 0.8})
+        release, moves = threading.Event(), []
+        follower = Mock()
+        follower.update.side_effect = lambda *a: (moves.append(a), release.wait(1))
+        with patch("ptz.from_config", return_value=follower):
+            pipeline.configure_ptz({"host": "10.0.0.9"})
+            pipeline.configure_ptz({"host": "10.0.0.9"})  # unchanged login: no rebuild
+        with patch.object(app, "read_detections", side_effect=lambda *a, **k: [dict(rider)]), \
+             patch.object(app, "zoom_region", side_effect=lambda frame, detections, target: (frame, None)), \
+             patch.object(app.CaptureState, "select", return_value=rider), \
+             patch.object(app, "detect_faces", return_value=[]):
+            started = time.monotonic()
+            for _ in range(5):
+                pipeline.process(np.zeros((360, 640, 3), dtype=np.uint8), {"type": "rtsp"}, dashboard)
+            self.assertLess(time.monotonic() - started, 0.5)
+        release.set()
+        self.assertEqual(len(moves), 1, "one move at a time; busy frames are skipped")
+        self.assertEqual(moves[0][0], [100, 100, 140, 200])
+        self.assertEqual(moves[0][1:3], (640, 360))
+
     def test_face_locator_runs_every_second_frame_and_reuses_faces(self):
         import app
         face = {"class_name": "face", "confidence": 0.9, "track_id": None, "box": [10, 10, 30, 30], "zoomed": False}

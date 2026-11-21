@@ -32,8 +32,8 @@ DEFAULT_PORT = 8003
 SESSION_COOKIE = "helmet_session"
 MAX_VIDEO_BYTES = 250 * 1024 * 1024
 VIDEO_SUFFIXES = {".mp4", ".mov", ".avi", ".mkv", ".m4v"}
-CODE_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py", "backup.py",
-              "static/index.html", "static/app.js", "static/app.css")
+CODE_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py",
+              "backup.py", "ptz.py", "static/index.html", "static/app.js", "static/app.css")
 CSP = ("default-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; style-src 'self'; "
        "script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
 STATIC_FILES = {"app.js": "text/javascript; charset=utf-8", "app.css": "text/css; charset=utf-8",
@@ -710,6 +710,12 @@ class DashboardServer:
                 # The browser only sees redacted URLs; keep the stored URL when it was not edited.
                 if previous and (not camera.get("url") or camera.get("url") == public_camera(previous)["url"]):
                     camera = {**camera, "url": previous["url"]}
+                # The browser never sees the PTZ password: keep the stored login unless a new one was sent.
+                if previous and previous.get("ptz") and not isinstance(camera.get("ptz"), dict):
+                    camera = {**camera, "ptz": previous["ptz"]}
+                elif previous and previous.get("ptz") and isinstance(camera.get("ptz"), dict) \
+                        and not camera["ptz"].get("password") and camera["ptz"].get("host") == previous["ptz"]["host"]:
+                    camera = {**camera, "ptz": {**previous["ptz"], **{k: v for k, v in camera["ptz"].items() if v}}}
                 incoming.append(camera)
             saved = save_cameras(owner.storage, incoming)
             audit(user, "cameras_saved", f"{len(saved)} cameras", {"names": [camera["name"] for camera in saved]})

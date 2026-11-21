@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+import cv2
 import numpy as np
 
 from event_store import (associate_objects, bulk_apply, clean_expired_events, delete_event, event_stats,
@@ -261,6 +262,17 @@ class EventStoreTests(unittest.TestCase):
         self.assertEqual(normalize_plate("22BH1234AA"), ("22BH1234AA", True))
         self.assertEqual(normalize_plate("dl3cab1234"), ("DL3CAB1234", True))
         self.assertEqual(normalize_plate("HELLO"), ("HELLO", False))
+        self.assertFalse(normalize_plate("SO550882")[1])  # not a real state code
+        self.assertEqual(normalize_plate("TG09AB1234"), ("TG09AB1234", True))
+
+    def test_reads_two_line_square_plate_row_by_row(self):
+        import event_store
+        if not event_store.TESSERACT:
+            self.skipTest("Tesseract is not installed")
+        plate = np.full((120, 200, 3), 255, dtype=np.uint8)
+        cv2.putText(plate, "GJ01AB", (12, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 0), 4)
+        cv2.putText(plate, "1234", (40, 105), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 0), 4)
+        self.assertEqual(read_plate_text(plate), "GJ01AB1234")
 
     def test_query_filters_stats_and_bulk_actions(self):
         with tempfile.TemporaryDirectory() as temp:

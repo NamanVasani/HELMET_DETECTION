@@ -20,7 +20,7 @@ jobs:
       - name: Lint
         run: ruff check .
       - name: Python tests
-        run: python -B -m unittest test_adaptive_zoom test_capture_state test_evaluation test_service test_event_store test_dashboard test_server_features test_manage test_alerts_cameras test_backup test_retrain
+        run: python -B -m unittest test_adaptive_zoom test_capture_state test_evaluation test_service test_event_store test_dashboard test_server_features test_manage test_alerts_cameras test_backup test_retrain test_ptz
       - uses: actions/setup-node@v5
         with:
           node-version: "22"

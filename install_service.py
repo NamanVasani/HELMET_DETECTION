@@ -19,7 +19,7 @@ from urllib.request import urlopen
 LABEL = "com.helmet.dashboard"
 ENTRY = "app.py"
 RUNTIME_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py",
-                 "backup.py", "manage.py", "model-manifest.json")
+                 "backup.py", "ptz.py", "manage.py", "model-manifest.json")
 
 
 def service_config(runtime, lan_hosts=None, tls=None):
