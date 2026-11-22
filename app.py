@@ -1,4 +1,5 @@
 from collections import deque
+import threading
 import time
 import traceback
 import os
@@ -48,8 +49,39 @@ def too_close(detection, frame_height):
     if MAX_HEAD_FRACTION <= 0 or detection.get("zoomed"):
         return False
     return (detection["box"][3] - detection["box"][1]) > MAX_HEAD_FRACTION * frame_height
-# Optional inference device, e.g. HELMET_DEVICE=mps for the Apple GPU (off by default: an MPS run hung once).
-DEVICE = {"device": os.environ["HELMET_DEVICE"]} if os.environ.get("HELMET_DEVICE") else {}
+
+
+def pick_device(choice=None):
+    """Apple GPU when present (2026-11-22: full pipeline 7.1 vs 6.3 fps at 1080p, 3/3 runs, no hangs).
+
+    HELMET_DEVICE=cpu turns it off; any other value (e.g. cuda:0) is passed to ultralytics as is.
+    """
+    choice = os.environ.get("HELMET_DEVICE", "auto") if choice is None else choice
+    if choice in ("", "cpu"):
+        return {}
+    if choice == "auto":
+        try:
+            import torch
+            return {"device": "mps"} if torch.backends.mps.is_available() else {}
+        except Exception:  # noqa: BLE001 - no torch GPU support means CPU
+            return {}
+    return {"device": choice}
+
+
+DEVICE = pick_device()
+
+
+def run_model(call, *args, **kwargs):
+    """Run model.track/predict on DEVICE; if the GPU errors, switch to the CPU for good instead of stopping."""
+    global DEVICE
+    try:
+        return call(*args, **kwargs, **DEVICE)
+    except RuntimeError as error:
+        if not DEVICE:
+            raise
+        print(f"GPU inference failed ({error}); continuing on the CPU.")
+        DEVICE = {}
+        return call(*args, **kwargs)
 EXPECTED_CLASSES = ["helmet", "no-helmet", "number-plate", "rider", "bike"]
 FULL_FRAME_THRESHOLDS = {"helmet": DETECTION_CONFIDENCE, "no-helmet": DETECTION_CONFIDENCE}
 # Plates and bikes are context, not violations, so they use a lower bar. Measured 2026-11-22 on the 462 test
@@ -362,7 +394,32 @@ class SourcePipeline:
         self.recent = deque(maxlen=30)
         self.fps = 0.0
         self.events = 0
+        self.ptz, self.ptz_config = None, None
+        self.ptz_lock = threading.Lock()
         self.reset()
+
+    def configure_ptz(self, config):
+        """Follow distant riders with an ONVIF PTZ camera; None turns it off. Rebuilt only when the login changes."""
+        if config == self.ptz_config:
+            return
+        from ptz import from_config
+        self.ptz_config, self.ptz = config, from_config(config)
+
+    def _steer(self, target, width, height):
+        """Send a PTZ move in the background: a slow or offline camera must never stall detection."""
+        if self.ptz is None or not self.ptz_lock.acquire(blocking=False):
+            return
+        follower, box, now = self.ptz, list(target["box"]) if target else None, time.monotonic()
+
+        def step():
+            try:
+                if box is None:
+                    follower.idle(now)
+                else:
+                    follower.update(box, width, height, now)
+            finally:
+                self.ptz_lock.release()
+        threading.Thread(target=step, daemon=True, name=f"ptz-{self.key}").start()
 
     def reset(self):
         self.captures = CaptureState()
@@ -377,7 +434,8 @@ class SourcePipeline:
         return detection["confidence"] >= threshold
 
     def process(self, frame, source, dashboard, alerts=None, zone=None):
-        result = self.model.track(
+        result = run_model(
+            self.model.track,
             frame,
             persist=True,
             tracker="bytetrack.yaml",
@@ -386,7 +444,6 @@ class SourcePipeline:
             imgsz=INFERENCE_SIZE,
             classes=[0, 1, 2, 3, 4],
             verbose=False,
-            **DEVICE,
         )[0]
         detections = read_detections(result, self.model, locator=True)
         # Faces only steer zoom focus, so refreshing them every FACE_EVERY frames is enough.
@@ -398,14 +455,17 @@ class SourcePipeline:
         detections.extend(faces)
         target = self.captures.select(detections, self.frames, time.monotonic())
         zoomed, region = zoom_region(frame, detections, target)
+        if self.ptz is not None:
+            self._steer(target if target and target.get("class_name") != "face" else None,
+                        frame.shape[1], frame.shape[0])
         focused_head = any(self._qualifies(item) and belongs_to_focus(
             associate_objects(item, detections), target, item
         ) for item in detections if item["class_name"] in {"helmet", "no-helmet"})
         if target and region and not focused_head:
             left, top, zoom = region
-            close_result = self.model.predict(zoomed, conf=min(self.zoom_threshold, *OBJECT_CONFIDENCE.values()),
+            close_result = run_model(self.model.predict, zoomed, conf=min(self.zoom_threshold, *OBJECT_CONFIDENCE.values()),
                                               imgsz=INFERENCE_SIZE,
-                                              classes=[0, 1, 2, 4], verbose=False, **DEVICE)[0]
+                                              classes=[0, 1, 2, 4], verbose=False)[0]
             detections.extend(read_detections(close_result, self.model, min_confidence=self.zoom_threshold,
                                               offset=(left, top), scale=zoom,
                                               track_id_override=target.get("track_id") if target else None))
@@ -585,8 +645,9 @@ def run_detector(dashboard, cameras=None, alerts=None):
                 worked = True
                 source = {"type": "rtsp", "camera": reader.camera["name"], "camera_id": key,
                           "site": reader.camera.get("site", "")}
-                pipeline(f"camera:{key}").process(camera_frame, source, dashboard, alerts,
-                                                  zone=reader.camera.get("zone"))
+                camera_pipeline = pipeline(f"camera:{key}")
+                camera_pipeline.configure_ptz(reader.camera.get("ptz"))
+                camera_pipeline.process(camera_frame, source, dashboard, alerts, zone=reader.camera.get("zone"))
             frame_data = dashboard.next_frame(timeout=0 if worked else 0.05 if cameras and cameras.readers else 1)
             if frame_data is None:
                 continue

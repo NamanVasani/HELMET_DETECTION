@@ -32,8 +32,8 @@ DEFAULT_PORT = 8003
 SESSION_COOKIE = "helmet_session"
 MAX_VIDEO_BYTES = 250 * 1024 * 1024
 VIDEO_SUFFIXES = {".mp4", ".mov", ".avi", ".mkv", ".m4v"}
-CODE_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py", "backup.py",
-              "static/index.html", "static/app.js", "static/app.css")
+CODE_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.py", "cameras.py", "reports_pdf.py",
+              "backup.py", "ptz.py", "static/index.html", "static/app.js", "static/app.css")
 CSP = ("default-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; style-src 'self'; "
        "script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
 STATIC_FILES = {"app.js": "text/javascript; charset=utf-8", "app.css": "text/css; charset=utf-8",
@@ -71,8 +71,8 @@ class HostOriginMiddleware:
         headers = {key.decode("latin-1").lower(): value.decode("latin-1") for key, value in scope["headers"]}
         host = headers.get("host", "").lower()
         origin = headers.get("origin")
-        allowed = self.owner.allowed_hosts()
-        if host not in allowed or (origin is not None and origin not in {f"http://{host}", f"https://{host}"}):
+        if not self.owner.host_allowed(host) or (
+                origin is not None and origin not in {f"http://{host}", f"https://{host}"}):
             response = JSONResponse({"error": "Use this dashboard from its configured address"}, status_code=403)
             return await response(scope, receive, send)
 
@@ -155,8 +155,17 @@ class DashboardServer:
     def allowed_hosts(self):
         hosts = {f"127.0.0.1:{self.port}", f"localhost:{self.port}", f"[::1]:{self.port}"}
         for item in self.extra_hosts:
-            hosts.add(item if ":" in item.rsplit("]", 1)[-1] else f"{item}:{self.port}")
+            if not item.startswith("*."):
+                hosts.add(item if ":" in item.rsplit("]", 1)[-1] else f"{item}:{self.port}")
         return hosts
+
+    def host_allowed(self, host):
+        """Exact host:port entries, plus opt-in "*.domain" entries for HTTPS tunnels (e.g. *.trycloudflare.com)."""
+        if host in self.allowed_hosts():
+            return True
+        name = host[:-4] if host.endswith(":443") else host
+        return ":" not in name and any(item.startswith("*.") and name.endswith(item[1:]) and len(name) > len(item) - 1
+                                       for item in self.extra_hosts)
 
     def _serve(self):
         try:
@@ -710,6 +719,12 @@ class DashboardServer:
                 # The browser only sees redacted URLs; keep the stored URL when it was not edited.
                 if previous and (not camera.get("url") or camera.get("url") == public_camera(previous)["url"]):
                     camera = {**camera, "url": previous["url"]}
+                # The browser never sees the PTZ password: keep the stored login unless a new one was sent.
+                if previous and previous.get("ptz") and not isinstance(camera.get("ptz"), dict):
+                    camera = {**camera, "ptz": previous["ptz"]}
+                elif previous and previous.get("ptz") and isinstance(camera.get("ptz"), dict) \
+                        and not camera["ptz"].get("password") and camera["ptz"].get("host") == previous["ptz"]["host"]:
+                    camera = {**camera, "ptz": {**previous["ptz"], **{k: v for k, v in camera["ptz"].items() if v}}}
                 incoming.append(camera)
             saved = save_cameras(owner.storage, incoming)
             audit(user, "cameras_saved", f"{len(saved)} cameras", {"names": [camera["name"] for camera in saved]})

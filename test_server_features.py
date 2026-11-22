@@ -179,6 +179,22 @@ class ServerFeatureTests(unittest.TestCase):
         response, body = admin.call(f"/api/cameras/{camera_id}/snapshot", raw=True)
         self.assertEqual(body, b"\xff\xd8snapshot")
 
+    def test_ptz_password_is_hidden_and_kept_on_edit(self):
+        admin = self.admin()
+        ptz = {"host": "10.0.0.9", "port": 8080, "username": "admin", "password": "ptz-secret"}
+        saved = admin.call("/api/cameras", {"cameras": [
+            {"name": "Gate PTZ", "url": "rtsp://10.0.0.9/stream", "enabled": True, "ptz": ptz}]}, method="PUT")["cameras"]
+        self.assertNotIn("ptz-secret", json.dumps(saved))
+        listed = admin.call("/api/cameras")["cameras"]
+        self.assertEqual(listed[0]["ptz"], {"host": "10.0.0.9", "port": 8080})
+        admin.call("/api/cameras", {"cameras": [dict(listed[0], name="Gate PTZ north")]}, method="PUT")
+        from cameras import load_cameras
+        self.assertEqual(load_cameras(self.root)[0]["ptz"]["password"], "ptz-secret")
+        self.assertEqual(admin.status_of("/api/cameras", {"cameras": [
+            dict(listed[0], ptz={"host": "10.0.0.9", "port": 99999})]}, method="PUT"), 400)
+        admin.call("/api/cameras", {"cameras": [dict(listed[0], ptz={})]}, method="PUT")
+        self.assertIsNone(load_cameras(self.root)[0]["ptz"])
+
     def test_alert_secrets_are_never_returned(self):
         admin = self.admin()
         shown = admin.call("/api/settings/alerts", {"enabled": True, "webhook_url": "https://hooks.example.test/x",

@@ -28,3 +28,38 @@ class ServiceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TunnelTests(unittest.TestCase):
+    def test_tunnel_mode_trusts_only_quick_tunnel_addresses_with_login(self):
+        runtime = Path("/Users/example/Library/Application Support/Helmet")
+        env = service_config(runtime, ["192.168.1.9:8003"], tunnel=True)["EnvironmentVariables"]
+        self.assertEqual(env["HELMET_AUTH"], "1")
+        self.assertEqual(env["HELMET_ALLOWED_HOSTS"], "192.168.1.9:8003,*.trycloudflare.com")
+        self.assertNotIn("trycloudflare", str(service_config(runtime)))
+
+    def test_wildcard_host_matching_rejects_look_alikes(self):
+        import tempfile
+        from dashboard import DashboardServer
+        with tempfile.TemporaryDirectory() as temp:
+            server = DashboardServer(port=0, storage=Path(temp), allowed_hosts="*.trycloudflare.com,10.0.0.2")
+            plain = DashboardServer(port=0, storage=Path(temp))
+            try:
+                for host in ("calm-river-1.trycloudflare.com", "calm-river-1.trycloudflare.com:443",
+                             f"10.0.0.2:{server.port}", f"127.0.0.1:{server.port}"):
+                    self.assertTrue(server.host_allowed(host), host)
+                for host in ("trycloudflare.com", ".trycloudflare.com", "x.trycloudflare.com.evil.com",
+                             "x.trycloudflare.com:8080", "evil.com", "xtrycloudflare.com"):
+                    self.assertFalse(server.host_allowed(host), host)
+                self.assertFalse(plain.host_allowed("calm-river-1.trycloudflare.com"))
+            finally:
+                server.close()
+                plain.close()
+
+    def test_remote_access_finds_link_and_builds_command(self):
+        from remote_access import find_url, tunnel_command
+        line = "2026-11-22T10:00:00Z INF |  https://calm-river-1.trycloudflare.com                    |"
+        self.assertEqual(find_url(line), "https://calm-river-1.trycloudflare.com")
+        self.assertIsNone(find_url("Requesting new quick Tunnel on https://api.trycloudflare.com..."))
+        self.assertEqual(tunnel_command("cf")[-3:], ["--url", "https://127.0.0.1:8003", "--no-tls-verify"])
+        self.assertEqual(tunnel_command("cf", https=False)[-1], "http://127.0.0.1:8003")

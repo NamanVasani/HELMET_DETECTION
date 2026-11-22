@@ -39,7 +39,25 @@ def validate_camera(camera):
     if not (url.isdigit() or urlsplit(url).scheme in {"rtsp", "rtsps", "http", "https"}):
         raise ValueError("Camera URL must be rtsp://, http(s)://, or a local device number")
     return {"id": str(camera.get("id") or secrets.token_hex(4)), "name": name, "url": url, "site": site,
-            "enabled": bool(camera.get("enabled", True)), "zone": validate_zone(camera.get("zone"))}
+            "enabled": bool(camera.get("enabled", True)), "zone": validate_zone(camera.get("zone")),
+            "ptz": validate_ptz(camera.get("ptz"))}
+
+
+def validate_ptz(ptz):
+    """Optional ONVIF pan/tilt/zoom login: {host, port, username, password, profile}. Empty means no PTZ."""
+    if not isinstance(ptz, dict) or not str(ptz.get("host") or "").strip():
+        return None
+    host = str(ptz["host"]).strip()
+    if not re.fullmatch(r"[A-Za-z0-9.\-:\[\]]{1,100}", host):
+        raise ValueError("PTZ host must be an IP address or host name")
+    try:
+        port = int(ptz.get("port") or 80)
+    except (TypeError, ValueError):
+        raise ValueError("PTZ port must be a number") from None
+    if not 1 <= port <= 65535:
+        raise ValueError("PTZ port must be 1-65535")
+    return {"host": host, "port": port, "username": str(ptz.get("username") or "")[:100],
+            "password": str(ptz.get("password") or "")[:200], "profile": str(ptz.get("profile") or "")[:100]}
 
 
 def validate_zone(zone):
@@ -89,6 +107,7 @@ def save_cameras(root, cameras):
 def public_camera(camera, status=None):
     return {"id": camera["id"], "name": camera["name"], "site": camera.get("site", ""),
             "enabled": camera["enabled"], "url": redact_url(camera["url"]), "zone": camera.get("zone"),
+            "ptz": ({"host": camera["ptz"]["host"], "port": camera["ptz"]["port"]} if camera.get("ptz") else None),
             **(status or {})}
 
 
@@ -179,13 +198,15 @@ class CameraManager:
     def sync(self, cameras=None):
         cameras = load_cameras(self.root) if cameras is None else cameras
         wanted = {camera["id"]: camera for camera in cameras if camera.get("enabled")}
-        signature = sorted((key, value["url"], value["name"], str(value.get("zone"))) for key, value in wanted.items())
+        signature = sorted((key, value["url"], value["name"], str(value.get("zone")), str(value.get("ptz")))
+                           for key, value in wanted.items())
         if signature == self.signature:
             return
         self.signature = signature
         for key, reader in self.readers.items():
             if key in wanted and wanted[key]["url"] == reader.camera["url"]:
-                reader.camera = {**reader.camera, "zone": wanted[key].get("zone")}  # zone edits need no reconnect
+                # zone and PTZ edits need no reconnect
+                reader.camera = {**reader.camera, "zone": wanted[key].get("zone"), "ptz": wanted[key].get("ptz")}
         for key in list(self.readers):
             reader = self.readers[key]
             if key not in wanted or wanted[key]["url"] != reader.camera["url"] or wanted[key]["name"] != reader.camera["name"]:

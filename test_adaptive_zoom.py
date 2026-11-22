@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
@@ -140,6 +141,23 @@ class AdaptiveZoomTests(unittest.TestCase):
         model = type("Model", (), {"names": {0: "rider"}})()
         detections = read_detections(result, model)
         self.assertEqual([item["track_id"] for item in detections], [11, 12])
+
+    def test_device_choice_and_gpu_failure_falls_back_to_cpu(self):
+        import app
+        self.assertEqual(app.pick_device("cpu"), {})
+        self.assertEqual(app.pick_device("cuda:0"), {"device": "cuda:0"})
+        calls = []
+
+        def flaky(frame, **kwargs):
+            calls.append(kwargs)
+            if kwargs.get("device") == "mps":
+                raise RuntimeError("MPS backend out of memory")
+            return "ok"
+
+        with patch.object(app, "DEVICE", {"device": "mps"}):
+            self.assertEqual(app.run_model(flaky, "frame", conf=0.5), "ok")
+            self.assertEqual(app.DEVICE, {})
+        self.assertEqual(calls, [{"conf": 0.5, "device": "mps"}, {"conf": 0.5}])
 
     def test_keeps_less_certain_plates_and_bikes_but_not_heads(self):
         class Scalar:

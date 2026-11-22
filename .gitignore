@@ -35,7 +35,6 @@ __pycache__/
 /node_modules/
 
 # Demo recordings contain dataset footage of real people; publish only after checking dataset licences
-/site/media/
 
 # Machine-specific evaluation scratch files
 /reports/eval-*/*-images.txt
