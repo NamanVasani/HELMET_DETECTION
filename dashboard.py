@@ -71,8 +71,8 @@ class HostOriginMiddleware:
         headers = {key.decode("latin-1").lower(): value.decode("latin-1") for key, value in scope["headers"]}
         host = headers.get("host", "").lower()
         origin = headers.get("origin")
-        allowed = self.owner.allowed_hosts()
-        if host not in allowed or (origin is not None and origin not in {f"http://{host}", f"https://{host}"}):
+        if not self.owner.host_allowed(host) or (
+                origin is not None and origin not in {f"http://{host}", f"https://{host}"}):
             response = JSONResponse({"error": "Use this dashboard from its configured address"}, status_code=403)
             return await response(scope, receive, send)
 
@@ -155,8 +155,17 @@ class DashboardServer:
     def allowed_hosts(self):
         hosts = {f"127.0.0.1:{self.port}", f"localhost:{self.port}", f"[::1]:{self.port}"}
         for item in self.extra_hosts:
-            hosts.add(item if ":" in item.rsplit("]", 1)[-1] else f"{item}:{self.port}")
+            if not item.startswith("*."):
+                hosts.add(item if ":" in item.rsplit("]", 1)[-1] else f"{item}:{self.port}")
         return hosts
+
+    def host_allowed(self, host):
+        """Exact host:port entries, plus opt-in "*.domain" entries for HTTPS tunnels (e.g. *.trycloudflare.com)."""
+        if host in self.allowed_hosts():
+            return True
+        name = host[:-4] if host.endswith(":443") else host
+        return ":" not in name and any(item.startswith("*.") and name.endswith(item[1:]) and len(name) > len(item) - 1
+                                       for item in self.extra_hosts)
 
     def _serve(self):
         try:

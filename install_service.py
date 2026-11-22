@@ -22,7 +22,10 @@ RUNTIME_FILES = ("app.py", "dashboard.py", "event_store.py", "auth.py", "alerts.
                  "backup.py", "ptz.py", "manage.py", "model-manifest.json")
 
 
-def service_config(runtime, lan_hosts=None, tls=None):
+TUNNEL_HOSTS = ("*.trycloudflare.com",)
+
+
+def service_config(runtime, lan_hosts=None, tls=None, tunnel=False):
     config = {"Label": LABEL,
             "ProgramArguments": [str(runtime / ".venv/bin/python"), "-u", str(runtime / ENTRY)],
             "WorkingDirectory": str(runtime), "RunAtLoad": True, "KeepAlive": True,
@@ -37,6 +40,11 @@ def service_config(runtime, lan_hosts=None, tls=None):
                                                "HELMET_ALLOWED_HOSTS": ",".join(lan_hosts)})
     if tls:
         config["EnvironmentVariables"].update({"HELMET_TLS_CERT": str(tls[0]), "HELMET_TLS_KEY": str(tls[1])})
+    if tunnel:
+        # Trust the random https address of a Cloudflare quick tunnel (remote_access.py); login stays required.
+        hosts = [item for item in config["EnvironmentVariables"].get("HELMET_ALLOWED_HOSTS", "").split(",") if item]
+        config["EnvironmentVariables"].update({"HELMET_AUTH": "1",
+                                               "HELMET_ALLOWED_HOSTS": ",".join(hosts + list(TUNNEL_HOSTS))})
     return config
 
 
@@ -157,6 +165,8 @@ def main():
     parser.add_argument("--replace-pid", type=int, help="Existing Helmet PID to replace after preparation")
     parser.add_argument("--check", action="store_true", help="Only report whether the service is up to date")
     parser.add_argument("--lan", action="store_true", help="Also serve phones/computers on the same Wi-Fi (login required)")
+    parser.add_argument("--tunnel", action="store_true",
+                        help="Allow access through a Cloudflare quick tunnel started by remote_access.py (login required)")
     args = parser.parse_args()
     if args.check:
         raise SystemExit(check(args.project.resolve()))
@@ -210,7 +220,7 @@ def main():
         (runtime / "storage").chmod(0o700)
         hosts = lan_hosts() if args.lan else None
         tls = ensure_certificate(runtime, hosts) if args.lan else None
-        agent.write_bytes(plistlib.dumps(service_config(runtime, hosts, tls)))
+        agent.write_bytes(plistlib.dumps(service_config(runtime, hosts, tls, tunnel=args.tunnel)))
         agent.chmod(0o600)
         subprocess.run(["launchctl", "bootstrap", domain, str(agent)], check=True)
         wait_ready()
@@ -218,6 +228,8 @@ def main():
         print(f"Helmet login service ready: {scheme}://127.0.0.1:8003; data: {runtime / 'storage'}")
         for host in hosts or []:
             print(f"  on your Wi-Fi: https://{host}")
+        if args.tunnel:
+            print("  away from home: run  python remote_access.py  and open the https link it prints")
         print("The original data folder remains in storage.before-login-service as a rollback copy.")
     except BaseException:
         subprocess.run(["launchctl", "bootout", job], capture_output=True)

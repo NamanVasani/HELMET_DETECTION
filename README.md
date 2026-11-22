@@ -1,5 +1,35 @@
 # Helmet — rider helmet compliance with human review
 
+**[Live product page](https://namanvasani.github.io/HELMET_DETECTION/)** · **[60-second demo video](https://namanvasani.github.io/HELMET_DETECTION/#demo)** · [CI](.github/workflows/ci.yml)
+
+![Helmet review dashboard](docs/images/review.png)
+
+| Quick review | Analytics | Dark mode |
+|---|---|---|
+| ![Quick review](docs/images/quick-review.png) | ![Analytics](docs/images/analytics.png) | ![Dark mode](docs/images/review-dark.png) |
+
+**What it is:** an end-to-end computer-vision product — a custom-trained YOLOv8 model, a real-time detection pipeline
+for webcams, phones and CCTV, and a secure web dashboard where people review every case before it counts.
+
+**Highlights**
+
+- Custom 5-class YOLOv8n model (helmet, no-helmet, number plate, rider, bike) trained on 5,273 merged images;
+  mAP50 0.745 on a de-duplicated test split, with thresholds frozen on validation data only.
+- Real-time pipeline: ByteTrack tracking, auto-zoom on distant riders (no-helmet recall 0.28 → 0.70 on small
+  crops), 3-frame confirmation, "too close" guard, Apple-GPU inference with automatic CPU fallback.
+- Number plates of every shape (long one-line plates 0/33 → 23/33 found) and two-line plate OCR with Indian
+  state-code validation.
+- Works with browser webcams, **phones** (front/back camera, on-device preview with live boxes), uploaded video and
+  RTSP CCTV, including **ONVIF PTZ** cameras that turn and zoom toward riders.
+- Product features: roles and audit log, quick review with keyboard shortcuts, analytics, CSV/ZIP/PDF exports,
+  WhatsApp/email/webhook alerts, nightly encrypted backups, privacy mode (face blur), DPDP-oriented retention.
+- Engineering: FastAPI + SQLite, strict CSP, scrypt passwords, HTTPS on the LAN, launchd/Docker/systemd deploys,
+  128 Python tests + jsdom browser tests in GitHub Actions, and a guarded retraining loop that never swaps the model
+  without proof it is better.
+
+**Tech:** Python · PyTorch / Ultralytics YOLOv8 · OpenCV · FastAPI · SQLite · vanilla JS · Tesseract OCR · ONVIF ·
+GitHub Actions · Docker
+
 Helmet watches two-wheeler riders on a browser webcam, uploaded video, or CCTV/IP cameras (RTSP). A YOLOv8 model flags
 **helmet** and **no-helmet** riders, links them to a nearby rider, bike and number plate where it can do so without
 ambiguity, and saves evidence for a person to review. Nothing is treated as a violation until a reviewer confirms it.
@@ -10,7 +40,8 @@ It runs on one machine (a Mac, a Linux server or an edge box). All footage, evid
 
 - [Quick start (Mac)](#quick-start-mac)
 - [Using the dashboard](#using-the-dashboard)
-- [CCTV cameras](#cctv-cameras)
+- [CCTV cameras](#cctv-cameras) (incl. PTZ)
+- [Using it away from home](#using-it-away-from-home)
 - [Alerts](#alerts)
 - [Users and roles](#users-and-roles)
 - [Privacy, retention and audit](#privacy-retention-and-audit)
@@ -79,6 +110,34 @@ Use the camera's sub-stream (e.g. 1280×720) — inference runs at 800 px, so 4K
 - Detection throughput is shared: one Apple M4 processes roughly 4–7 frames/s in total (see
   [Model, accuracy and limits](#model-accuracy-and-limits)), so plan about 1–3 cameras per machine.
 - While an uploaded video is being analysed, live sources are paused.
+
+### PTZ cameras (optional)
+
+For an ONVIF camera that can pan, tilt and zoom, add a `ptz` login to its camera entry (via `PUT /api/cameras`):
+
+```json
+{"name": "Gate", "url": "rtsp://…", "ptz": {"host": "192.168.1.50", "port": 80, "username": "admin", "password": "…"}}
+```
+
+Helmet then turns and zooms toward the distant rider it is focusing on — at most one small move per second — and
+returns to the home position after 20 seconds without a target. Moves run in the background, so an offline or slow
+camera never stalls detection; the PTZ password is never sent to the browser. Standard library only. It has been
+tested against a simulated ONVIF camera (`test_ptz.py`), so check it on your camera model before relying on it.
+
+## Using it away from home
+
+`--lan` (below) covers phones on the same Wi-Fi. To open the dashboard from anywhere (mobile data, another network)
+without router changes or an account, use a free Cloudflare quick tunnel:
+
+```bash
+brew install cloudflared
+.venv/bin/python install_service.py --lan --tunnel --replace-pid $(lsof -tnP -iTCP:8003 -sTCP:LISTEN)
+.venv/bin/python remote_access.py      # prints https://<random-words>.trycloudflare.com — Ctrl+C closes it
+```
+
+The link has a real certificate (phone cameras work without warnings), changes every run, and stops working when you
+close it. **Change the admin password first**: the login page is reachable from the internet while the tunnel is open.
+All tunnel visitors share one login rate limit (5 wrong passwords lock sign-in for a minute).
 
 ## Alerts
 
@@ -193,10 +252,17 @@ survive a disk failure. Settings → Privacy shows the last backup.
   0.63 to 0.78 (`reports/zoom-calibration-2026-11-19.json`). Measured on dataset crops, not live footage.
 - Speed: the model itself runs at 22–31 tracked frames/s on an M4 (`reports/speed-2026-11-19.json`); the app's 4–7
   frames/s is set by face detection, the second zoom pass, JPEG work and the browser's frame rate. CoreML and ONNX
-  exports were not faster, so the `.pt` runtime stays.
+  exports were not faster, so the `.pt` runtime stays. The full app pipeline runs 7.1 frames/s on the Apple GPU vs
+  6.3 on the CPU at 1080p (3 runs each, no hangs), so the GPU is used automatically when present.
 - These numbers come from the source datasets, **not** from independent road footage. Night, rain, glare, motion blur
   and camera angles you deploy with must be checked on your own labelled clips before relying on the system.
-- Plate text uses Tesseract and is often wrong on small, angled or dirty plates. Treat it as a hint and correct it.
+- Plates and bikes are kept from 0.35 confidence (helmet/no-helmet still need 0.80). At the old 0.80 no long one-line
+  plate was found (0/33 on the test split); at 0.35 23/33 long and 67/96 square plates are found, 80% precise. Most
+  remaining misses are tiny plates (2–3% of the image height) on vehicles with no detected rider; a second, zoomed
+  look under riders found none of them, so finding those needs retraining with more small-plate images.
+- Plate text uses Tesseract. Square two-line plates are split into rows and read line by line (hand-checked two-line
+  plates: 0% → 53% characters right), and a reading is only accepted as valid with a real Indian state/UT code. It is
+  still often wrong on small, angled or dirty plates — treat it as a hint and correct it.
 - This is a review tool. It does not identify people, prove plate ownership, issue fines or contact authorities.
 
 ### Improving the model with your reviews
@@ -228,12 +294,13 @@ validation only and reports frozen-threshold test results. Never commit API keys
 VIRTUAL_ENV=.venv uv pip install -r requirements-dev.txt && npm install
 .venv/bin/ruff check .
 .venv/bin/python -B -m unittest test_adaptive_zoom test_capture_state test_evaluation test_service test_event_store \
-    test_dashboard test_server_features test_manage test_alerts_cameras test_backup test_retrain
+    test_dashboard test_server_features test_manage test_alerts_cameras test_backup test_retrain test_ptz
 node test_camera_page.js          # dashboard in jsdom: login, review, keyboard, bulk, camera, video, roles, chart
 .venv/bin/python check_usage.py   # real-model replay through upload, detection, storage and preview
 ```
 
-CI runs the same lint and tests on every push (`.github/workflows/ci.yml`).
+CI runs the same lint and tests on every push (`.github/workflows/ci.yml`); `.github/workflows/pages.yml` publishes
+`site/` (the landing page) to GitHub Pages.
 
 | File | Purpose |
 |---|---|
@@ -243,6 +310,9 @@ CI runs the same lint and tests on every push (`.github/workflows/ci.yml`).
 | `auth.py`, `alerts.py`, `cameras.py`, `reports_pdf.py` | accounts, notifications, RTSP readers, PDF reports |
 | `static/` | dashboard UI (no inline script; works under strict CSP) |
 | `manage.py`, `install_service.py` | admin CLI and Mac login service installer |
+| `ptz.py`, `remote_access.py` | ONVIF pan/tilt/zoom follow; Cloudflare quick tunnel for access away from home |
+| `retrain.py` | guarded retraining from reviewed events (never replaces the model by itself) |
+| `site/` | product landing page (published to GitHub Pages) |
 | `evaluate_model.py`, `train.py`, `ml_audit.py`, `pseudo_label.py`, `calibrate_zoom.py`, `export_model.py`, `benchmark_speed.py` | evaluation, training, label audit/fill, zoom calibration, export, speed |
 
 ## Configuration reference
@@ -253,14 +323,15 @@ CI runs the same lint and tests on every push (`.github/workflows/ci.yml`).
 | `HELMET_MODEL` | `best.pt`, then `runs/detect/helmet_v3/weights/best.pt` | checkpoint to load |
 | `HELMET_HOST` | `127.0.0.1` | listen address (`0.0.0.0` in Docker) |
 | `HELMET_AUTH` | `1` | require login |
-| `HELMET_ALLOWED_HOSTS` | — | extra `host[:port]` names browsers use |
+| `HELMET_ALLOWED_HOSTS` | — | extra `host[:port]` names browsers use; `*.domain` entries allow HTTPS tunnels |
 | `HELMET_ADMIN_USER` / `HELMET_ADMIN_PASSWORD` | — | create the first admin if none exists |
 | `HELMET_RETENTION_DAYS` | `30` | delete evidence older than this (`0` = never) |
 | `HELMET_KEEP_CONFIRMED` | `1` | keep confirmed events past retention |
 | `HELMET_PRIVACY` | `1` | blur faces / drop plates for helmet-compliant riders |
 | `HELMET_FACE_EVERY` | `2` | run the face locator every Nth frame (busy scene 3.8 → 4.8 fps, same saved events) |
 | `HELMET_MAX_HEAD_FRACTION` | `0.45` | heads taller than this share of the frame are "too close to judge" (close-up webcam hair was read as a helmet); `0` disables |
-| `HELMET_DEVICE` | — | inference device, e.g. `mps`; off by default (mixed speed results, and one MPS run hung) |
+| `HELMET_DEVICE` | `auto` | `auto` = Apple GPU when present (7.1 vs 6.3 fps), else CPU; `cpu` turns it off; a GPU error falls back to the CPU |
+| `HELMET_PLATE_CONFIDENCE` | `0.35` | minimum confidence for number-plate boxes |
 | `HELMET_BACKUP` | `1` | nightly backups on/off |
 | `HELMET_BACKUP_DIR` / `HELMET_BACKUP_TIME` / `HELMET_BACKUP_KEEP` | `../backups`, `02:00`, `7` | where, when and how many |
 | `HELMET_BACKUP_PASSPHRASE` | — | encrypt backups (AES-256) |
